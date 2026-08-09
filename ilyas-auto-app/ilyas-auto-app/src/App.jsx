@@ -57,8 +57,6 @@ export default function App() {
     )
   }
 
-  // ── Placeholder site public — la vitrine (grille véhicules, fiche, réservation)
-  //    arrive dans la prochaine étape. Le panel admin est déjà 100% fonctionnel. ──
   return (
     <div className="public-placeholder">
       <div style={{ fontSize: 56, marginBottom: 8 }}>🚗</div>
@@ -67,7 +65,6 @@ export default function App() {
       <a href={waLink('Bonjour ILYAS AUTO, je vous contacte depuis votre site web.')} target="_blank" rel="noreferrer">
         💬 Nous contacter sur WhatsApp
       </a>
-      <a href="#admin" className="admin-link">Espace Admin</a>
     </div>
   )
 }
