@@ -6,6 +6,7 @@ function statutOf(key) { return STATUTS.find(s => s.key === key) || STATUTS[0] }
 
 export default function VehicleDetail({ vehicle: v, onClose, onReserve }) {
   const images = Array.isArray(v.images) && v.images.length > 0 ? v.images : (v.img ? [{ url: v.img }] : [])
+  const gallery = Array.isArray(v.images_gallery) ? v.images_gallery : []
   const [idx, setIdx] = useState(0)
   const [lb, setLb] = useState(false)
   const touchX = useRef(null)
@@ -28,14 +29,11 @@ export default function VehicleDetail({ vehicle: v, onClose, onReserve }) {
 
   return (
     <div className="vd-ov">
-      {/* Header sticky (mobile + desktop) */}
-      <div className="vd-hdr">
-        <button className="btn-close" onClick={onClose}>✕</button>
-        <span className="vd-hdr-title">{v.marque} {v.modele}</span>
-      </div>
+      {/* Bouton fermer flottant — ne bloque plus la photo */}
+      <button className="vd-close-float" onClick={onClose}>✕</button>
 
       <div className="vd-layout">
-        {/* ── Colonne galerie ── */}
+        {/* ── Colonne galerie (carrousel) ── */}
         <div className="vd-gallery-col">
           {images.length > 0 ? (
             <div className="vd-gallery" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
@@ -49,7 +47,6 @@ export default function VehicleDetail({ vehicle: v, onClose, onReserve }) {
                 <div className="vd-counter">{idx + 1}/{images.length}</div>
               </>}
               <div className="vd-statut-float" style={{ background: st.color }}>{st.label}</div>
-              <div className="vd-zoom-hint">🔍 Cliquer pour zoomer</div>
             </div>
           ) : (
             <div className="vd-gallery vd-gallery-empty">🚗</div>
@@ -84,7 +81,6 @@ export default function VehicleDetail({ vehicle: v, onClose, onReserve }) {
               <div><img src={flagURI(v.provenance)} style={{ width: 15, height: 11, borderRadius: 2 }} alt="" />{ORIGINS[v.provenance]?.label || 'Monde'}</div>
             </div>
 
-            {/* Réserver — visible en ligne sur desktop */}
             <button className="btn-hero-primary vd-reserve-desktop" disabled={disabled} onClick={() => !disabled && onReserve(v)}>
               {disabled ? '🚫 Véhicule vendu' : '🚘 Réserver ce véhicule'}
             </button>
@@ -107,6 +103,16 @@ export default function VehicleDetail({ vehicle: v, onClose, onReserve }) {
           </div>
         </div>
       </div>
+
+      {/* ── Galerie grand format — pleine largeur, après la description ── */}
+      {gallery.length > 0 && (
+        <div className="vd-gallery-full-wrap">
+          <div className="vd-gallery-full-title">📸 Plus de photos</div>
+          <div className="vd-gallery-full">
+            {gallery.map((img, i) => <img key={i} src={img.url} alt="" loading="lazy" />)}
+          </div>
+        </div>
+      )}
 
       {/* Barre sticky — mobile uniquement */}
       <div className="vd-bottom">
