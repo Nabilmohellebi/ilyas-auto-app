@@ -19,6 +19,7 @@ export default function VehicleForm({ vehicle, onClose, onSave }) {
     description:   vehicle?.description || '',
     specs:         vehicle?.specs ? (typeof vehicle.specs === 'string' ? JSON.parse(vehicle.specs) : vehicle.specs) : [],
     images:        vehicle?.images ? (typeof vehicle.images === 'string' ? JSON.parse(vehicle.images) : vehicle.images) : [],
+    images_gallery: vehicle?.images_gallery ? (typeof vehicle.images_gallery === 'string' ? JSON.parse(vehicle.images_gallery) : vehicle.images_gallery) : [],
     img:           vehicle?.img || '',
     display_order: vehicle?.display_order || 99,
   })
@@ -94,6 +95,26 @@ export default function VehicleForm({ vehicle, onClose, onSave }) {
     if (form.img === removedUrl) set('img', arr[0]?.url || '')
   }
 
+  // ── Galerie grand format (2e catégorie de photos) ──
+  async function handleGalleryFileSelect(e) {
+    const files = Array.from(e.target.files)
+    for (const file of files) {
+      const url = await uploadFile(file)
+      if (url) set('images_gallery', [...form.images_gallery, { url }])
+    }
+    e.target.value = ''
+  }
+  function moveGalleryImg(i, dir) {
+    const j = dir === 'up' ? i - 1 : i + 1
+    if (j < 0 || j >= form.images_gallery.length) return
+    const arr = [...form.images_gallery]
+    ;[arr[i], arr[j]] = [arr[j], arr[i]]
+    set('images_gallery', arr)
+  }
+  function removeGalleryImg(i) {
+    set('images_gallery', form.images_gallery.filter((_, idx) => idx !== i))
+  }
+
   function addSpec() {
     if (!newSpec.trim()) return
     set('specs', [...form.specs, newSpec.trim()])
@@ -119,6 +140,7 @@ export default function VehicleForm({ vehicle, onClose, onSave }) {
       description:   form.description,
       specs:         form.specs,
       images:        form.images,
+      images_gallery: form.images_gallery,
       img:           form.img || form.images[0]?.url || null,
       display_order: Number(form.display_order) || 99,
     })
@@ -287,6 +309,51 @@ export default function VehicleForm({ vehicle, onClose, onSave }) {
               </div>
             )}
             {form.images.length === 0 && <div style={{ textAlign: 'center', padding: 12, color: 'rgba(255,255,255,.2)', fontSize: 12 }}>Aucune photo — ajoutez-en ci-dessus</div>}
+          </div>
+
+          {/* ── Galerie grand format (2e catégorie) ── */}
+          <div className="pf-section">
+            <h3>📜 Galerie grand format</h3>
+            <p style={{ fontSize: 12, color: 'rgba(255,255,255,.4)', marginBottom: 10, lineHeight: 1.5 }}>
+              Ces photos s'affichent en bas de la fiche véhicule, <strong>après la description</strong>, en grand format (une par ligne). Utile pour montrer plus de détails : intérieur, coffre, moteur...
+            </p>
+            <label className="upload-zone"
+              onDragOver={e => e.preventDefault()}
+              onDrop={async e => {
+                e.preventDefault()
+                const files = Array.from(e.dataTransfer.files)
+                for (const f of files) {
+                  const url = await uploadFile(f)
+                  if (url) set('images_gallery', [...form.images_gallery, { url }])
+                }
+              }}
+            >
+              <input type="file" accept="image/*" multiple onChange={handleGalleryFileSelect} />
+              <div style={{ fontSize: 26, marginBottom: 4 }}>📸</div>
+              <div style={{ fontSize: 13, color: 'rgba(255,255,255,.5)' }}>
+                {uploading ? '⏳ Upload en cours...' : 'Cliquer ou glisser des photos ici'}
+              </div>
+            </label>
+
+            {form.images_gallery.length > 0 && (
+              <div style={{ marginTop: 10 }}>
+                {form.images_gallery.map((img, i) => (
+                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6, background: '#1b1b23', border: '1px solid rgba(255,255,255,.08)', borderRadius: 10, padding: '7px 10px' }}>
+                    <div style={{ width: 18, height: 18, borderRadius: '50%', background: '#e63946', color: '#fff', fontSize: 10, fontWeight: 900, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>{i + 1}</div>
+                    {img.url && <img src={img.url} alt="" style={{ width: 48, height: 48, borderRadius: 8, objectFit: 'cover', flexShrink: 0 }} />}
+                    <div style={{ flex: 1, fontSize: 11, color: 'rgba(255,255,255,.4)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {img.url?.split('/').pop()?.slice(-20)}
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                      <button onClick={() => moveGalleryImg(i, 'up')} disabled={i === 0} style={{ background: i > 0 ? 'rgba(255,255,255,.1)' : 'transparent', border: 'none', borderRadius: 4, width: 22, height: 18, color: i > 0 ? 'white' : 'rgba(255,255,255,.15)', cursor: i > 0 ? 'pointer' : 'default', fontSize: 9 }}>▲</button>
+                      <button onClick={() => moveGalleryImg(i, 'down')} disabled={i === form.images_gallery.length - 1} style={{ background: i < form.images_gallery.length - 1 ? 'rgba(255,255,255,.1)' : 'transparent', border: 'none', borderRadius: 4, width: 22, height: 18, color: i < form.images_gallery.length - 1 ? 'white' : 'rgba(255,255,255,.15)', cursor: i < form.images_gallery.length - 1 ? 'pointer' : 'default', fontSize: 9 }}>▼</button>
+                    </div>
+                    <button onClick={() => removeGalleryImg(i)} style={{ background: 'rgba(230,57,70,.12)', border: '1px solid rgba(230,57,70,.25)', borderRadius: 6, color: '#ffb3b8', cursor: 'pointer', fontSize: 11, padding: '3px 8px', fontWeight: 800 }}>✕</button>
+                  </div>
+                ))}
+              </div>
+            )}
+            {form.images_gallery.length === 0 && <div style={{ textAlign: 'center', padding: 12, color: 'rgba(255,255,255,.2)', fontSize: 12 }}>Aucune photo galerie</div>}
           </div>
 
           {/* ── Ordre affichage ── */}
