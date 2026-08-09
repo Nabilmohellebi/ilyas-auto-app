@@ -1,9 +1,8 @@
 import { useState } from 'react'
 import AdminLogin from './components/admin/AdminLogin'
 import AdminPanel from './components/admin/AdminPanel'
+import PublicSite from './components/PublicSite'
 import { getSettings } from './utils/useSettings'
-import { waLink } from './utils/notify'
-import CONFIG from './config'
 
 export default function App() {
   const [isAdmin] = useState(() =>
@@ -57,14 +56,5 @@ export default function App() {
     )
   }
 
-  return (
-    <div className="public-placeholder">
-      <div style={{ fontSize: 56, marginBottom: 8 }}>🚗</div>
-      <h1>ILYAS <em>AUTO</em></h1>
-      <p>{CONFIG.slogan}<br/>Le site vitrine arrive très bientôt — contactez-nous dès maintenant sur WhatsApp.</p>
-      <a href={waLink('Bonjour ILYAS AUTO, je vous contacte depuis votre site web.')} target="_blank" rel="noreferrer">
-        💬 Nous contacter sur WhatsApp
-      </a>
-    </div>
-  )
+  return <PublicSite />
 }
