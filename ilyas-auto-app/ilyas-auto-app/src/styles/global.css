@@ -1,0 +1,274 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&display=swap');
+
+/* ═══════════════════════════════════════════════════════
+   ILYAS AUTO — Dark Sport CSS
+   Rouge / Noir · inspiré du style showroom automobile
+═══════════════════════════════════════════════════════ */
+
+* { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+input, select, textarea, button { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+input:not([type="checkbox"]):not([type="radio"]), select, textarea { font-size: 16px !important; }
+
+:root {
+  --bk:    #0b0b0e;
+  --bk2:   #0f0f13;
+  --card:  #16161d;
+  --card2: #1b1b23;
+  --card3: #202028;
+  --brd:   #26262f;
+  --brd2:  #2e2e38;
+  --br:    #e63946;   /* rouge sport = accent principal */
+  --br2:   #c1121f;
+  --br3:   #ff5a63;
+  --glow:  rgba(230,57,70,.22);
+  --g3:    rgba(255,255,255,.92);
+  --g4:    rgba(255,255,255,.48);
+  --g5:    rgba(255,255,255,.18);
+  --g6:    rgba(255,255,255,.07);
+  --wa:    #25D366;
+  --red:   #e63946;
+  --green: #22c55e;
+  --ff:    'Montserrat', system-ui, sans-serif;
+  --fb:    'Montserrat', system-ui, sans-serif;
+  --r:     12px;
+  --r2:    18px;
+  --sh:    0 8px 32px rgba(0,0,0,.6);
+  --sh2:   0 2px 12px rgba(0,0,0,.4);
+  --red-sh: 0 0 24px rgba(230,57,70,.3);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bk);
+  color: var(--g3);
+  font-family: var(--fb);
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+button { cursor: pointer; font-family: var(--fb); }
+img { display: block; max-width: 100%; }
+input, select, textarea { font-family: var(--fb); outline: none; }
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(230,57,70,.35); border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(230,57,70,.55); }
+
+.app { min-height: 100vh; display: flex; flex-direction: column; position: relative; z-index: 1; }
+
+/* ═══════════════════════════════════════════════════
+   PLACEHOLDER SITE PUBLIC (phase 1 = admin uniquement)
+═══════════════════════════════════════════════════ */
+.public-placeholder {
+  min-height: 100vh; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; text-align: center;
+  padding: 32px 20px; background: radial-gradient(ellipse at top, rgba(230,57,70,.08), var(--bk) 60%);
+}
+.public-placeholder h1 {
+  font-family: var(--ff); font-weight: 900; letter-spacing: -.02em;
+  font-size: clamp(30px, 7vw, 54px); color: white; margin-bottom: 10px;
+}
+.public-placeholder h1 em { color: var(--br); font-style: normal; }
+.public-placeholder p { color: var(--g4); font-size: 15px; max-width: 420px; line-height: 1.7; margin-bottom: 24px; }
+.public-placeholder a {
+  background: linear-gradient(135deg, var(--br), var(--br2));
+  color: white; text-decoration: none; font-weight: 800; font-size: 14px;
+  padding: 13px 28px; border-radius: 12px; transition: transform .2s, box-shadow .2s;
+}
+.public-placeholder a:hover { transform: translateY(-2px); box-shadow: var(--red-sh); }
+.public-placeholder .admin-link { margin-top: 30px; color: var(--g5); font-size: 12px; text-decoration: underline; }
+
+/* ═══════════════════════════════════════════════════
+   TOAST
+═══════════════════════════════════════════════════ */
+.toasts {
+  position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%);
+  z-index: 999; display: flex; flex-direction: column; gap: 8px; align-items: center; pointer-events: none;
+}
+.toast-msg {
+  background: rgba(20,20,24,.97); border: 1px solid rgba(255,255,255,.12);
+  border-radius: 12px; padding: 11px 20px; font-size: 13.5px; font-weight: 600; color: white;
+  backdrop-filter: blur(12px); box-shadow: 0 8px 32px rgba(0,0,0,.5); white-space: nowrap;
+  animation: toastIn .3s cubic-bezier(.22,1,.36,1);
+}
+.toast-msg.error { border-color: rgba(230,57,70,.45); color: #ffb3b8; background: rgba(230,57,70,.12); }
+@keyframes toastIn { from { opacity:0; transform: translateY(12px) scale(.92); } to { opacity:1; transform: translateY(0) scale(1); } }
+
+/* ═══════════════════════════════════════════════════
+   LOGIN ADMIN
+═══════════════════════════════════════════════════ */
+.login-wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px;
+  background: radial-gradient(ellipse at top, rgba(230,57,70,.1), var(--bk) 65%); }
+.login-box {
+  background: linear-gradient(160deg, #181820 0%, #0f0f13 100%);
+  border: 1px solid rgba(230,57,70,.25);
+  border-radius: 22px; padding: 44px 32px; width: min(380px, 100%); text-align: center;
+  box-shadow: 0 0 60px rgba(230,57,70,.1), 0 32px 80px rgba(0,0,0,.6);
+}
+.login-box h1 { font-family: var(--ff); font-size: 26px; font-weight: 900; color: white; margin: 16px 0 6px; letter-spacing: -.02em; }
+.login-box h1 em { color: var(--br); font-style: normal; }
+.login-box p { color: var(--g4); font-size: 14px; margin-bottom: 26px; }
+.login-box input {
+  width: 100%; background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.1);
+  border-radius: 12px; padding: 13px 16px; color: white; font-size: 15px; margin-bottom: 12px; transition: all .2s;
+}
+.login-box input:focus { border-color: rgba(230,57,70,.5); background: rgba(230,57,70,.06); box-shadow: 0 0 0 3px rgba(230,57,70,.1); }
+.login-box button {
+  width: 100%; background: linear-gradient(135deg, var(--br), var(--br2));
+  border: none; border-radius: 12px; padding: 14px; color: white; font-size: 15px; font-weight: 900; transition: all .25s;
+}
+.login-box button:hover { box-shadow: 0 6px 24px rgba(230,57,70,.45); transform: translateY(-1px); }
+.login-error { color: var(--br3); font-size: 12.5px; font-weight: 700; margin-bottom: 10px; }
+.login-hint { font-size: 11px; color: var(--g5); margin-top: 14px; line-height: 1.6; }
+
+/* ═══════════════════════════════════════════════════
+   ADMIN — Layout général
+═══════════════════════════════════════════════════ */
+.adm { min-height: 100vh; background: var(--bk); display: flex; flex-direction: column; }
+.adm-top {
+  background: rgba(11,11,14,.97); border-bottom: 1px solid rgba(230,57,70,.18);
+  padding: 0 24px; height: 60px; display: flex; align-items: center;
+  gap: 16px; position: sticky; top: 0; z-index: 50; backdrop-filter: blur(12px); flex-wrap: wrap;
+}
+.adm-logo { font-family: var(--ff); font-size: 18px; font-weight: 900; color: white; display: flex; align-items: center; gap: 8px; letter-spacing: -.02em; }
+.adm-logo em { color: var(--br); font-style: normal; }
+.adm-badge { font-size: 10px; background: rgba(230,57,70,.15); color: var(--br3); font-weight: 800; padding: 3px 9px; border-radius: 20px; letter-spacing: .04em; }
+.adm-tabs { display: flex; gap: 4px; margin-left: auto; flex-wrap: wrap; }
+.adm-tab {
+  background: none; border: 1px solid transparent; border-radius: 10px;
+  padding: 7px 16px; color: var(--g4); font-size: 13px; font-weight: 700; transition: all .2s; white-space: nowrap;
+}
+.adm-tab.active { background: rgba(230,57,70,.14); border-color: rgba(230,57,70,.35); color: var(--br3); }
+.adm-tab:hover:not(.active) { color: white; border-color: var(--brd2); }
+.adm-logout {
+  background: none; border: 1px solid var(--brd); border-radius: 8px;
+  padding: 6px 12px; color: var(--g4); font-size: 12px; font-weight: 700; transition: all .2s;
+}
+.adm-logout:hover { color: var(--br3); border-color: rgba(230,57,70,.35); }
+.adm-body { flex: 1; padding: 24px; max-width: 1280px; margin: 0 auto; width: 100%; }
+
+.adm-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; margin-bottom: 24px; }
+.stat-card { background: var(--card); border: 1px solid var(--brd); border-radius: var(--r); padding: 18px; transition: all .2s; }
+.stat-card:hover { border-color: rgba(230,57,70,.3); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,.4); }
+.stat-card .label { font-size: 11px; font-weight: 700; color: var(--g4); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 8px; }
+.stat-card .value { font-family: var(--ff); font-size: 26px; font-weight: 900; color: white; }
+.stat-card .value.red { color: var(--br3); }
+
+.adm-toolbar { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; align-items: center; }
+.adm-search {
+  background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.1);
+  border-radius: 10px; padding: 9px 14px; color: white; font-size: 13px; flex: 1; min-width: 180px; transition: all .2s;
+}
+.adm-search:focus { border-color: rgba(230,57,70,.4); background: rgba(230,57,70,.05); }
+
+.filter-btn {
+  background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08);
+  border-radius: 9px; padding: 8px 13px; color: rgba(255,255,255,.5); font-size: 12px; font-weight: 700; transition: all .2s; white-space: nowrap;
+}
+.filter-btn.active { background: rgba(230,57,70,.15); border-color: rgba(230,57,70,.4); color: var(--br3); }
+
+.act-btn {
+  background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.1);
+  border-radius: 9px; padding: 7px 13px; color: rgba(255,255,255,.75); font-size: 12px; font-weight: 700; transition: all .2s;
+}
+.act-btn:hover { border-color: rgba(230,57,70,.4); color: var(--br3); background: rgba(230,57,70,.08); }
+.act-btn.danger:hover { border-color: rgba(230,57,70,.5); color: #ffb3b8; background: rgba(230,57,70,.1); }
+.act-btn.wa { background: rgba(37,211,102,.08); border-color: rgba(37,211,102,.25); color: #86efac; }
+.act-btn.primary { background: var(--br); border-color: var(--br); color: white; }
+.act-btn.primary:hover { background: var(--br2); color: white; }
+
+.empty { text-align: center; padding: 60px 20px; color: var(--g4); }
+.empty p { font-size: 14px; margin-top: 10px; }
+.spinner { text-align: center; padding: 60px; color: var(--g4); font-size: 14px; }
+
+/* ── Grille véhicules (admin) ── */
+.adm-vgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; }
+.adm-vcard { background: var(--card); border: 1px solid var(--brd); border-radius: var(--r); overflow: hidden; transition: all .2s; position: relative; }
+.adm-vcard:hover { border-color: rgba(230,57,70,.3); transform: translateY(-2px); }
+.adm-vcard-img { height: 140px; display: flex; align-items: center; justify-content: center; background: var(--card2); overflow: hidden; position: relative; }
+.adm-vcard-img img { width: 100%; height: 100%; object-fit: cover; transition: transform .3s; }
+.adm-vcard:hover .adm-vcard-img img { transform: scale(1.05); }
+.adm-vcard-statut { position: absolute; top: 8px; left: 8px; font-size: 10px; font-weight: 800; padding: 3px 9px; border-radius: 20px; color: #0b0b0e; letter-spacing: .02em; }
+.adm-vcard-body { padding: 12px 14px; }
+.adm-vcard-name { font-size: 13.5px; font-weight: 800; color: white; margin-bottom: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.adm-vcard-sub { font-size: 11px; color: var(--g4); margin-bottom: 8px; }
+.adm-vcard-price { font-family: var(--ff); font-size: 17px; color: var(--br3); font-weight: 900; margin-bottom: 10px; }
+.adm-vcard-actions { display: flex; gap: 6px; }
+.adm-vcard-actions .act-btn { flex: 1; text-align: center; font-size: 11.5px; padding: 6px 8px; }
+
+/* ── Réservations ── */
+.rescard { background: var(--card); border: 1px solid var(--brd); border-radius: var(--r); padding: 16px; margin-bottom: 10px; transition: border-color .2s; }
+.rescard.new { border-color: rgba(230,57,70,.35); background: rgba(230,57,70,.03); }
+.rescard-top { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
+.rescard-veh { font-weight: 900; color: white; font-size: 14.5px; }
+.rescard-date { font-size: 11px; color: var(--g5); }
+.res-badge { font-size: 10px; font-weight: 800; padding: 3px 10px; border-radius: 20px; letter-spacing: .04em; white-space: nowrap; }
+.res-badge.nouvelle   { background: rgba(230,57,70,.15); color: var(--br3); }
+.res-badge.contactee  { background: rgba(59,130,246,.14); color: #93c5fd; }
+.res-badge.vendue     { background: rgba(34,197,94,.14); color: #86efac; }
+.res-badge.annulee    { background: rgba(255,255,255,.08); color: var(--g4); }
+.rescard-info { font-size: 13px; color: var(--g3); display: flex; flex-direction: column; gap: 3px; margin-bottom: 12px; }
+.rescard-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+/* ── Formulaire véhicule (modal) ── */
+.pf-ov {
+  position: fixed; inset: 0; background: rgba(0,0,0,.88); backdrop-filter: blur(6px);
+  z-index: 400; display: flex; align-items: flex-start; justify-content: center; padding: 20px; overflow-y: auto;
+}
+.pf {
+  background: var(--bk); border: 1px solid rgba(230,57,70,.2); border-radius: 20px;
+  width: min(700px, 100%); margin: auto; display: flex; flex-direction: column;
+}
+.pf-hdr { padding: 18px 24px; border-bottom: 1px solid var(--brd); display: flex; align-items: center; justify-content: space-between; }
+.pf-hdr h2 { font-family: var(--ff); font-size: 19px; font-weight: 800; color: white; }
+.pf-body { padding: 24px; display: flex; flex-direction: column; gap: 16px; max-height: 70vh; overflow-y: auto; }
+.pf-section { border: 1px solid var(--brd); border-radius: var(--r); padding: 16px; }
+.pf-section h3 { font-size: 12px; font-weight: 800; color: var(--br3); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 14px; }
+.pf-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.pf-footer { padding: 16px 24px; border-top: 1px solid var(--brd); display: flex; gap: 10px; justify-content: flex-end; }
+
+.form-field { display: flex; flex-direction: column; gap: 5px; }
+.form-field label { font-size: 11px; font-weight: 800; color: rgba(255,255,255,.45); text-transform: uppercase; letter-spacing: .06em; }
+.form-field input, .form-field select, .form-field textarea {
+  background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.1);
+  border-radius: 9px; padding: 10px 13px; color: white; font-size: 14px; transition: all .2s; width: 100%; font-family: inherit;
+}
+.form-field input:focus, .form-field select:focus, .form-field textarea:focus {
+  border-color: rgba(230,57,70,.45); background: rgba(230,57,70,.05); box-shadow: 0 0 0 3px rgba(230,57,70,.1);
+}
+.form-field select option { background: var(--card2); }
+.form-field textarea { resize: vertical; min-height: 60px; }
+
+.btn-cancel { background: rgba(255,255,255,.05); border: 1px solid var(--brd); border-radius: 10px; padding: 10px 20px; color: white; font-size: 14px; font-weight: 700; transition: all .2s; }
+.btn-cancel:hover { border-color: rgba(255,255,255,.2); }
+.btn-save { background: linear-gradient(135deg, var(--br), var(--br2)); border: none; border-radius: 10px; padding: 10px 24px; color: white; font-size: 14px; font-weight: 900; transition: all .2s; }
+.btn-save:hover { box-shadow: 0 4px 16px rgba(230,57,70,.4); transform: translateY(-1px); }
+.btn-save:disabled { opacity: .4; cursor: not-allowed; }
+.btn-close { background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1); border-radius: 10px; width: 34px; height: 34px; color: white; font-size: 16px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all .2s; }
+.btn-close:hover { background: rgba(255,255,255,.12); color: var(--br3); border-color: rgba(230,57,70,.3); }
+
+.upload-zone { border: 2px dashed rgba(255,255,255,.14); border-radius: 12px; padding: 20px; text-align: center; cursor: pointer; transition: all .2s; margin-bottom: 8px; }
+.upload-zone:hover, .upload-zone.drag { border-color: rgba(230,57,70,.5); background: rgba(230,57,70,.05); }
+.upload-zone input { display: none; }
+
+.statut-pill { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 800; cursor: pointer; transition: all .2s; border: 2px solid transparent; }
+
+/* ═══════════════════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════════════════ */
+@media (max-width: 640px) {
+  .adm-top { padding: 10px 14px; height: auto; }
+  .adm-tabs { gap: 4px; }
+  .adm-tab { font-size: 11.5px; padding: 6px 10px; }
+  .adm-body { padding: 14px; }
+  .adm-stats { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .stat-card { padding: 12px; }
+  .stat-card .value { font-size: 20px; }
+  .pf-grid { grid-template-columns: 1fr; }
+  .pf-body { padding: 14px; max-height: 75vh; }
+  .adm-vgrid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .toasts { bottom: 16px; right: 14px; left: 14px; }
+}
