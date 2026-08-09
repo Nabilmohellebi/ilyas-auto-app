@@ -21,11 +21,6 @@ export default function AdminLogin({ onLogin, error }) {
           autoFocus
         />
         <button onClick={() => onLogin(pw)}>Connexion →</button>
-
-        <div className="login-hint">
-          💡 Mot de passe par défaut : <strong>ilyas2026</strong><br/>
-          (à changer dans Paramètres une fois connecté)
-        </div>
       </div>
     </div>
   )
