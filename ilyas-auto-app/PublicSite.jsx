@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react'
 import { supabase } from '../supabase'
 import { fmt, waLink } from '../utils/notify'
 import { ORIGINS, flagURI, STATUTS, PLACEHOLDER_IMG } from '../data/vehicles-data'
+import { getSettings } from '../utils/useSettings'
 import ReservationModal from './ReservationModal'
 import VehicleDetail from './VehicleDetail'
 import AnnouncementBar from './AnnouncementBar'
@@ -18,6 +19,7 @@ export default function PublicSite() {
   const [reserveVehicle, setReserveVehicle] = useState(null)
   const [openVehicle, setOpenVehicle] = useState(null)
   const [trackingOpen, setTrackingOpen] = useState(false)
+  const [settings, setSettings] = useState({})
 
   const [search, setSearch] = useState('')
   const [brand, setBrand] = useState('all')
@@ -36,7 +38,22 @@ export default function PublicSite() {
       setLoading(false)
     }
     load()
+    getSettings().then(setSettings)
   }, [])
+
+  // ── Infos boutique : ce qui est réglé dans Admin → Paramètres prend le dessus,
+  //    sinon on retombe sur les valeurs par défaut de config.js ──
+  const s = useMemo(() => ({
+    nom:        settings.shop_name       || CONFIG.nom,
+    telephone:  settings.shop_phone      || CONFIG.telephone,
+    whatsapp:   settings.shop_whatsapp   || CONFIG.whatsapp,
+    adresse:    settings.shop_address    || CONFIG.adresse,
+    horaires:   settings.shop_horaires   || CONFIG.horaires,
+    mapsUrl:    settings.shop_maps_url   || CONFIG.mapsUrl,
+    mapsEmbed:  settings.shop_maps_embed || CONFIG.mapsEmbed,
+    facebook:   CONFIG.facebook,
+    instagram:  CONFIG.instagram,
+  }), [settings])
 
   const brands = useMemo(() => [...new Set(vehicles.map(v => v.marque))].sort(), [vehicles])
 
@@ -70,8 +87,8 @@ export default function PublicSite() {
   }
 
   function waDirect(v) {
-    const text = `Bonjour ${CONFIG.nom}, je suis intéressé par la ${v.marque} ${v.modele} (${v.annee}) affichée à ${fmt(v.prix)}. Est-elle toujours disponible ?`
-    window.open(waLink(text), '_blank')
+    const text = `Bonjour ${s.nom}, je suis intéressé par la ${v.marque} ${v.modele} (${v.annee}) affichée à ${fmt(v.prix)}. Est-elle toujours disponible ?`
+    window.open(waLink(text, s.whatsapp), '_blank')
   }
 
   return (
@@ -89,7 +106,7 @@ export default function PublicSite() {
             <a onClick={() => scrollTo('stock')} href="#stock">Notre Stock</a>
             <a onClick={() => scrollTo('showroom')} href="#showroom">Showroom</a>
             <a onClick={() => setTrackingOpen(true)} href="#" onClickCapture={e => e.preventDefault()}>Suivi commande</a>
-            <a href={waLink('Bonjour ' + CONFIG.nom + ', je vous contacte depuis votre site web.')} target="_blank" rel="noreferrer" className="nav-wa-btn">💬 WhatsApp</a>
+            <a href={waLink('Bonjour ' + s.nom + ', je vous contacte depuis votre site web.', s.whatsapp)} target="_blank" rel="noreferrer" className="nav-wa-btn">💬 WhatsApp</a>
           </div>
           <button className="nav-burger" onClick={() => setMobileOpen(o => !o)}>☰</button>
         </div>
@@ -98,7 +115,7 @@ export default function PublicSite() {
           <a onClick={() => scrollTo('stock')} href="#stock">Notre Stock</a>
           <a onClick={() => scrollTo('showroom')} href="#showroom">Showroom</a>
           <a onClick={e => { e.preventDefault(); setMobileOpen(false); setTrackingOpen(true) }} href="#">Suivi commande</a>
-          <a href={waLink('Bonjour ' + CONFIG.nom + ', je vous contacte depuis votre site web.')} target="_blank" rel="noreferrer">💬 WhatsApp</a>
+          <a href={waLink('Bonjour ' + s.nom + ', je vous contacte depuis votre site web.', s.whatsapp)} target="_blank" rel="noreferrer">💬 WhatsApp</a>
         </div>
       </nav>
 
@@ -111,7 +128,7 @@ export default function PublicSite() {
             Import direct : France · Allemagne · Monde
           </div>
           <h1>VOTRE PROCHAINE VOITURE<br /><span>VIENT D'EUROPE</span></h1>
-          <p>Véhicules neufs & occasion, contrôlés et disponibles immédiatement au showroom {CONFIG.nom}, {CONFIG.adresse}.</p>
+          <p>Véhicules neufs & occasion, contrôlés et disponibles immédiatement au showroom {s.nom}, {s.adresse}.</p>
           <div className="hero-cta">
             <a href="#stock" onClick={e => { e.preventDefault(); scrollTo('stock') }} className="btn-hero-primary">🚗 Voir le stock</a>
             <a href="#showroom" onClick={e => { e.preventDefault(); scrollTo('showroom') }} className="btn-hero-secondary">📍 Visiter le showroom</a>
@@ -230,22 +247,22 @@ export default function PublicSite() {
           <div>
             <div className="showroom-info-row">
               <span className="ic">📍</span>
-              <div><h4>Adresse</h4><p>{CONFIG.nom} — Showroom & parc d'exposition<br />{CONFIG.adresse}</p></div>
+              <div><h4>Adresse</h4><p>{s.nom} — Showroom & parc d'exposition<br />{s.adresse}</p></div>
             </div>
             <div className="showroom-info-row">
               <span className="ic">📞</span>
-              <div><h4>Téléphone / WhatsApp</h4><p>+{CONFIG.telephone}</p></div>
+              <div><h4>Téléphone / WhatsApp</h4><p>+{s.telephone}</p></div>
             </div>
             <div className="showroom-info-row">
               <span className="ic">🕐</span>
-              <div><h4>Horaires</h4><p>{CONFIG.horaires}</p></div>
+              <div><h4>Horaires</h4><p>{s.horaires}</p></div>
             </div>
-            <a href={CONFIG.mapsUrl} target="_blank" rel="noreferrer" className="btn-hero-primary" style={{ marginTop: 10 }}>
+            <a href={s.mapsUrl} target="_blank" rel="noreferrer" className="btn-hero-primary" style={{ marginTop: 10 }}>
               🧭 Itinéraire GPS (Google Maps)
             </a>
           </div>
           <div className="showroom-map">
-            <iframe title="Showroom" src={CONFIG.mapsEmbed} loading="lazy" />
+            <iframe title="Showroom" src={s.mapsEmbed} loading="lazy" />
           </div>
         </div>
       </section>
@@ -255,19 +272,19 @@ export default function PublicSite() {
         <div className="footer-auto-inner">
           <div>
             <div className="footer-logo">ILYAS<em>AUTO</em></div>
-            <div className="footer-sub">© {new Date().getFullYear()} {CONFIG.nom} — Tous droits réservés.</div>
+            <div className="footer-sub">© {new Date().getFullYear()} {s.nom} — Tous droits réservés.</div>
           </div>
           <div className="footer-social">
-            <a href={waLink('Bonjour ' + CONFIG.nom)} target="_blank" rel="noreferrer">💬</a>
+            <a href={waLink('Bonjour ' + s.nom, s.whatsapp)} target="_blank" rel="noreferrer">💬</a>
             <button onClick={() => setTrackingOpen(true)} className="footer-track-btn">📦 Suivre ma réservation</button>
-            {CONFIG.facebook && <a href={CONFIG.facebook} target="_blank" rel="noreferrer">📘</a>}
-            {CONFIG.instagram && <a href={CONFIG.instagram} target="_blank" rel="noreferrer">📷</a>}
+            {s.facebook && <a href={s.facebook} target="_blank" rel="noreferrer">📘</a>}
+            {s.instagram && <a href={s.instagram} target="_blank" rel="noreferrer">📷</a>}
           </div>
         </div>
       </footer>
 
       {/* ── WhatsApp flottant ── */}
-      <a className="wa-float" href={waLink('Bonjour ' + CONFIG.nom + ', je vous contacte depuis votre site web.')} target="_blank" rel="noreferrer">💬</a>
+      <a className="wa-float" href={waLink('Bonjour ' + s.nom + ', je vous contacte depuis votre site web.', s.whatsapp)} target="_blank" rel="noreferrer">💬</a>
 
       {/* ── Fiche détail véhicule ── */}
       {openVehicle && (
