@@ -1,8 +1,36 @@
 import { useState, useRef } from 'react'
 import { fmt } from '../utils/notify'
 import { ORIGINS, flagURI, STATUTS, PLACEHOLDER_IMG } from '../data/vehicles-data'
+import FinancingCalculator from './FinancingCalculator'
 
 function statutOf(key) { return STATUTS.find(s => s.key === key) || STATUTS[0] }
+
+function getEmbedUrl(url) {
+  if (!url) return null
+  url = url.trim()
+  if (url.includes('youtube.com') || url.includes('youtu.be')) {
+    let id = null
+    try {
+      if (url.includes('youtu.be/')) id = url.split('youtu.be/')[1]?.split(/[?&#]/)[0]
+      else if (url.includes('youtube.com/shorts/')) id = url.split('youtube.com/shorts/')[1]?.split(/[?&#]/)[0]
+      else id = new URL(url).searchParams.get('v')
+    } catch { id = null }
+    return id ? { type: 'youtube', src: `https://www.youtube.com/embed/${id}?rel=0&modestbranding=1` } : null
+  }
+  if (url.includes('tiktok.com')) {
+    const id = url.match(/\/video\/([0-9]+)/)?.[1] || url.match(/([0-9]{15,})/)?.[1]
+    if (id) return { type: 'tiktok', src: `https://www.tiktok.com/embed/v2/${id}` }
+    return { type: 'external', src: url }
+  }
+  if (url.includes('instagram.com/reel') || url.includes('instagram.com/p/')) {
+    const id = url.match(/\/(?:reel|p)\/([A-Za-z0-9_-]+)/)?.[1]
+    if (id) return { type: 'instagram', src: `https://www.instagram.com/p/${id}/embed/` }
+  }
+  if (url.includes('facebook.com') && url.includes('video')) {
+    return { type: 'facebook', src: `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(url)}&show_text=false` }
+  }
+  return { type: 'external', src: url }
+}
 
 export default function VehicleDetail({ vehicle: v, onClose, onReserve }) {
   const images = Array.isArray(v.images) && v.images.length > 0 ? v.images : (v.img ? [{ url: v.img }] : [])
@@ -47,6 +75,7 @@ export default function VehicleDetail({ vehicle: v, onClose, onReserve }) {
                 <div className="vd-counter">{idx + 1}/{images.length}</div>
               </>}
               <div className="vd-statut-float" style={{ background: st.color }}>{st.label}</div>
+              {disabled && <div className="stamp-sold">Vendu</div>}
             </div>
           ) : (
             <div className="vd-gallery vd-gallery-empty">🚗</div>
@@ -85,12 +114,40 @@ export default function VehicleDetail({ vehicle: v, onClose, onReserve }) {
               {disabled ? '🚫 Véhicule vendu' : '🚘 Réserver ce véhicule'}
             </button>
 
+            {/* Vidéo */}
+            {v.video_url && (() => {
+              const embed = getEmbedUrl(v.video_url)
+              if (!embed) return null
+              if (embed.type === 'external') {
+                const isTikTok = embed.src.includes('tiktok')
+                const isInsta = embed.src.includes('instagram')
+                const icon = isTikTok ? '🎵' : isInsta ? '📸' : '▶️'
+                const platform = isTikTok ? 'TikTok' : isInsta ? 'Instagram' : 'Voir la vidéo'
+                return (
+                  <a href={embed.src} target="_blank" rel="noreferrer" className="vd-video-card">
+                    <div className="ic">{icon}</div>
+                    <div>
+                      <div className="txt-title">Voir la vidéo {platform}</div>
+                      <div className="txt-sub">Appuyez pour regarder la vidéo du véhicule</div>
+                    </div>
+                  </a>
+                )
+              }
+              return (
+                <div className="vd-video-embed" style={{ paddingBottom: embed.type === 'tiktok' ? '150%' : '56.25%' }}>
+                  <iframe src={embed.src} allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen loading="lazy" />
+                </div>
+              )
+            })()}
+
             {v.description && (
               <div className="vd-section">
                 <h3>📝 Description</h3>
                 <p className="vd-description">{v.description}</p>
               </div>
             )}
+
+            {!disabled && <FinancingCalculator prix={v.prix} />}
 
             {specs.length > 0 && (
               <div className="vd-section">
