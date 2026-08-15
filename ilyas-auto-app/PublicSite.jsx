@@ -4,6 +4,9 @@ import { fmt, waLink } from '../utils/notify'
 import { ORIGINS, flagURI, STATUTS, PLACEHOLDER_IMG } from '../data/vehicles-data'
 import ReservationModal from './ReservationModal'
 import VehicleDetail from './VehicleDetail'
+import AnnouncementBar from './AnnouncementBar'
+import TrackingPage from './TrackingPage'
+import VehicleGallery from './VehicleGallery'
 import CONFIG from '../config'
 
 function statutOf(key) { return STATUTS.find(s => s.key === key) || STATUTS[0] }
@@ -14,11 +17,13 @@ export default function PublicSite() {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [reserveVehicle, setReserveVehicle] = useState(null)
   const [openVehicle, setOpenVehicle] = useState(null)
+  const [trackingOpen, setTrackingOpen] = useState(false)
 
   const [search, setSearch] = useState('')
   const [brand, setBrand] = useState('all')
   const [origin, setOrigin] = useState('all')
   const [budget, setBudget] = useState('all')
+  const [sort, setSort] = useState('default')
 
   useEffect(() => {
     async function load() {
@@ -35,6 +40,11 @@ export default function PublicSite() {
 
   const brands = useMemo(() => [...new Set(vehicles.map(v => v.marque))].sort(), [vehicles])
 
+  const recentVehicles = useMemo(
+    () => [...vehicles].sort((a, b) => new Date(b.created_at) - new Date(a.created_at)),
+    [vehicles]
+  )
+
   const filtered = vehicles.filter(v => {
     if (brand !== 'all' && v.marque !== brand) return false
     if (origin !== 'all' && v.provenance !== origin) return false
@@ -43,6 +53,15 @@ export default function PublicSite() {
     if (budget === 'high' && v.prix <= 7000000) return false
     if (search && !`${v.marque} ${v.modele}`.toLowerCase().includes(search.toLowerCase())) return false
     return true
+  })
+
+  const sorted = [...filtered].sort((a, b) => {
+    if (sort === 'price_asc') return a.prix - b.prix
+    if (sort === 'price_desc') return b.prix - a.prix
+    if (sort === 'year_desc') return b.annee - a.annee
+    if (sort === 'year_asc') return a.annee - b.annee
+    if (sort === 'km_asc') return (a.km || 0) - (b.km || 0)
+    return (a.display_order || 99) - (b.display_order || 99)
   })
 
   function scrollTo(id) {
@@ -57,6 +76,10 @@ export default function PublicSite() {
 
   return (
     <div className="app">
+      {/* ── Bande nouveautés & promos — tout en haut ── */}
+      {!loading && <VehicleGallery vehicles={recentVehicles} onVehicleClick={setOpenVehicle} />}
+
+      <AnnouncementBar />
       {/* ── Navigation ── */}
       <nav className="nav">
         <div className="nav-inner">
@@ -65,6 +88,7 @@ export default function PublicSite() {
             <a onClick={() => scrollTo('accueil')} href="#accueil">Accueil</a>
             <a onClick={() => scrollTo('stock')} href="#stock">Notre Stock</a>
             <a onClick={() => scrollTo('showroom')} href="#showroom">Showroom</a>
+            <a onClick={() => setTrackingOpen(true)} href="#" onClickCapture={e => e.preventDefault()}>Suivi commande</a>
             <a href={waLink('Bonjour ' + CONFIG.nom + ', je vous contacte depuis votre site web.')} target="_blank" rel="noreferrer" className="nav-wa-btn">💬 WhatsApp</a>
           </div>
           <button className="nav-burger" onClick={() => setMobileOpen(o => !o)}>☰</button>
@@ -73,6 +97,7 @@ export default function PublicSite() {
           <a onClick={() => scrollTo('accueil')} href="#accueil">Accueil</a>
           <a onClick={() => scrollTo('stock')} href="#stock">Notre Stock</a>
           <a onClick={() => scrollTo('showroom')} href="#showroom">Showroom</a>
+          <a onClick={e => { e.preventDefault(); setMobileOpen(false); setTrackingOpen(true) }} href="#">Suivi commande</a>
           <a href={waLink('Bonjour ' + CONFIG.nom + ', je vous contacte depuis votre site web.')} target="_blank" rel="noreferrer">💬 WhatsApp</a>
         </div>
       </nav>
@@ -128,18 +153,26 @@ export default function PublicSite() {
             <option value="mid">4 000 000 – 7 000 000 DA</option>
             <option value="high">Plus de 7 000 000 DA</option>
           </select>
+          <select value={sort} onChange={e => setSort(e.target.value)}>
+            <option value="default">Tri par défaut</option>
+            <option value="price_asc">Prix croissant</option>
+            <option value="price_desc">Prix décroissant</option>
+            <option value="year_desc">Année (récent)</option>
+            <option value="year_asc">Année (ancien)</option>
+            <option value="km_asc">Kilométrage (moins)</option>
+          </select>
         </div>
 
         {loading ? (
           <div className="spinner">Chargement du stock…</div>
-        ) : filtered.length === 0 ? (
+        ) : sorted.length === 0 ? (
           <div className="empty">
             <div style={{ fontSize: 44 }}>🚗</div>
             <p>{vehicles.length === 0 ? 'Aucun véhicule en ligne pour le moment.' : 'Aucun véhicule ne correspond à vos critères.'}</p>
           </div>
         ) : (
           <div className="veh-grid">
-            {filtered.map(v => {
+            {sorted.map(v => {
               const disc = v.prix_old && v.prix_old > v.prix ? Math.round(100 - (v.prix / v.prix_old) * 100) : 0
               const st = statutOf(v.statut)
               const disabled = v.statut === 'vendu'
@@ -152,6 +185,7 @@ export default function PublicSite() {
                       {ORIGINS[v.provenance]?.label || 'Monde'}
                     </div>
                     {v.badge && <div className="veh-badge-tag">{v.badge}</div>}
+                    {v.statut === 'vendu' && <div className="stamp-sold">Vendu</div>}
                     <img src={v.img || PLACEHOLDER_IMG} alt={v.marque} />
                     <div className="veh-price-strip">
                       <span className="price">{fmt(v.prix)}</span>
@@ -225,6 +259,7 @@ export default function PublicSite() {
           </div>
           <div className="footer-social">
             <a href={waLink('Bonjour ' + CONFIG.nom)} target="_blank" rel="noreferrer">💬</a>
+            <button onClick={() => setTrackingOpen(true)} className="footer-track-btn">📦 Suivre ma réservation</button>
             {CONFIG.facebook && <a href={CONFIG.facebook} target="_blank" rel="noreferrer">📘</a>}
             {CONFIG.instagram && <a href={CONFIG.instagram} target="_blank" rel="noreferrer">📷</a>}
           </div>
@@ -245,6 +280,9 @@ export default function PublicSite() {
 
       {/* ── Modal réservation ── */}
       {reserveVehicle && <ReservationModal vehicle={reserveVehicle} onClose={() => setReserveVehicle(null)} />}
+
+      {/* ── Suivi de réservation ── */}
+      {trackingOpen && <TrackingPage onClose={() => setTrackingOpen(false)} />}
     </div>
   )
 }
