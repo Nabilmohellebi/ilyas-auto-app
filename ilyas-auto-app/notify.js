@@ -51,8 +51,8 @@ export function openWA(reservation) {
   window.open(`https://wa.me/${normalized}?text=${buildWAMessage(reservation)}`, '_blank')
 }
 
-// Lien WA générique (bouton flottant, footer, etc.)
-export function waLink(text) {
-  const phone = CONFIG.whatsapp || '213550123456'
-  return `https://wa.me/${phone}?text=${encodeURIComponent(text)}`
+// Lien WA générique (bouton flottant, footer, etc.) — phone optionnel, sinon celui de config.js
+export function waLink(text, phone) {
+  const p = phone || CONFIG.whatsapp || '213550123456'
+  return `https://wa.me/${p}?text=${encodeURIComponent(text)}`
 }
