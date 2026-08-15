@@ -20,6 +20,7 @@ export default function VehicleForm({ vehicle, onClose, onSave }) {
     specs:         vehicle?.specs ? (typeof vehicle.specs === 'string' ? JSON.parse(vehicle.specs) : vehicle.specs) : [],
     images:        vehicle?.images ? (typeof vehicle.images === 'string' ? JSON.parse(vehicle.images) : vehicle.images) : [],
     images_gallery: vehicle?.images_gallery ? (typeof vehicle.images_gallery === 'string' ? JSON.parse(vehicle.images_gallery) : vehicle.images_gallery) : [],
+    video_url:     vehicle?.video_url || '',
     img:           vehicle?.img || '',
     display_order: vehicle?.display_order || 99,
   })
@@ -31,10 +32,11 @@ export default function VehicleForm({ vehicle, onClose, onSave }) {
 
   async function uploadFile(file) {
     setUploading(true)
+    const isGif = file.type === 'image/gif' || (file.name || '').toLowerCase().endsWith('.gif')
     let fileToUpload = file
     let ext = (file.name || '').split('.').pop()?.toLowerCase() || 'jpg'
 
-    if (file.size > 350 * 1024) {
+    if (!isGif && file.size > 350 * 1024) {
       try {
         fileToUpload = await new Promise(resolve => {
           const img = new Image()
@@ -59,7 +61,8 @@ export default function VehicleForm({ vehicle, onClose, onSave }) {
     }
 
     const path = `vehicles/${Date.now()}.${ext}`
-    const { error } = await supabase.storage.from('vehicle-images').upload(path, fileToUpload, { upsert: true })
+    const opts = isGif ? { contentType: 'image/gif', upsert: true } : { upsert: true }
+    const { error } = await supabase.storage.from('vehicle-images').upload(path, fileToUpload, opts)
     setUploading(false)
 
     if (error) { alert('Erreur upload : ' + error.message); return null }
@@ -141,6 +144,7 @@ export default function VehicleForm({ vehicle, onClose, onSave }) {
       specs:         form.specs,
       images:        form.images,
       images_gallery: form.images_gallery,
+      video_url:     form.video_url || null,
       img:           form.img || form.images[0]?.url || null,
       display_order: Number(form.display_order) || 99,
     })
@@ -235,6 +239,25 @@ export default function VehicleForm({ vehicle, onClose, onSave }) {
                 >{s.label}</div>
               ))}
             </div>
+          </div>
+
+          {/* ── Vidéo ── */}
+          <div className="pf-section">
+            <h3>🎬 Vidéo du véhicule (optionnel)</h3>
+            <p style={{ fontSize: 12, color: 'rgba(255,255,255,.4)', marginBottom: 10, lineHeight: 1.5 }}>
+              Colle un lien YouTube, TikTok ou Instagram. La vidéo s'affichera sur la fiche du véhicule.
+            </p>
+            <input
+              placeholder="https://youtube.com/watch?v=... ou https://tiktok.com/..."
+              value={form.video_url}
+              onChange={e => set('video_url', e.target.value)}
+              style={{ background: '#1b1b23', border: '1px solid rgba(255,255,255,.1)', borderRadius: 9, padding: '10px 13px', color: 'white', fontSize: 13, outline: 'none', width: '100%', boxSizing: 'border-box' }}
+            />
+            {form.video_url && (
+              <div style={{ marginTop: 8, background: 'rgba(230,57,70,.08)', border: '1px solid rgba(230,57,70,.2)', borderRadius: 8, padding: '8px 12px', fontSize: 12, color: '#ff5a63' }}>
+                ✅ Lien vidéo enregistré
+              </div>
+            )}
           </div>
 
           {/* ── Description ── */}
@@ -346,33 +369,4 @@ export default function VehicleForm({ vehicle, onClose, onSave }) {
                     </div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                       <button onClick={() => moveGalleryImg(i, 'up')} disabled={i === 0} style={{ background: i > 0 ? 'rgba(255,255,255,.1)' : 'transparent', border: 'none', borderRadius: 4, width: 22, height: 18, color: i > 0 ? 'white' : 'rgba(255,255,255,.15)', cursor: i > 0 ? 'pointer' : 'default', fontSize: 9 }}>▲</button>
-                      <button onClick={() => moveGalleryImg(i, 'down')} disabled={i === form.images_gallery.length - 1} style={{ background: i < form.images_gallery.length - 1 ? 'rgba(255,255,255,.1)' : 'transparent', border: 'none', borderRadius: 4, width: 22, height: 18, color: i < form.images_gallery.length - 1 ? 'white' : 'rgba(255,255,255,.15)', cursor: i < form.images_gallery.length - 1 ? 'pointer' : 'default', fontSize: 9 }}>▼</button>
-                    </div>
-                    <button onClick={() => removeGalleryImg(i)} style={{ background: 'rgba(230,57,70,.12)', border: '1px solid rgba(230,57,70,.25)', borderRadius: 6, color: '#ffb3b8', cursor: 'pointer', fontSize: 11, padding: '3px 8px', fontWeight: 800 }}>✕</button>
-                  </div>
-                ))}
-              </div>
-            )}
-            {form.images_gallery.length === 0 && <div style={{ textAlign: 'center', padding: 12, color: 'rgba(255,255,255,.2)', fontSize: 12 }}>Aucune photo galerie</div>}
-          </div>
-
-          {/* ── Ordre affichage ── */}
-          <div className="pf-section">
-            <h3>🔢 Ordre d'affichage</h3>
-            <div className="form-field" style={{ maxWidth: 200 }}>
-              <label>Position (1 = en premier)</label>
-              <input type="number" value={form.display_order} onChange={e => set('display_order', e.target.value)} />
-            </div>
-          </div>
-        </div>
-
-        <div className="pf-footer">
-          <button className="btn-cancel" onClick={onClose}>Annuler</button>
-          <button className="btn-save" onClick={handleSave} disabled={!form.marque || !form.modele || !form.prix}>
-            {isEdit ? '💾 Enregistrer' : '➕ Ajouter au stock'}
-          </button>
-        </div>
-      </div>
-    </div>
-  )
-}
+                      <button onClick={() => moveGalleryImg(i, 'down')} disabled={i === form.images_gallery.length - 1} style={{ background: i < form.images_gallery.length - 1 ? 'rgba(255,255,255,.1)' : 'transparent', border: 'none', borderRadius: 4, width: 22, height: 18, color: i < 
