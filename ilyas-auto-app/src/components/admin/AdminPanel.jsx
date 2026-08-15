@@ -119,6 +119,8 @@ export default function AdminPanel({ onLogout, onToast }) {
   const [tab, setTab] = useState('vehicules')
   const [vehicles, setVehicles] = useState([])
   const [reservations, setReservations] = useState([])
+  const [bannerMsgs, setBannerMsgs] = useState([])
+  const [newMsg, setNewMsg] = useState('')
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [filterStatut, setFilterStatut] = useState('all')
@@ -136,7 +138,66 @@ export default function AdminPanel({ onLogout, onToast }) {
     setReservations(data || [])
   }, [])
 
-  useEffect(() => { loadVehicles(); loadReservations() }, [])
+  useEffect(() => { loadVehicles(); loadReservations(); loadBanner() }, [])
+
+  async function loadBanner() {
+    const { data } = await supabase.from('banner_messages').select('*').order('position', { ascending: true })
+    setBannerMsgs(data || [])
+  }
+  async function addMsg() {
+    const msg = newMsg.trim()
+    if (!msg) return
+    const pos = bannerMsgs.length + 1
+    await supabase.from('banner_messages').insert({ message: msg, actif: true, position: pos })
+    setNewMsg('')
+    loadBanner()
+  }
+  async function toggleMsg(id, actif) {
+    await supabase.from('banner_messages').update({ actif }).eq('id', id)
+    setBannerMsgs(prev => prev.map(m => m.id === id ? { ...m, actif } : m))
+  }
+  async function deleteMsg(id) {
+    await supabase.from('banner_messages').delete().eq('id', id)
+    setBannerMsgs(prev => prev.filter(m => m.id !== id))
+  }
+  async function moveMsg(id, dir) {
+    const idx = bannerMsgs.findIndex(m => m.id === id)
+    const swapIdx = dir === 'up' ? idx - 1 : idx + 1
+    if (swapIdx < 0 || swapIdx >= bannerMsgs.length) return
+    const a = bannerMsgs[idx], b = bannerMsgs[swapIdx]
+    await supabase.from('banner_messages').update({ position: b.position }).eq('id', a.id)
+    await supabase.from('banner_messages').update({ position: a.position }).eq('id', b.id)
+    loadBanner()
+  }
+
+  function exportReservationsExcel() {
+    const rows = reservations.map(r => ({
+      'N° Réservation': r.id,
+      'Date': new Date(r.created_at).toLocaleDateString('fr-FR'),
+      'Heure': new Date(r.created_at).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }),
+      'Véhicule': r.vehicule_nom,
+      'Prix (DA)': r.vehicule_prix,
+      'Client': r.nom_client,
+      'Téléphone': r.telephone,
+      'Message': r.message || '',
+      'Statut': r.statut,
+    }))
+    if (rows.length === 0) { onToast('Aucune réservation à exporter', 'error'); return }
+    const cols = Object.keys(rows[0])
+    const bom = '\uFEFF'
+    const csv = bom + [cols.join(';'), ...rows.map(r => cols.map(c => {
+      const val = String(r[c] ?? '').replace(/"/g, '""')
+      return val.includes(';') || val.includes('\n') ? `"${val}"` : val
+    }).join(';'))].join('\n')
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `ilyas-auto-reservations-${new Date().toISOString().slice(0, 10)}.csv`
+    a.click()
+    URL.revokeObjectURL(url)
+    onToast(`✅ ${rows.length} réservations exportées`, 'default')
+  }
 
   async function saveVehicle(data) {
     if (data.id) {
@@ -198,7 +259,7 @@ export default function AdminPanel({ onLogout, onToast }) {
       <div className="adm-top">
         <div className="adm-logo">ILYAS <em>AUTO</em> <span className="adm-badge">ADMIN</span></div>
         <div className="adm-tabs">
-          {[['vehicules', '🚘 Véhicules'], ['reservations', '📩 Réservations'], ['settings', '⚙️ Paramètres']].map(([k, l]) => (
+          {[['vehicules', '🚘 Véhicules'], ['reservations', '📩 Réservations'], ['banniere', '📢 Bannière'], ['settings', '⚙️ Paramètres']].map(([k, l]) => (
             <button key={k} className={`adm-tab ${tab === k ? 'active' : ''}`} onClick={() => setTab(k)}>{l}</button>
           ))}
         </div>
@@ -269,6 +330,7 @@ export default function AdminPanel({ onLogout, onToast }) {
                   {k === 'all' ? 'Toutes' : RES_STATUTS.find(s => s.key === k).label}
                 </button>
               ))}
+              <button className="act-btn" style={{ marginLeft: 'auto' }} onClick={exportReservationsExcel}>📥 Export Excel ({reservations.length})</button>
             </div>
 
             {filteredRes.length === 0 ? (
@@ -297,6 +359,50 @@ export default function AdminPanel({ onLogout, onToast }) {
                 </div>
               </div>
             ))}
+          </div>
+        )}
+
+        {/* ── TAB BANNIÈRE ── */}
+        {tab === 'banniere' && (
+          <div>
+            <h3 style={{ color: 'white', fontSize: 16, fontWeight: 800, marginBottom: 8 }}>📢 Messages de la bannière défilante</h3>
+            <p style={{ color: 'rgba(255,255,255,.4)', fontSize: 12, marginBottom: 20 }}>
+              Ces messages s'affichent en haut du site en défilement (annonces, promos...).
+            </p>
+
+            <div style={{ display: 'flex', gap: 8, marginBottom: 20 }}>
+              <input
+                className="adm-search"
+                style={{ flex: 1 }}
+                placeholder="Ex : 🔥 Nouveaux arrivages chaque semaine"
+                value={newMsg}
+                onChange={e => setNewMsg(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && addMsg()}
+              />
+              <button className="act-btn primary" onClick={addMsg}>+ Ajouter</button>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {bannerMsgs.map(m => (
+                <div key={m.id} style={{
+                  display: 'flex', alignItems: 'center', gap: 10,
+                  background: m.actif ? 'var(--card)' : '#111116',
+                  border: `1px solid ${m.actif ? 'rgba(230,57,70,.2)' : 'rgba(255,255,255,.06)'}`,
+                  borderRadius: 10, padding: '10px 14px', opacity: m.actif ? 1 : .5,
+                }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                    <button onClick={() => moveMsg(m.id, 'up')} style={{ background: 'none', border: 'none', color: '#666', cursor: 'pointer', fontSize: 11, padding: 2 }}>▲</button>
+                    <button onClick={() => moveMsg(m.id, 'down')} style={{ background: 'none', border: 'none', color: '#666', cursor: 'pointer', fontSize: 11, padding: 2 }}>▼</button>
+                  </div>
+                  <span style={{ flex: 1, fontSize: 13, color: m.actif ? 'white' : '#777' }}>{m.message}</span>
+                  <button onClick={() => toggleMsg(m.id, !m.actif)} className="act-btn" style={{ background: m.actif ? 'rgba(34,197,94,.1)' : undefined, color: m.actif ? '#86efac' : undefined }}>
+                    {m.actif ? '✅ Actif' : '⏸ Inactif'}
+                  </button>
+                  <button onClick={() => deleteMsg(m.id)} className="act-btn danger">🗑</button>
+                </div>
+              ))}
+              {bannerMsgs.length === 0 && <div className="empty"><p>Aucun message — ajoutes-en un ci-dessus !</p></div>}
+            </div>
           </div>
         )}
 
