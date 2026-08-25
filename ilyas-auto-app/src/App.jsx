@@ -1,19 +1,34 @@
 import { useState, useEffect } from 'react'
 import { supabase } from './supabase'
 import CONFIG from './config'
-import { fr, ar } from './translations'
 import './global.css'
 
-// ── Components (à adapter selon ta structure réelle) ──
-// Tu dois importer tes vrais composants ici :
-// import PublicPage from './components/PublicPage'
-// import AdminLogin from './components/AdminLogin'
-// import AdminPanel from './components/AdminPanel'
+// ── Traductions inline (pas besoin de fichier externe) ──
+const fr = {
+  login: { erreur: 'Mot de passe incorrect' },
+  nav: { accueil: 'Accueil', stock: 'Notre Stock', showroom: 'Showroom', suivi: 'Suivi commande', whatsapp: 'WhatsApp' },
+  hero: { voirStock: '🚗 Voir le stock', visiterShowroom: '📍 Visiter le showroom' },
+  footer: { droits: 'Tous droits réservés.', suivre: '📦 Suivre ma réservation' },
+  statut: { disponible: '✅ Disponible', reserve: '⏳ Réservé', vendu: '🚫 Vendu' },
+  reservation: { titre: 'Réserver ce véhicule', envoyer: '📩 Envoyer', fermer: 'Fermer', erreur: 'Une erreur est survenue' },
+  tracking: { titre: '📦 Suivi de réservation', aucune: 'Aucune réservation trouvée.' },
+}
 
+const ar = {
+  login: { erreur: 'كلمة المرور غير صحيحة' },
+  nav: { accueil: 'الرئيسية', stock: 'مخزوننا', showroom: 'صالة العرض', suivi: 'تتبع الطلب', whatsapp: 'واتساب' },
+  hero: { voirStock: '🚗 عرض المخزون', visiterShowroom: '📍 زيارة صالة العرض' },
+  footer: { droits: 'جميع الحقوق محفوظة.', suivre: '📦 تتبع حجزي' },
+  statut: { disponible: '✅ متوفرة', reserve: '⏳ محجوزة', vendu: '🚫 مباعة' },
+  reservation: { titre: 'احجز هذه السيارة', envoyer: '📩 إرسال', fermer: 'إغلاق', erreur: 'حدث خطأ' },
+  tracking: { titre: '📦 تتبع الحجز', aucune: 'لم يتم العثور على حجز.' },
+}
+
+// ═══════════════════════════════════════════════════════
+// APP PRINCIPAL
+// ═══════════════════════════════════════════════════════
 function App() {
-  // ═══════════════════════════════════════════════════════
-  // FIX #1 : Lit le hash au démarrage — plus besoin de refresh !
-  // ═══════════════════════════════════════════════════════
+  // FIX #1 : Lit le hash au démarrage
   const getInitialView = () => {
     const hash = window.location.hash.replace('#', '').trim()
     return hash === 'admin' ? 'admin' : 'public'
@@ -25,16 +40,13 @@ function App() {
 
   const t = lang === 'ar' ? ar : fr
 
-  // ═══════════════════════════════════════════════════════
-  // FIX #2 : Écoute les changements de hash en temps réel
-  // ═══════════════════════════════════════════════════════
+  // FIX #2 : Écoute les changements de hash
   useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash.replace('#', '').trim()
       setView(hash === 'admin' ? 'admin' : 'public')
     }
     window.addEventListener('hashchange', handleHashChange)
-    // Vérifie aussi au cas où le hash serait déjà présent au mount
     handleHashChange()
     return () => window.removeEventListener('hashchange', handleHashChange)
   }, [])
@@ -42,12 +54,10 @@ function App() {
   // ── Admin password check ──
   const checkAdminPassword = async (pwd) => {
     const envPwd = import.meta.env.VITE_ADMIN_PASSWORD
-    // Vérifie d'abord le mot de passe en dur dans .env
     if (envPwd && pwd === envPwd) {
       setAdminAuth(true)
       return true
     }
-    // Sinon vérifie dans Supabase settings
     try {
       const { data } = await supabase
         .from('settings')
@@ -62,10 +72,6 @@ function App() {
     return false
   }
 
-  // ═══════════════════════════════════════════════════════
-  // RENDU
-  // ═══════════════════════════════════════════════════════
-
   // ── Page Admin ──
   if (view === 'admin') {
     if (!adminAuth) {
@@ -79,7 +85,7 @@ function App() {
 }
 
 // ═══════════════════════════════════════════════════════
-// PLACEHOLDERS — Remplace par tes vrais composants
+// SOUS-COMPOSANTS
 // ═══════════════════════════════════════════════════════
 
 function AdminLogin({ onLogin, t }) {
@@ -162,3 +168,5 @@ function PublicPage({ t, lang, setLang, config }) {
     </div>
   )
 }
+
+export default App
