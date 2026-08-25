@@ -6,14 +6,14 @@ let cacheTime = 0
 const CACHE_TTL = 2 * 60 * 1000 // 2 minutes
 
 const DEFAULTS = {
-  shop_name:       'Ilyas Auto',
-  shop_phone:      '213550123456',
-  shop_whatsapp:   '213550123456',
-  shop_email:      'contact@ilyasauto.com',
-  shop_address:    'Boumerdès, Algérie',
+  shop_name:       'HBR Auto',
+  shop_phone:      '213782705193',
+  shop_whatsapp:   '213781866576',
+  shop_email:      'contact@hbrauto.com',
+  shop_address:    'Alger, Algérie',  // ← REMPLACE par ton adresse exacte
   shop_horaires:   'Samedi – Jeudi : 09h00 – 19h00 · Vendredi : fermé',
-  shop_maps_url:   'https://www.google.com/maps/place/ILYAS+AUTO/@36.7436498,4.3255931,17z',
-  shop_maps_embed: 'https://maps.google.com/maps?q=36.7436498,4.3277685&z=16&output=embed',
+  shop_maps_url:   'https://maps.app.goo.gl/mrnBnx1ZRXTS4xoi6?g_st=ac',
+  shop_maps_embed: 'https://www.google.com/maps/embed?pb=PLACEHOLDER',  // ← REMPLACE par le vrai lien embed
   maintenance:     'false',
   admin_password:  '', // si vide → on retombe sur VITE_ADMIN_PASSWORD
 }
