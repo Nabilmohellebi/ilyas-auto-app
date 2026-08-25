@@ -1,16 +1,16 @@
 // ══════════════════════════════════════════════
-//  CONFIG ILYAS AUTO — Modifier ici directement
+//  CONFIG HBR AUTO — Modifier ici directement
 // ══════════════════════════════════════════════
 
 const CONFIG = {
   // ── Infos showroom ──
-  nom:      'Ilyas Auto',
+  nom:      'HBR Auto',
   slogan:   'Importation & Vente de Véhicules · Algérie 🇩🇿',
-  adresse:  'Boumerdès, Algérie',
+  adresse:  'Alger, Algérie',  // ← REMPLACE par ton adresse exacte
 
   // ── Contact ──
   telephone: '213550123456',   // Format international sans +
-  email:     'contact@ilyasauto.com',
+  email:     'contact@hbrauto.com',
   whatsapp:  '213550123456',
 
   // ── Réseaux sociaux ──
@@ -19,8 +19,9 @@ const CONFIG = {
   tiktok:    '',
 
   // ── Showroom ──
-  mapsUrl: 'https://www.google.com/maps/place/ILYAS+AUTO/@36.7436498,4.3255931,17z',
-  mapsEmbed: 'https://maps.google.com/maps?q=36.7436498,4.3277685&z=16&output=embed',
+  mapsUrl: 'https://maps.app.goo.gl/mrnBnx1ZRXTS4xoi6?g_st=ac',
+  // Pour l'embed : va sur ton lien Google Maps → Partager → Intégrer une carte → copie le src de l'iframe
+  mapsEmbed: 'https://www.google.com/maps/embed?pb=PLACEHOLDER',  // ← REMPLACE par le vrai lien embed
   horaires: 'Samedi – Jeudi : 09h00 – 19h00 · Vendredi : fermé',
 }
 
