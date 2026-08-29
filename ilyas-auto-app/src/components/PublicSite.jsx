@@ -1,8 +1,10 @@
 import { useState, useEffect, useMemo } from 'react'
 import { supabase } from '../supabase'
 import { fmt, waLink } from '../utils/notify'
-import { ORIGINS, flagURI, STATUTS, PLACEHOLDER_IMG } from '../data/vehicles-data'
+import { ORIGINS, flagURI, PLACEHOLDER_IMG } from '../data/vehicles-data'
 import { getSettings } from '../utils/useSettings'
+import { statutLabel } from '../i18n/translations'
+import { LangProvider, useLang } from '../i18n/LangContext'
 import ReservationModal from './ReservationModal'
 import VehicleDetail from './VehicleDetail'
 import AnnouncementBar from './AnnouncementBar'
@@ -10,9 +12,12 @@ import TrackingPage from './TrackingPage'
 import VehicleGallery from './VehicleGallery'
 import CONFIG from '../config'
 
-function statutOf(key) { return STATUTS.find(s => s.key === key) || STATUTS[0] }
+function statutColor(key) {
+  return key === 'disponible' ? '#22c55e' : key === 'reserve' ? '#f59e0b' : '#6b7280'
+}
 
-export default function PublicSite() {
+function PublicSiteInner() {
+  const { lang, t, rtl, toggleLang } = useLang()
   const [vehicles, setVehicles] = useState([])
   const [loading, setLoading] = useState(true)
   const [mobileOpen, setMobileOpen] = useState(false)
@@ -41,8 +46,6 @@ export default function PublicSite() {
     getSettings().then(setSettings)
   }, [])
 
-  // ── Infos boutique : ce qui est réglé dans Admin → Paramètres prend le dessus,
-  //    sinon on retombe sur les valeurs par défaut de config.js ──
   const s = useMemo(() => ({
     nom:        settings.shop_name       || CONFIG.nom,
     telephone:  settings.shop_phone      || CONFIG.telephone,
@@ -54,6 +57,13 @@ export default function PublicSite() {
     facebook:   CONFIG.facebook,
     instagram:  CONFIG.instagram,
   }), [settings])
+
+  // ── Logo dynamique — dernier mot du nom mis en avant (accent) ──
+  const logoParts = useMemo(() => {
+    const words = (s.nom || 'HBR Auto').trim().split(' ')
+    const last = words.pop()
+    return { rest: words.join(' '), last }
+  }, [s.nom])
 
   const brands = useMemo(() => [...new Set(vehicles.map(v => v.marque))].sort(), [vehicles])
 
@@ -92,30 +102,32 @@ export default function PublicSite() {
   }
 
   return (
-    <div className="app">
-      {/* ── Bande nouveautés & promos — tout en haut ── */}
-      {!loading && <VehicleGallery vehicles={recentVehicles} onVehicleClick={setOpenVehicle} />}
+    <div className="app" dir={rtl ? 'rtl' : 'ltr'}>
+      {/* ── Bande nouveautés & promos ── */}
+      {!loading && <VehicleGallery vehicles={recentVehicles} onVehicleClick={setOpenVehicle} newLabel={t.card.nouveau} />}
 
       <AnnouncementBar />
       {/* ── Navigation ── */}
       <nav className="nav">
         <div className="nav-inner">
-          <a href="#accueil" className="nav-logo">ILYAS<em>AUTO</em></a>
+          <a href="#accueil" className="nav-logo">{logoParts.rest && logoParts.rest + ' '}<em>{logoParts.last}</em></a>
           <div className="nav-links">
-            <a onClick={() => scrollTo('accueil')} href="#accueil">Accueil</a>
-            <a onClick={() => scrollTo('stock')} href="#stock">Notre Stock</a>
-            <a onClick={() => scrollTo('showroom')} href="#showroom">Showroom</a>
-            <a onClick={() => setTrackingOpen(true)} href="#" onClickCapture={e => e.preventDefault()}>Suivi commande</a>
-            <a href={waLink('Bonjour ' + s.nom + ', je vous contacte depuis votre site web.', s.whatsapp)} target="_blank" rel="noreferrer" className="nav-wa-btn">💬 WhatsApp</a>
+            <a onClick={() => scrollTo('accueil')} href="#accueil">{t.nav.accueil}</a>
+            <a onClick={() => scrollTo('stock')} href="#stock">{t.nav.stock}</a>
+            <a onClick={() => scrollTo('showroom')} href="#showroom">{t.nav.showroom}</a>
+            <a onClick={e => { e.preventDefault(); setTrackingOpen(true) }} href="#">{t.nav.suivi}</a>
+            <button onClick={toggleLang} className="lang-toggle">{lang === 'fr' ? '🇩🇿 عربي' : '🇫🇷 Français'}</button>
+            <a href={waLink('Bonjour ' + s.nom + ', je vous contacte depuis votre site web.', s.whatsapp)} target="_blank" rel="noreferrer" className="nav-wa-btn">💬 {t.nav.whatsapp}</a>
           </div>
           <button className="nav-burger" onClick={() => setMobileOpen(o => !o)}>☰</button>
         </div>
         <div className={`nav-mobile ${mobileOpen ? 'open' : ''}`}>
-          <a onClick={() => scrollTo('accueil')} href="#accueil">Accueil</a>
-          <a onClick={() => scrollTo('stock')} href="#stock">Notre Stock</a>
-          <a onClick={() => scrollTo('showroom')} href="#showroom">Showroom</a>
-          <a onClick={e => { e.preventDefault(); setMobileOpen(false); setTrackingOpen(true) }} href="#">Suivi commande</a>
-          <a href={waLink('Bonjour ' + s.nom + ', je vous contacte depuis votre site web.', s.whatsapp)} target="_blank" rel="noreferrer">💬 WhatsApp</a>
+          <a onClick={() => scrollTo('accueil')} href="#accueil">{t.nav.accueil}</a>
+          <a onClick={() => scrollTo('stock')} href="#stock">{t.nav.stock}</a>
+          <a onClick={() => scrollTo('showroom')} href="#showroom">{t.nav.showroom}</a>
+          <a onClick={e => { e.preventDefault(); setMobileOpen(false); setTrackingOpen(true) }} href="#">{t.nav.suivi}</a>
+          <button onClick={toggleLang} className="lang-toggle" style={{ marginTop: 6, width: 'fit-content' }}>{lang === 'fr' ? '🇩🇿 عربي' : '🇫🇷 Français'}</button>
+          <a href={waLink('Bonjour ' + s.nom + ', je vous contacte depuis votre site web.', s.whatsapp)} target="_blank" rel="noreferrer">💬 {t.nav.whatsapp}</a>
         </div>
       </nav>
 
@@ -125,13 +137,13 @@ export default function PublicSite() {
           <div className="hero-eyebrow">
             <img src={flagURI('france')} style={{ width: 16, height: 11, borderRadius: 2 }} alt="" />
             <img src={flagURI('allemagne')} style={{ width: 16, height: 11, borderRadius: 2 }} alt="" />
-            Import direct : France · Allemagne · Monde
+            {t.hero.eyebrow}
           </div>
-          <h1>VOTRE PROCHAINE VOITURE<br /><span>VIENT D'EUROPE</span></h1>
-          <p>Véhicules neufs & occasion, contrôlés et disponibles immédiatement au showroom {s.nom}, {s.adresse}.</p>
+          <h1>{t.hero.titre1}<br /><span>{t.hero.titre2}</span></h1>
+          <p>{t.hero.desc(s.nom, s.adresse)}</p>
           <div className="hero-cta">
-            <a href="#stock" onClick={e => { e.preventDefault(); scrollTo('stock') }} className="btn-hero-primary">🚗 Voir le stock</a>
-            <a href="#showroom" onClick={e => { e.preventDefault(); scrollTo('showroom') }} className="btn-hero-secondary">📍 Visiter le showroom</a>
+            <a href="#stock" onClick={e => { e.preventDefault(); scrollTo('stock') }} className="btn-hero-primary">{t.hero.voirStock}</a>
+            <a href="#showroom" onClick={e => { e.preventDefault(); scrollTo('showroom') }} className="btn-hero-secondary">{t.hero.visiterShowroom}</a>
           </div>
         </div>
       </header>
@@ -139,70 +151,69 @@ export default function PublicSite() {
       {/* ── Trust bar ── */}
       <div className="trust-bar">
         <div className="trust-grid">
-          <div><div className="num">+500</div><div className="lbl">Véhicules livrés</div></div>
-          <div><div className="num">FR · DE</div><div className="lbl">Origine garantie</div></div>
-          <div><div className="num">100%</div><div className="lbl">Contrôlés avant vente</div></div>
-          <div><div className="num">DA</div><div className="lbl">Prix en dinars</div></div>
+          <div><div className="num">+500</div><div className="lbl">{t.trust.livres}</div></div>
+          <div><div className="num">FR · DE</div><div className="lbl">{t.trust.origine}</div></div>
+          <div><div className="num">100%</div><div className="lbl">{t.trust.controles}</div></div>
+          <div><div className="num">DA</div><div className="lbl">{t.trust.prix}</div></div>
         </div>
       </div>
 
       {/* ── Stock ── */}
       <section id="stock" className="section">
         <div className="section-head">
-          <h2>NOTRE CATALOGUE</h2>
+          <h2>{t.catalogue.titre}</h2>
           <div className="bar" />
-          <p>Véhicules importés, contrôlés et prêts à rouler. Prix affichés en dinars algériens (DA).</p>
+          <p>{t.catalogue.desc}</p>
         </div>
 
         <div className="filters-bar">
-          <input placeholder="🔍 Rechercher un modèle..." value={search} onChange={e => setSearch(e.target.value)} />
+          <input placeholder={t.catalogue.rechercher} value={search} onChange={e => setSearch(e.target.value)} />
           <select value={brand} onChange={e => setBrand(e.target.value)}>
-            <option value="all">Toutes les marques</option>
+            <option value="all">{t.catalogue.toutesMarques}</option>
             {brands.map(b => <option key={b} value={b}>{b}</option>)}
           </select>
           <select value={origin} onChange={e => setOrigin(e.target.value)}>
-            <option value="all">Toutes origines</option>
+            <option value="all">{t.catalogue.toutesOrigines}</option>
             {Object.entries(ORIGINS).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
           </select>
           <select value={budget} onChange={e => setBudget(e.target.value)}>
-            <option value="all">Tout budget</option>
-            <option value="low">Moins de 4 000 000 DA</option>
-            <option value="mid">4 000 000 – 7 000 000 DA</option>
-            <option value="high">Plus de 7 000 000 DA</option>
+            <option value="all">{t.catalogue.toutBudget}</option>
+            <option value="low">{t.catalogue.budgetLow}</option>
+            <option value="mid">{t.catalogue.budgetMid}</option>
+            <option value="high">{t.catalogue.budgetHigh}</option>
           </select>
           <select value={sort} onChange={e => setSort(e.target.value)}>
-            <option value="default">Tri par défaut</option>
-            <option value="price_asc">Prix croissant</option>
-            <option value="price_desc">Prix décroissant</option>
-            <option value="year_desc">Année (récent)</option>
-            <option value="year_asc">Année (ancien)</option>
-            <option value="km_asc">Kilométrage (moins)</option>
+            <option value="default">{t.catalogue.triDefaut}</option>
+            <option value="price_asc">{t.catalogue.prixCroissant}</option>
+            <option value="price_desc">{t.catalogue.prixDecroissant}</option>
+            <option value="year_desc">{t.catalogue.anneeRecent}</option>
+            <option value="year_asc">{t.catalogue.anneeAncien}</option>
+            <option value="km_asc">{t.catalogue.kmMoins}</option>
           </select>
         </div>
 
         {loading ? (
-          <div className="spinner">Chargement du stock…</div>
+          <div className="spinner">{t.catalogue.chargement}</div>
         ) : sorted.length === 0 ? (
           <div className="empty">
             <div style={{ fontSize: 44 }}>🚗</div>
-            <p>{vehicles.length === 0 ? 'Aucun véhicule en ligne pour le moment.' : 'Aucun véhicule ne correspond à vos critères.'}</p>
+            <p>{vehicles.length === 0 ? t.catalogue.aucunVehiculeLigne : t.catalogue.aucunCorrespond}</p>
           </div>
         ) : (
           <div className="veh-grid">
             {sorted.map(v => {
               const disc = v.prix_old && v.prix_old > v.prix ? Math.round(100 - (v.prix / v.prix_old) * 100) : 0
-              const st = statutOf(v.statut)
               const disabled = v.statut === 'vendu'
               return (
                 <div key={v.id} className="veh-card" style={{ opacity: disabled ? .55 : 1 }}>
                   <div className="veh-card-img" style={{ cursor: 'pointer' }} onClick={() => setOpenVehicle(v)}>
-                    <div className="veh-statut-badge" style={{ background: st.color }}>{st.label}</div>
+                    <div className="veh-statut-badge" style={{ background: statutColor(v.statut) }}>{statutLabel(v.statut, lang)}</div>
                     <div className="veh-flag-badge">
                       <img src={flagURI(v.provenance)} style={{ width: 14, height: 10, borderRadius: 2 }} alt="" />
                       {ORIGINS[v.provenance]?.label || 'Monde'}
                     </div>
                     {v.badge && <div className="veh-badge-tag">{v.badge}</div>}
-                    {v.statut === 'vendu' && <div className="stamp-sold">Vendu</div>}
+                    {v.statut === 'vendu' && <div className="stamp-sold">{lang === 'ar' ? 'مباعة' : 'Vendu'}</div>}
                     <img src={v.img || PLACEHOLDER_IMG} alt={v.marque} />
                     <div className="veh-price-strip">
                       <span className="price">{fmt(v.prix)}</span>
@@ -218,16 +229,16 @@ export default function PublicSite() {
                       <span className="veh-year-badge">{v.annee}</span>
                     </div>
                     <div className="veh-specs">
-                      <span>🛣️ {v.km ? Number(v.km).toLocaleString('fr-FR') + ' km' : 'Neuf / 0 km'}</span>
+                      <span>🛣️ {v.km ? Number(v.km).toLocaleString('fr-FR') + ' km' : t.card.neuf}</span>
                       <span>⚙️ {v.transmission}</span>
                       <span>⛽ {v.carburant}</span>
                       <span>📅 {v.annee}</span>
                     </div>
                     <div className="veh-actions">
                       <button className="btn-veh-reserve" disabled={disabled} onClick={() => setReserveVehicle(v)}>
-                        {disabled ? 'VÉHICULE VENDU' : 'RÉSERVER / ACHETER'}
+                        {disabled ? t.card.vendu : t.card.reserver}
                       </button>
-                      <button className="btn-veh-wa" title="Contacter sur WhatsApp" onClick={() => waDirect(v)}>💬</button>
+                      <button className="btn-veh-wa" title="WhatsApp" onClick={() => waDirect(v)}>💬</button>
                     </div>
                   </div>
                 </div>
@@ -240,25 +251,25 @@ export default function PublicSite() {
       {/* ── Showroom ── */}
       <section id="showroom" className="section">
         <div className="section-head">
-          <h2>VISITEZ NOTRE SHOWROOM</h2>
+          <h2>{t.showroom.titre}</h2>
           <div className="bar" />
         </div>
         <div className="showroom-grid">
           <div>
             <div className="showroom-info-row">
               <span className="ic">📍</span>
-              <div><h4>Adresse</h4><p>{s.nom} — Showroom & parc d'exposition<br />{s.adresse}</p></div>
+              <div><h4>{t.showroom.adresse}</h4><p>{s.nom}<br />{s.adresse}</p></div>
             </div>
             <div className="showroom-info-row">
               <span className="ic">📞</span>
-              <div><h4>Téléphone / WhatsApp</h4><p>+{s.telephone}</p></div>
+              <div><h4>{t.showroom.telephone}</h4><p>+{s.telephone}</p></div>
             </div>
             <div className="showroom-info-row">
               <span className="ic">🕐</span>
-              <div><h4>Horaires</h4><p>{s.horaires}</p></div>
+              <div><h4>{t.showroom.horaires}</h4><p>{s.horaires}</p></div>
             </div>
             <a href={s.mapsUrl} target="_blank" rel="noreferrer" className="btn-hero-primary" style={{ marginTop: 10 }}>
-              🧭 Itinéraire GPS (Google Maps)
+              {t.showroom.itineraire}
             </a>
           </div>
           <div className="showroom-map">
@@ -271,12 +282,12 @@ export default function PublicSite() {
       <footer className="footer-auto">
         <div className="footer-auto-inner">
           <div>
-            <div className="footer-logo">ILYAS<em>AUTO</em></div>
-            <div className="footer-sub">© {new Date().getFullYear()} {s.nom} — Tous droits réservés.</div>
+            <div className="footer-logo">{logoParts.rest && logoParts.rest + ' '}<em>{logoParts.last}</em></div>
+            <div className="footer-sub">© {new Date().getFullYear()} {s.nom} — {t.footer.droits}</div>
           </div>
           <div className="footer-social">
             <a href={waLink('Bonjour ' + s.nom, s.whatsapp)} target="_blank" rel="noreferrer">💬</a>
-            <button onClick={() => setTrackingOpen(true)} className="footer-track-btn">📦 Suivre ma réservation</button>
+            <button onClick={() => setTrackingOpen(true)} className="footer-track-btn">{t.footer.suivre}</button>
             {s.facebook && <a href={s.facebook} target="_blank" rel="noreferrer">📘</a>}
             {s.instagram && <a href={s.instagram} target="_blank" rel="noreferrer">📷</a>}
           </div>
@@ -301,5 +312,13 @@ export default function PublicSite() {
       {/* ── Suivi de réservation ── */}
       {trackingOpen && <TrackingPage onClose={() => setTrackingOpen(false)} />}
     </div>
+  )
+}
+
+export default function PublicSite() {
+  return (
+    <LangProvider>
+      <PublicSiteInner />
+    </LangProvider>
   )
 }
