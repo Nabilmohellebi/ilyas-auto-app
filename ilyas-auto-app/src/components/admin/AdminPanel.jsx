@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '../../supabase'
-import { saveSettings, saveSetting, getSettings } from '../../utils/useSettings'
+import { saveSetting, getSettings } from '../../utils/useSettings'
 import { openWA, fmt } from '../../utils/notify'
-import { STATUTS, flagURI, ORIGINS, PLACEHOLDER_IMG } from '../../data/vehicles-data'
+import { STATUTS, PLACEHOLDER_IMG, flagURI } from '../../data/vehicles-data'
 import VehicleForm from './VehicleForm'
 
 const RES_STATUTS = [
@@ -18,7 +18,7 @@ function statutOf(key) { return STATUTS.find(s => s.key === key) || STATUTS[0] }
 //  PARAMÈTRES
 // ═══════════════════════════════════════════════
 function AdminSettings({ onLogout, onToast }) {
-  const [shop, setShop] = useState({ name: 'Ilyas Auto', phone: '213550123456', whatsapp: '213550123456', address: 'Boumerdès, Algérie', email: '', horaires: '', mapsUrl: '', mapsEmbed: '' })
+  const [shop, setShop] = useState({ name: 'HBR Auto', phone: '213550123456', whatsapp: '213550123456', address: 'HBR Melaba, Azazga, Algérie', email: '', horaires: '', mapsUrl: '', mapsEmbed: '' })
   const [shopSaving, setShopSaving] = useState(false)
   const [pwForm, setPwForm] = useState({ current: '', new1: '', new2: '' })
   const [pwSaving, setPwSaving] = useState(false)
@@ -27,10 +27,10 @@ function AdminSettings({ onLogout, onToast }) {
   useEffect(() => {
     getSettings().then(s => {
       setShop({
-        name: s.shop_name || 'Ilyas Auto',
+        name: s.shop_name || 'HBR Auto',
         phone: s.shop_phone || '213550123456',
         whatsapp: s.shop_whatsapp || s.shop_phone || '213550123456',
-        address: s.shop_address || 'Boumerdès, Algérie',
+        address: s.shop_address || 'HBR Melaba, Azazga, Algérie',
         email: s.shop_email || '',
         horaires: s.shop_horaires || 'Samedi – Jeudi : 09h00 – 19h00 · Vendredi : fermé',
         mapsUrl: s.shop_maps_url || '',
@@ -211,7 +211,7 @@ export default function AdminPanel({ onLogout, onToast }) {
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `ilyas-auto-reservations-${new Date().toISOString().slice(0, 10)}.csv`
+    a.download = `hbr-auto-reservations-${new Date().toISOString().slice(0, 10)}.csv`
     a.click()
     URL.revokeObjectURL(url)
     onToast(`✅ ${rows.length} réservations exportées`, 'default')
@@ -275,7 +275,7 @@ export default function AdminPanel({ onLogout, onToast }) {
   return (
     <div className="adm">
       <div className="adm-top">
-        <div className="adm-logo">ILYAS <em>AUTO</em> <span className="adm-badge">ADMIN</span></div>
+        <div className="adm-logo">HBR <em>AUTO</em> <span className="adm-badge">ADMIN</span></div>
         <div className="adm-tabs">
           {[['vehicules', '🚘 Véhicules'], ['reservations', '📩 Réservations'], ['banniere', '📢 Bannière'], ['settings', '⚙️ Paramètres']].map(([k, l]) => (
             <button key={k} className={`adm-tab ${tab === k ? 'active' : ''}`} onClick={() => setTab(k)}>{l}</button>
