@@ -20,7 +20,7 @@ export function genId() {
 // ── Notifier une nouvelle réservation sur Telegram ──
 export async function notifyTelegram(reservation) {
   const msg = `
-🚗 *Nouvelle réservation — Ilyas Auto*
+🚗 *Nouvelle réservation — ${CONFIG.nom}*
 ━━━━━━━━━━━━━━━━
 🆔 *${reservation.id}*
 
@@ -37,14 +37,14 @@ ${reservation.message ? `📝 *Message :* ${reservation.message}\n` : ''}━━�
 
 export function buildWAMessage(reservation) {
   return encodeURIComponent(
-    `Bonjour ${reservation.nom_client}, ici Ilyas Auto 👋\n` +
+    `Bonjour ${reservation.nom_client}, ici ${CONFIG.nom} 👋\n` +
     `Nous avons bien reçu votre demande concernant :\n` +
     `🚘 ${reservation.vehicule_nom} — ${fmt(reservation.vehicule_prix)}\n\n` +
     `Un conseiller va vous recontacter très vite pour confirmer les détails.`
   )
 }
 
-// Ouvrir WA avec le client concerné pour une réservation
+// Ouvrir WA avec le client concerné pour une réservation (usage admin)
 export function openWA(reservation) {
   const phone = String(reservation.telephone || '').replace(/\D/g, '')
   const normalized = phone.startsWith('0') ? '213' + phone.slice(1) : phone

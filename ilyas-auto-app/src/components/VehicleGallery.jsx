@@ -6,10 +6,9 @@ import { useState } from 'react'
 import { fmt } from '../utils/notify'
 import { PLACEHOLDER_IMG } from '../data/vehicles-data'
 
-export default function VehicleGallery({ vehicles, onVehicleClick }) {
+export default function VehicleGallery({ vehicles, onVehicleClick, newLabel }) {
   const [paused, setPaused] = useState(false)
 
-  // Les plus récents en premier (déjà triés par created_at côté parent), limité à 12
   const items = vehicles.slice(0, 12)
   if (items.length < 2) return null
 
@@ -32,7 +31,7 @@ export default function VehicleGallery({ vehicles, onVehicleClick }) {
             <div key={`${v.id}-${i}`} className="veh-strip-card" onClick={() => onVehicleClick(v)}>
               <div className="veh-strip-img">
                 <img src={v.img || PLACEHOLDER_IMG} alt={v.marque} loading="lazy" />
-                {isNew && <span className="veh-strip-tag new">🆕 Nouveau</span>}
+                {isNew && <span className="veh-strip-tag new">{newLabel || '🆕 Nouveau'}</span>}
                 {!isNew && disc > 0 && <span className="veh-strip-tag promo">-{disc}%</span>}
               </div>
               <div className="veh-strip-info">

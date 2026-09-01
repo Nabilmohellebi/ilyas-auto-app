@@ -7,7 +7,7 @@ export default function AdminLogin({ onLogin, error }) {
     <div className="login-wrap">
       <div className="login-box">
         <div style={{ fontSize: 48 }}>🚗</div>
-        <h1>ILYAS <em>AUTO</em></h1>
+        <h1>HBR <em>AUTO</em></h1>
         <p>Espace administrateur — Gestion du showroom</p>
 
         {error && <div className="login-error">❌ Mot de passe incorrect.</div>}
@@ -21,11 +21,6 @@ export default function AdminLogin({ onLogin, error }) {
           autoFocus
         />
         <button onClick={() => onLogin(pw)}>Connexion →</button>
-
-        <div className="login-hint">
-          💡 Mot de passe par défaut : <strong>ilyas2026</strong><br/>
-          (à changer dans Paramètres une fois connecté)
-        </div>
       </div>
     </div>
   )

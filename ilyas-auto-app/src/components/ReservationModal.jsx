@@ -2,12 +2,13 @@ import { useState } from 'react'
 import { supabase } from '../supabase'
 import { fmt, genId, notifyTelegram, waLink } from '../utils/notify'
 import { PLACEHOLDER_IMG } from '../data/vehicles-data'
+import { useLang } from '../i18n/LangContext'
 
 export default function ReservationModal({ vehicle, onClose }) {
+  const { t } = useLang()
   const [form, setForm] = useState({ nom: '', tel: '', message: '' })
   const [sending, setSending] = useState(false)
   const [sent, setSent] = useState(false)
-  const [reservation, setReservation] = useState(null)
   const [error, setError] = useState('')
 
   function set(k, v) { setForm(f => ({ ...f, [k]: v })) }
@@ -31,10 +32,9 @@ export default function ReservationModal({ vehicle, onClose }) {
     const { error: err } = await supabase.from('reservations').insert(res)
     setSending(false)
 
-    if (err) { setError('Une erreur est survenue, merci de réessayer.'); return }
+    if (err) { setError(t.reservation.erreur); return }
 
     notifyTelegram(res)
-    setReservation(res)
     setSent(true)
   }
 
@@ -51,9 +51,9 @@ export default function ReservationModal({ vehicle, onClose }) {
         {!sent ? (
           <>
             <h2 style={{ fontFamily: 'var(--ff)', fontSize: 21, fontWeight: 900, color: 'white', marginBottom: 4 }}>
-              Réserver ce véhicule
+              {t.reservation.titre}
             </h2>
-            <p style={{ fontSize: 12.5, color: 'rgba(255,255,255,.5)' }}>Un conseiller vous recontacte rapidement.</p>
+            <p style={{ fontSize: 12.5, color: 'rgba(255,255,255,.5)' }}>{t.reservation.sousTitre}</p>
 
             <div className="res-veh-preview">
               <img src={vehicle.img || PLACEHOLDER_IMG} alt="" />
@@ -64,16 +64,16 @@ export default function ReservationModal({ vehicle, onClose }) {
             </div>
 
             <div className="form-field" style={{ marginBottom: 12 }}>
-              <label>Votre nom *</label>
-              <input placeholder="Nom et prénom" value={form.nom} onChange={e => set('nom', e.target.value)} />
+              <label>{t.reservation.nom}</label>
+              <input placeholder={t.reservation.nomPh} value={form.nom} onChange={e => set('nom', e.target.value)} />
             </div>
             <div className="form-field" style={{ marginBottom: 12 }}>
-              <label>Téléphone *</label>
-              <input placeholder="05 50 12 34 56" type="tel" value={form.tel} onChange={e => set('tel', e.target.value)} />
+              <label>{t.reservation.tel}</label>
+              <input placeholder={t.reservation.telPh} type="tel" value={form.tel} onChange={e => set('tel', e.target.value)} />
             </div>
             <div className="form-field" style={{ marginBottom: 16 }}>
-              <label>Message (optionnel)</label>
-              <textarea rows={3} placeholder="Je souhaite réserver / avoir plus d'infos..." value={form.message} onChange={e => set('message', e.target.value)} />
+              <label>{t.reservation.message}</label>
+              <textarea rows={3} placeholder={t.reservation.messagePh} value={form.message} onChange={e => set('message', e.target.value)} />
             </div>
 
             {error && <div style={{ color: '#ffb3b8', fontSize: 12.5, marginBottom: 10 }}>❌ {error}</div>}
@@ -84,20 +84,20 @@ export default function ReservationModal({ vehicle, onClose }) {
               onClick={submit}
               disabled={sending || !form.nom.trim() || !form.tel.trim()}
             >
-              {sending ? '⏳ Envoi en cours...' : '📩 Envoyer la demande'}
+              {sending ? t.reservation.envoiEnCours : t.reservation.envoyer}
             </button>
           </>
         ) : (
           <div className="res-success">
             <div style={{ width: 64, height: 64, borderRadius: '50%', background: 'rgba(34,197,94,.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 30, margin: '0 auto 16px' }}>✅</div>
-            <h2 style={{ fontFamily: 'var(--ff)', fontSize: 20, fontWeight: 900, color: 'white', marginBottom: 8 }}>Demande envoyée !</h2>
+            <h2 style={{ fontFamily: 'var(--ff)', fontSize: 20, fontWeight: 900, color: 'white', marginBottom: 8 }}>{t.reservation.envoye}</h2>
             <p style={{ fontSize: 13, color: 'rgba(255,255,255,.55)', marginBottom: 20, lineHeight: 1.6 }}>
-              Notre équipe vous contactera très vite.<br/>Accélérez la procédure en confirmant sur WhatsApp :
+              {t.reservation.merci}<br />{t.reservation.confirmerWA}
             </p>
             <a href={waLink(waConfirmText)} target="_blank" rel="noreferrer" className="btn-hero-primary" style={{ width: '100%', justifyContent: 'center', marginBottom: 10 }}>
-              💬 Confirmer sur WhatsApp
+              {t.reservation.confirmerBtn}
             </a>
-            <button onClick={onClose} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,.4)', fontSize: 12.5, textDecoration: 'underline', cursor: 'pointer' }}>Fermer</button>
+            <button onClick={onClose} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,.4)', fontSize: 12.5, textDecoration: 'underline', cursor: 'pointer' }}>{t.reservation.fermer}</button>
           </div>
         )}
       </div>

@@ -1,9 +1,13 @@
 import { useState, useRef } from 'react'
 import { fmt } from '../utils/notify'
-import { ORIGINS, flagURI, STATUTS, PLACEHOLDER_IMG } from '../data/vehicles-data'
+import { ORIGINS, flagURI, PLACEHOLDER_IMG } from '../data/vehicles-data'
+import { statutLabel } from '../i18n/translations'
+import { useLang } from '../i18n/LangContext'
 import FinancingCalculator from './FinancingCalculator'
 
-function statutOf(key) { return STATUTS.find(s => s.key === key) || STATUTS[0] }
+function statutColor(key) {
+  return key === 'disponible' ? '#22c55e' : key === 'reserve' ? '#f59e0b' : '#6b7280'
+}
 
 function getEmbedUrl(url) {
   if (!url) return null
@@ -33,6 +37,7 @@ function getEmbedUrl(url) {
 }
 
 export default function VehicleDetail({ vehicle: v, onClose, onReserve }) {
+  const { lang, t } = useLang()
   const images = Array.isArray(v.images) && v.images.length > 0 ? v.images : (v.img ? [{ url: v.img }] : [])
   const gallery = Array.isArray(v.images_gallery) ? v.images_gallery : []
   const [idx, setIdx] = useState(0)
@@ -40,7 +45,6 @@ export default function VehicleDetail({ vehicle: v, onClose, onReserve }) {
   const touchX = useRef(null)
 
   const disc = v.prix_old && v.prix_old > v.prix ? Math.round(100 - (v.prix / v.prix_old) * 100) : 0
-  const st = statutOf(v.statut)
   const disabled = v.statut === 'vendu'
   const specs = Array.isArray(v.specs) ? v.specs : []
 
@@ -57,11 +61,9 @@ export default function VehicleDetail({ vehicle: v, onClose, onReserve }) {
 
   return (
     <div className="vd-ov">
-      {/* Bouton fermer flottant — ne bloque plus la photo */}
       <button className="vd-close-float" onClick={onClose}>✕</button>
 
       <div className="vd-layout">
-        {/* ── Colonne galerie (carrousel) ── */}
         <div className="vd-gallery-col">
           {images.length > 0 ? (
             <div className="vd-gallery" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
@@ -74,8 +76,8 @@ export default function VehicleDetail({ vehicle: v, onClose, onReserve }) {
                 </div>
                 <div className="vd-counter">{idx + 1}/{images.length}</div>
               </>}
-              <div className="vd-statut-float" style={{ background: st.color }}>{st.label}</div>
-              {disabled && <div className="stamp-sold">Vendu</div>}
+              <div className="vd-statut-float" style={{ background: statutColor(v.statut) }}>{statutLabel(v.statut, lang)}</div>
+              {disabled && <div className="stamp-sold">{lang === 'ar' ? 'مباعة' : 'Vendu'}</div>}
             </div>
           ) : (
             <div className="vd-gallery vd-gallery-empty">🚗</div>
@@ -92,7 +94,6 @@ export default function VehicleDetail({ vehicle: v, onClose, onReserve }) {
           )}
         </div>
 
-        {/* ── Colonne infos ── */}
         <div className="vd-info-col">
           <div className="vd-info">
             {v.badge && <span className="vd-badge">{v.badge}</span>}
@@ -103,7 +104,7 @@ export default function VehicleDetail({ vehicle: v, onClose, onReserve }) {
             </div>
 
             <div className="vd-specs-grid">
-              <div><span className="ic">🛣️</span>{v.km ? Number(v.km).toLocaleString('fr-FR') + ' km' : 'Neuf / 0 km'}</div>
+              <div><span className="ic">🛣️</span>{v.km ? Number(v.km).toLocaleString('fr-FR') + ' km' : t.card.neuf}</div>
               <div><span className="ic">⚙️</span>{v.transmission}</div>
               <div><span className="ic">⛽</span>{v.carburant}</div>
               <div><span className="ic">📅</span>{v.annee}</div>
@@ -111,10 +112,9 @@ export default function VehicleDetail({ vehicle: v, onClose, onReserve }) {
             </div>
 
             <button className="btn-hero-primary vd-reserve-desktop" disabled={disabled} onClick={() => !disabled && onReserve(v)}>
-              {disabled ? '🚫 Véhicule vendu' : '🚘 Réserver ce véhicule'}
+              {disabled ? t.detail.vendu : t.detail.reserver}
             </button>
 
-            {/* Vidéo */}
             {v.video_url && (() => {
               const embed = getEmbedUrl(v.video_url)
               if (!embed) return null
@@ -122,13 +122,12 @@ export default function VehicleDetail({ vehicle: v, onClose, onReserve }) {
                 const isTikTok = embed.src.includes('tiktok')
                 const isInsta = embed.src.includes('instagram')
                 const icon = isTikTok ? '🎵' : isInsta ? '📸' : '▶️'
-                const platform = isTikTok ? 'TikTok' : isInsta ? 'Instagram' : 'Voir la vidéo'
+                const platform = isTikTok ? 'TikTok' : isInsta ? 'Instagram' : ''
                 return (
                   <a href={embed.src} target="_blank" rel="noreferrer" className="vd-video-card">
                     <div className="ic">{icon}</div>
                     <div>
-                      <div className="txt-title">Voir la vidéo {platform}</div>
-                      <div className="txt-sub">Appuyez pour regarder la vidéo du véhicule</div>
+                      <div className="txt-title">{t.detail.video} {platform}</div>
                     </div>
                   </a>
                 )
@@ -142,7 +141,7 @@ export default function VehicleDetail({ vehicle: v, onClose, onReserve }) {
 
             {v.description && (
               <div className="vd-section">
-                <h3>📝 Description</h3>
+                <h3>{t.detail.description}</h3>
                 <p className="vd-description">{v.description}</p>
               </div>
             )}
@@ -151,7 +150,7 @@ export default function VehicleDetail({ vehicle: v, onClose, onReserve }) {
 
             {specs.length > 0 && (
               <div className="vd-section">
-                <h3>⚙️ Équipements & Options</h3>
+                <h3>{t.detail.equipements}</h3>
                 <div className="vd-equip-grid">
                   {specs.map((s, i) => <div key={i} className="vd-equip-item"><span>✓</span>{s}</div>)}
                 </div>
@@ -161,28 +160,25 @@ export default function VehicleDetail({ vehicle: v, onClose, onReserve }) {
         </div>
       </div>
 
-      {/* ── Galerie grand format — pleine largeur, après la description ── */}
       {gallery.length > 0 && (
         <div className="vd-gallery-full-wrap">
-          <div className="vd-gallery-full-title">📸 Plus de photos</div>
+          <div className="vd-gallery-full-title">{t.detail.plusPhotos}</div>
           <div className="vd-gallery-full">
             {gallery.map((img, i) => <img key={i} src={img.url} alt="" loading="lazy" />)}
           </div>
         </div>
       )}
 
-      {/* Barre sticky — mobile uniquement */}
       <div className="vd-bottom">
         <div className="vd-bottom-price">
-          <span className="lbl">Prix</span>
+          <span className="lbl">{t.detail.prix}</span>
           <strong>{fmt(v.prix)}</strong>
         </div>
         <button className="btn-hero-primary" style={{ flex: 1, justifyContent: 'center' }} disabled={disabled} onClick={() => !disabled && onReserve(v)}>
-          {disabled ? '🚫 Véhicule vendu' : '🚘 Réserver ce véhicule'}
+          {disabled ? t.detail.vendu : t.detail.reserver}
         </button>
       </div>
 
-      {/* Lightbox plein écran */}
       {lb && images.length > 0 && (
         <div className="vd-lightbox" onClick={() => setLb(false)}>
           <img src={images[idx]?.url} alt="" onClick={e => e.stopPropagation()} />

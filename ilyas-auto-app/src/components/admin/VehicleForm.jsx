@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react'
 import { supabase } from '../../supabase'
-import { BRANDS, TRANSMISSIONS, FUELS, BADGES, STATUTS, ORIGINS, flagURI } from '../../data/vehicles-data'
+import { BRANDS, TRANSMISSIONS, FUELS, BADGES, STATUTS, ORIGINS } from '../../data/vehicles-data'
 
 export default function VehicleForm({ vehicle, onClose, onSave }) {
   const isEdit = !!vehicle
@@ -289,7 +289,7 @@ export default function VehicleForm({ vehicle, onClose, onSave }) {
             </div>
           </div>
 
-          {/* ── Photos ── */}
+          {/* ── Photos carrousel ── */}
           <div className="pf-section">
             <h3>📸 Photos du véhicule</h3>
             <label className="upload-zone"
@@ -308,7 +308,7 @@ export default function VehicleForm({ vehicle, onClose, onSave }) {
               <div style={{ fontSize: 13, color: 'rgba(255,255,255,.5)' }}>
                 {uploading ? '⏳ Upload en cours...' : 'Cliquer ou glisser des photos ici'}
               </div>
-              <div style={{ fontSize: 11, color: 'rgba(255,255,255,.25)', marginTop: 3 }}>JPG, PNG, WebP — compression automatique</div>
+              <div style={{ fontSize: 11, color: 'rgba(255,255,255,.25)', marginTop: 3 }}>JPG, PNG, WebP, GIF — compression automatique</div>
             </label>
 
             {form.images.length > 0 && (
