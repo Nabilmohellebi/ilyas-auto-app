@@ -56,6 +56,12 @@ function PublicSiteInner() {
     mapsEmbed:  settings.shop_maps_embed || CONFIG.mapsEmbed,
     facebook:   CONFIG.facebook,
     instagram:  CONFIG.instagram,
+    phones:     (() => {
+      try {
+        const parsed = JSON.parse(settings.shop_phones || '[]')
+        return Array.isArray(parsed) && parsed.length > 0 ? parsed : [{ label: '', number: settings.shop_phone || CONFIG.telephone }]
+      } catch { return [{ label: '', number: settings.shop_phone || CONFIG.telephone }] }
+    })(),
   }), [settings])
 
   // ── Logo dynamique — dernier mot du nom mis en avant (accent) ──
@@ -262,7 +268,11 @@ function PublicSiteInner() {
             </div>
             <div className="showroom-info-row">
               <span className="ic">📞</span>
-              <div><h4>{t.showroom.telephone}</h4><p>+{s.telephone}</p></div>
+              <div><h4>{t.showroom.telephone}</h4>
+                {s.phones.map((p, i) => (
+                  <p key={i}>{p.label && <strong style={{ color: 'rgba(255,255,255,.85)' }}>{p.label} : </strong>}<a href={`tel:+${p.number}`} style={{ color: 'inherit', textDecoration: 'none' }}>+{p.number}</a></p>
+                ))}
+              </div>
             </div>
             <div className="showroom-info-row">
               <span className="ic">🕐</span>
