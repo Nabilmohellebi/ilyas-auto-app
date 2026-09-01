@@ -19,6 +19,7 @@ function statutOf(key) { return STATUTS.find(s => s.key === key) || STATUTS[0] }
 // ═══════════════════════════════════════════════
 function AdminSettings({ onLogout, onToast }) {
   const [shop, setShop] = useState({ name: 'HBR Auto', phone: '213550123456', whatsapp: '213550123456', address: 'HBR Melaba, Azazga, Algérie', email: '', horaires: '', mapsUrl: '', mapsEmbed: '' })
+  const [phones, setPhones] = useState([])
   const [shopSaving, setShopSaving] = useState(false)
   const [pwForm, setPwForm] = useState({ current: '', new1: '', new2: '' })
   const [pwSaving, setPwSaving] = useState(false)
@@ -36,8 +37,19 @@ function AdminSettings({ onLogout, onToast }) {
         mapsUrl: s.shop_maps_url || '',
         mapsEmbed: s.shop_maps_embed || '',
       })
+      // Liste de numéros — si jamais configurée, on part du numéro principal
+      try {
+        const parsed = JSON.parse(s.shop_phones || '[]')
+        setPhones(Array.isArray(parsed) && parsed.length > 0 ? parsed : [{ label: 'Ventes', number: s.shop_phone || '213550123456' }])
+      } catch {
+        setPhones([{ label: 'Ventes', number: s.shop_phone || '213550123456' }])
+      }
     })
   }, [])
+
+  function addPhone() { setPhones(p => [...p, { label: '', number: '' }]) }
+  function updatePhone(i, key, val) { setPhones(p => p.map((ph, idx) => idx === i ? { ...ph, [key]: val } : ph)) }
+  function removePhone(i) { setPhones(p => p.filter((_, idx) => idx !== i)) }
 
   async function saveShop() {
     setShopSaving(true)
@@ -50,6 +62,7 @@ function AdminSettings({ onLogout, onToast }) {
       await saveSetting('shop_horaires', shop.horaires)
       await saveSetting('shop_maps_url', shop.mapsUrl)
       await saveSetting('shop_maps_embed', shop.mapsEmbed)
+      await saveSetting('shop_phones', JSON.stringify(phones.filter(p => p.number.trim())))
       onToast && onToast('✅ Informations sauvegardées', 'default')
     } catch (e) {
       onToast && onToast('❌ Erreur : ' + e.message, 'error')
@@ -104,6 +117,35 @@ function AdminSettings({ onLogout, onToast }) {
           </div>
         </div>
         <button className="btn-save" onClick={saveShop} disabled={shopSaving}>{shopSaving ? '⏳...' : '💾 Sauvegarder'}</button>
+      </div>
+
+      <div className="pf-section" style={{ marginBottom: 14 }}>
+        <h3>📞 Numéros de téléphone</h3>
+        <p style={{ fontSize: 12, color: 'rgba(255,255,255,.4)', marginBottom: 12, lineHeight: 1.5 }}>
+          Ajoute autant de numéros que tu veux (ventes, SAV, standard...). Ils s'affichent tous dans la section Showroom du site.
+        </p>
+        {phones.map((p, i) => (
+          <div key={i} style={{ display: 'flex', gap: 8, marginBottom: 8, alignItems: 'center' }}>
+            <input
+              placeholder="Ex : Ventes"
+              value={p.label}
+              onChange={e => updatePhone(i, 'label', e.target.value)}
+              style={{ flex: 1, background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.1)', borderRadius: 9, padding: '10px 12px', color: 'white', fontSize: 13 }}
+            />
+            <input
+              placeholder="213550123456"
+              value={p.number}
+              onChange={e => updatePhone(i, 'number', e.target.value)}
+              type="tel"
+              style={{ flex: 1.4, background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.1)', borderRadius: 9, padding: '10px 12px', color: 'white', fontSize: 13 }}
+            />
+            <button onClick={() => removePhone(i)} style={{ background: 'rgba(230,57,70,.12)', border: '1px solid rgba(230,57,70,.25)', borderRadius: 8, color: '#ffb3b8', cursor: 'pointer', fontSize: 13, padding: '9px 12px', flexShrink: 0 }}>✕</button>
+          </div>
+        ))}
+        <div style={{ display: 'flex', gap: 8, marginTop: 4 }}>
+          <button className="act-btn" onClick={addPhone}>+ Ajouter un numéro</button>
+          <button className="btn-save" onClick={saveShop} disabled={shopSaving}>{shopSaving ? '⏳...' : '💾 Sauvegarder'}</button>
+        </div>
       </div>
 
       <div className="pf-section">
