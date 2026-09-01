@@ -30,19 +30,19 @@ export async function getSettings() {
   return s
 }
 
+// ── Upsert : crée la ligne si elle n'existe pas encore, sinon la met à jour.
+//    (l'ancienne version faisait un update puis un insert "si erreur", mais un
+//    update sur une clé absente ne renvoie PAS d'erreur côté Supabase → rien
+//    n'était jamais sauvegardé pour une clé nouvelle. Upsert règle ça.) ──
 export async function saveSetting(key, value) {
   cache = null; cacheTime = 0
-  const { error: errU } = await supabase
+  const { error } = await supabase
     .from('settings')
-    .update({ value: String(value), updated_at: new Date().toISOString() })
-    .eq('key', key)
-
-  if (errU) {
-    const { error: errI } = await supabase
-      .from('settings')
-      .insert({ key, value: String(value), updated_at: new Date().toISOString() })
-    if (errI) { console.error('saveSetting insert:', errI); throw errI }
-  }
+    .upsert(
+      { key, value: String(value), updated_at: new Date().toISOString() },
+      { onConflict: 'key' }
+    )
+  if (error) { console.error('saveSetting:', error); throw error }
 }
 
 export async function saveSettings(obj) {
