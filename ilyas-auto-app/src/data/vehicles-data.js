@@ -11,6 +11,7 @@ export const BRANDS = [
 
 export const TRANSMISSIONS = ['Automatique', 'Manuelle']
 export const FUELS = ['Diesel', 'Essence', 'Hybride', 'GPL', 'Électrique']
+export const BODY_TYPES = ['Berline', 'SUV', 'Citadine', 'Coupé', 'Break', 'Monospace', 'Pick-up', 'Cabriolet']
 export const BADGES = ['', '⚡ Nouveau', '🔥 Coup de cœur', '⭐ Best-seller', '💎 Premium', '🎯 Prix cassé']
 export const STATUTS = [
   { key: 'disponible', label: '✅ Disponible',  color: '#22c55e' },
