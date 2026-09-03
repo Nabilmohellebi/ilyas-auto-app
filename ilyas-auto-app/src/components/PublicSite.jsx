@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import { supabase } from '../supabase'
 import { fmt, waLink } from '../utils/notify'
-import { ORIGINS, flagURI, PLACEHOLDER_IMG } from '../data/vehicles-data'
+import { ORIGINS, flagURI, PLACEHOLDER_IMG, BODY_TYPES } from '../data/vehicles-data'
 import { getSettings } from '../utils/useSettings'
 import { statutLabel } from '../i18n/translations'
 import { LangProvider, useLang } from '../i18n/LangContext'
@@ -10,6 +10,7 @@ import VehicleDetail from './VehicleDetail'
 import AnnouncementBar from './AnnouncementBar'
 import TrackingPage from './TrackingPage'
 import VehicleGallery from './VehicleGallery'
+import VehicleCompare from './VehicleCompare'
 import CONFIG from '../config'
 
 function statutColor(key) {
@@ -25,12 +26,16 @@ function PublicSiteInner() {
   const [openVehicle, setOpenVehicle] = useState(null)
   const [trackingOpen, setTrackingOpen] = useState(false)
   const [settings, setSettings] = useState({})
+  const [compareList, setCompareList] = useState([])
+  const [compareOpen, setCompareOpen] = useState(false)
 
   const [search, setSearch] = useState('')
   const [brand, setBrand] = useState('all')
   const [origin, setOrigin] = useState('all')
+  const [bodyType, setBodyType] = useState('all')
   const [budget, setBudget] = useState('all')
   const [sort, setSort] = useState('default')
+  const [heroIdx, setHeroIdx] = useState(0)
 
   useEffect(() => {
     async function load() {
@@ -73,6 +78,22 @@ function PublicSiteInner() {
 
   const brands = useMemo(() => [...new Set(vehicles.map(v => v.marque))].sort(), [vehicles])
 
+  const heroImages = useMemo(() => vehicles.filter(v => v.img).slice(0, 6).map(v => v.img), [vehicles])
+
+  useEffect(() => {
+    if (heroImages.length < 2) return
+    const id = setInterval(() => setHeroIdx(i => (i + 1) % heroImages.length), 5000)
+    return () => clearInterval(id)
+  }, [heroImages.length])
+
+  function toggleCompare(v) {
+    setCompareList(prev => {
+      if (prev.find(x => x.id === v.id)) return prev.filter(x => x.id !== v.id)
+      if (prev.length >= 3) return prev
+      return [...prev, v]
+    })
+  }
+
   const recentVehicles = useMemo(
     () => [...vehicles].sort((a, b) => new Date(b.created_at) - new Date(a.created_at)),
     [vehicles]
@@ -81,6 +102,7 @@ function PublicSiteInner() {
   const filtered = vehicles.filter(v => {
     if (brand !== 'all' && v.marque !== brand) return false
     if (origin !== 'all' && v.provenance !== origin) return false
+    if (bodyType !== 'all' && v.carrosserie !== bodyType) return false
     if (budget === 'low' && v.prix >= 4000000) return false
     if (budget === 'mid' && (v.prix < 4000000 || v.prix > 7000000)) return false
     if (budget === 'high' && v.prix <= 7000000) return false
@@ -139,6 +161,10 @@ function PublicSiteInner() {
 
       {/* ── Hero ── */}
       <header id="accueil" className="hero-auto">
+        {heroImages.map((img, i) => (
+          <div key={i} className={`hero-bg-slide ${i === heroIdx ? 'active' : ''}`} style={{ backgroundImage: `url(${img})` }} />
+        ))}
+        <div className="hero-auto-overlay" />
         <div className="hero-auto-content">
           <div className="hero-eyebrow">
             <img src={flagURI('france')} style={{ width: 16, height: 11, borderRadius: 2 }} alt="" />
@@ -181,6 +207,10 @@ function PublicSiteInner() {
           <select value={origin} onChange={e => setOrigin(e.target.value)}>
             <option value="all">{t.catalogue.toutesOrigines}</option>
             {Object.entries(ORIGINS).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
+          </select>
+          <select value={bodyType} onChange={e => setBodyType(e.target.value)}>
+            <option value="all">Toutes carrosseries</option>
+            {BODY_TYPES.map(b => <option key={b} value={b}>{b}</option>)}
           </select>
           <select value={budget} onChange={e => setBudget(e.target.value)}>
             <option value="all">{t.catalogue.toutBudget}</option>
@@ -246,6 +276,10 @@ function PublicSiteInner() {
                       </button>
                       <button className="btn-veh-wa" title="WhatsApp" onClick={() => waDirect(v)}>💬</button>
                     </div>
+                    <label className="veh-compare-check">
+                      <input type="checkbox" checked={!!compareList.find(x => x.id === v.id)} onChange={() => toggleCompare(v)} />
+                      ⚖️ Comparer
+                    </label>
                   </div>
                 </div>
               )
@@ -306,6 +340,32 @@ function PublicSiteInner() {
 
       {/* ── WhatsApp flottant ── */}
       <a className="wa-float" href={waLink('Bonjour ' + s.nom + ', je vous contacte depuis votre site web.', s.whatsapp)} target="_blank" rel="noreferrer">💬</a>
+
+      {/* ── Barre flottante comparateur ── */}
+      {compareList.length > 0 && (
+        <div className="cmp-float-bar">
+          <div className="cmp-float-items">
+            {compareList.map(v => (
+              <div key={v.id} className="cmp-float-chip">
+                {v.marque} {v.modele}
+                <button onClick={() => toggleCompare(v)}>✕</button>
+              </div>
+            ))}
+          </div>
+          <button className="btn-hero-primary" disabled={compareList.length < 2} onClick={() => setCompareOpen(true)}>
+            ⚖️ Comparer ({compareList.length})
+          </button>
+        </div>
+      )}
+
+      {/* ── Modal comparateur ── */}
+      {compareOpen && (
+        <VehicleCompare
+          vehicles={compareList}
+          onClose={() => setCompareOpen(false)}
+          onOpenVehicle={v => { setCompareOpen(false); setOpenVehicle(v) }}
+        />
+      )}
 
       {/* ── Fiche détail véhicule ── */}
       {openVehicle && (
