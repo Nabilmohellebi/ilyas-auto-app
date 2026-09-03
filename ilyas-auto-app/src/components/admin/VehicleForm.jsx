@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react'
 import { supabase } from '../../supabase'
-import { BRANDS, TRANSMISSIONS, FUELS, BADGES, STATUTS, ORIGINS } from '../../data/vehicles-data'
+import { BRANDS, TRANSMISSIONS, FUELS, BODY_TYPES, BADGES, STATUTS, ORIGINS } from '../../data/vehicles-data'
 
 export default function VehicleForm({ vehicle, onClose, onSave }) {
   const isEdit = !!vehicle
@@ -13,6 +13,7 @@ export default function VehicleForm({ vehicle, onClose, onSave }) {
     km:            vehicle?.km ?? '',
     transmission:  vehicle?.transmission || 'Automatique',
     carburant:     vehicle?.carburant || 'Diesel',
+    carrosserie:   vehicle?.carrosserie || 'Berline',
     provenance:    vehicle?.provenance || 'france',
     badge:         vehicle?.badge || '',
     statut:        vehicle?.statut || 'disponible',
@@ -137,6 +138,7 @@ export default function VehicleForm({ vehicle, onClose, onSave }) {
       km:            form.km !== '' ? Number(form.km) : 0,
       transmission:  form.transmission,
       carburant:     form.carburant,
+      carrosserie:   form.carrosserie,
       provenance:    form.provenance,
       badge:         form.badge,
       statut:        form.statut,
@@ -190,6 +192,12 @@ export default function VehicleForm({ vehicle, onClose, onSave }) {
                 <label>Carburant</label>
                 <select value={form.carburant} onChange={e => set('carburant', e.target.value)}>
                   {FUELS.map(f => <option key={f} value={f}>{f}</option>)}
+                </select>
+              </div>
+              <div className="form-field">
+                <label>Type de carrosserie</label>
+                <select value={form.carrosserie} onChange={e => set('carrosserie', e.target.value)}>
+                  {BODY_TYPES.map(b => <option key={b} value={b}>{b}</option>)}
                 </select>
               </div>
               <div className="form-field">
