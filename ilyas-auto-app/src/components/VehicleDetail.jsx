@@ -5,6 +5,49 @@ import { statutLabel } from '../i18n/translations'
 import { useLang } from '../i18n/LangContext'
 import FinancingCalculator from './FinancingCalculator'
 
+function printVehicleSheet(v, images) {
+  const specs = Array.isArray(v.specs) ? v.specs : []
+  const win = window.open('', '_blank')
+  win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${v.marque} ${v.modele}</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family: Arial, sans-serif; color:#111; padding: 28px; }
+    .hdr { display:flex; justify-content:space-between; align-items:center; border-bottom:3px solid #e63946; padding-bottom:14px; margin-bottom:20px; }
+    .brand { font-size:22px; font-weight:900; }
+    .brand em { color:#e63946; font-style:normal; }
+    .date { font-size:11px; color:#888; }
+    img.main { width:100%; max-height:340px; object-fit:cover; border-radius:10px; margin-bottom:16px; }
+    h1 { font-size:24px; margin-bottom:4px; }
+    .price { font-size:26px; font-weight:900; color:#e63946; margin-bottom:16px; }
+    .specs { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:20px; }
+    .specs div { background:#f7f7f7; border-radius:8px; padding:8px 12px; font-size:13px; }
+    .section-title { font-size:13px; font-weight:800; text-transform:uppercase; letter-spacing:.04em; color:#555; margin-bottom:8px; border-top:1px solid #eee; padding-top:14px; }
+    p.desc { font-size:13px; line-height:1.7; margin-bottom:16px; }
+    ul { padding-left:18px; margin-bottom:16px; }
+    li { font-size:13px; margin-bottom:4px; }
+    .footer { margin-top:24px; border-top:1px solid #eee; padding-top:14px; font-size:11px; color:#999; }
+    @media print { button { display:none !important; } }
+  </style></head><body>
+    <button onclick="window.print()" style="background:#e63946;color:white;border:none;padding:10px 24px;border-radius:8px;font-size:13px;cursor:pointer;margin-bottom:16px;">🖨️ Imprimer / Enregistrer en PDF</button>
+    <div class="hdr"><div class="brand">HBR <em>AUTO</em></div><div class="date">${new Date().toLocaleDateString('fr-FR')}</div></div>
+    ${images[0] ? `<img class="main" src="${images[0].url}" />` : ''}
+    <h1>${v.marque} ${v.modele}</h1>
+    <div class="price">${fmt(v.prix)}</div>
+    <div class="specs">
+      <div>📅 Année : ${v.annee}</div>
+      <div>🛣️ Km : ${v.km ? Number(v.km).toLocaleString('fr-FR') : '0'} km</div>
+      <div>⚙️ Boîte : ${v.transmission}</div>
+      <div>⛽ Carburant : ${v.carburant}</div>
+      <div>🚙 Carrosserie : ${v.carrosserie || '—'}</div>
+      <div>🌍 Provenance : ${ORIGINS[v.provenance]?.label || 'Monde'}</div>
+    </div>
+    ${v.description ? `<div class="section-title">Description</div><p class="desc">${v.description}</p>` : ''}
+    ${specs.length ? `<div class="section-title">Équipements</div><ul>${specs.map(s => `<li>${s}</li>`).join('')}</ul>` : ''}
+    <div class="footer">HBR Auto · Document généré automatiquement · Prix indicatif, sous réserve de disponibilité.</div>
+  </body></html>`)
+  win.document.close()
+}
+
 function statutColor(key) {
   return key === 'disponible' ? '#22c55e' : key === 'reserve' ? '#f59e0b' : '#6b7280'
 }
@@ -108,12 +151,15 @@ export default function VehicleDetail({ vehicle: v, onClose, onReserve }) {
               <div><span className="ic">⚙️</span>{v.transmission}</div>
               <div><span className="ic">⛽</span>{v.carburant}</div>
               <div><span className="ic">📅</span>{v.annee}</div>
+              {v.carrosserie && <div><span className="ic">🚙</span>{v.carrosserie}</div>}
               <div><img src={flagURI(v.provenance)} style={{ width: 15, height: 11, borderRadius: 2 }} alt="" />{ORIGINS[v.provenance]?.label || 'Monde'}</div>
             </div>
 
             <button className="btn-hero-primary vd-reserve-desktop" disabled={disabled} onClick={() => !disabled && onReserve(v)}>
               {disabled ? t.detail.vendu : t.detail.reserver}
             </button>
+
+            <button className="vd-print-btn" onClick={() => printVehicleSheet(v, images)}>🖨️ Fiche PDF / Imprimer</button>
 
             {v.video_url && (() => {
               const embed = getEmbedUrl(v.video_url)
