@@ -6,7 +6,7 @@ import { useLang } from '../i18n/LangContext'
 
 export default function ReservationModal({ vehicle, onClose }) {
   const { t } = useLang()
-  const [form, setForm] = useState({ nom: '', tel: '', message: '' })
+  const [form, setForm] = useState({ nom: '', tel: '', date: '', message: '' })
   const [sending, setSending] = useState(false)
   const [sent, setSent] = useState(false)
   const [error, setError] = useState('')
@@ -25,6 +25,7 @@ export default function ReservationModal({ vehicle, onClose }) {
       vehicule_prix: vehicle.prix,
       nom_client: form.nom.trim(),
       telephone: form.tel.trim(),
+      date_souhaitee: form.date.trim() || null,
       message: form.message.trim() || null,
       statut: 'nouvelle',
     }
@@ -70,6 +71,10 @@ export default function ReservationModal({ vehicle, onClose }) {
             <div className="form-field" style={{ marginBottom: 12 }}>
               <label>{t.reservation.tel}</label>
               <input placeholder={t.reservation.telPh} type="tel" value={form.tel} onChange={e => set('tel', e.target.value)} />
+            </div>
+            <div className="form-field" style={{ marginBottom: 12 }}>
+              <label>{t.reservation.date}</label>
+              <input placeholder={t.reservation.datePh} value={form.date} onChange={e => set('date', e.target.value)} />
             </div>
             <div className="form-field" style={{ marginBottom: 16 }}>
               <label>{t.reservation.message}</label>
