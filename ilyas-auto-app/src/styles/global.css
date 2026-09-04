@@ -698,3 +698,49 @@ input, select, textarea { font-family: var(--fb); outline: none; }
   .cmp-veh-card img { width: 80px; height: 56px; }
   .cmp-table th, .cmp-table td { padding: 8px 10px; font-size: 12px; }
 }
+
+/* ═══════════════════════════════════════════════════
+   LA SÉLECTION — collections éditorialisées
+═══════════════════════════════════════════════════ */
+.edito-row { margin-bottom: 36px; }
+.edito-row-title { font-family: var(--ff); font-size: 15px; font-weight: 800; color: white; letter-spacing: .06em; text-transform: uppercase; margin-bottom: 16px; padding-left: 2px; }
+.edito-scroll { display: flex; gap: 16px; overflow-x: auto; padding-bottom: 8px; scrollbar-width: none; }
+.edito-scroll::-webkit-scrollbar { display: none; }
+.edito-card { width: 220px; flex-shrink: 0; cursor: pointer; border-radius: 14px; overflow: hidden; background: var(--card); border: 1px solid var(--brd); transition: all .3s; }
+.edito-card:hover { transform: translateY(-4px); border-color: rgba(230,57,70,.35); }
+.edito-card img { width: 100%; height: 150px; object-fit: cover; display: block; }
+.edito-card-info { padding: 12px 14px; }
+.edito-card-info .name { font-size: 13px; font-weight: 700; color: white; margin-bottom: 3px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.edito-card-info .price { font-size: 14px; font-weight: 900; color: var(--br3); }
+
+/* ═══════════════════════════════════════════════════
+   TÉMOIGNAGES CLIENTS
+═══════════════════════════════════════════════════ */
+.testi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+.testi-card { background: var(--card); border: 1px solid var(--brd); border-radius: 16px; padding: 24px; transition: border-color .3s; }
+.testi-card:hover { border-color: rgba(230,57,70,.3); }
+.testi-stars { color: #f5b400; font-size: 15px; letter-spacing: 2px; margin-bottom: 12px; }
+.testi-quote { font-size: 14px; color: rgba(255,255,255,.75); line-height: 1.7; font-style: italic; margin-bottom: 20px; }
+.testi-author { display: flex; align-items: center; gap: 12px; }
+.testi-author img { width: 42px; height: 42px; border-radius: 50%; object-fit: cover; }
+.testi-avatar { width: 42px; height: 42px; border-radius: 50%; background: rgba(230,57,70,.15); color: var(--br3); display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 15px; }
+.testi-name { font-size: 13.5px; font-weight: 800; color: white; }
+.testi-role { font-size: 11.5px; color: rgba(255,255,255,.4); }
+
+/* ═══════════════════════════════════════════════════
+   DESIGN ÉPURÉ — sobriété et espace, esprit maison de luxe
+   (ces règles surchargent volontairement les précédentes)
+═══════════════════════════════════════════════════ */
+.section { padding: 84px 20px; }
+.section-head { margin-bottom: 52px; }
+.section-head h2 { letter-spacing: .04em; font-weight: 800; }
+.section-head .bar { background: rgba(230,57,70,.6); height: 2px; }
+.hero-eyebrow { background: transparent; border-color: rgba(255,255,255,.14); font-weight: 400; letter-spacing: .04em; }
+.veh-card { border-color: rgba(255,255,255,.08); }
+.veh-card:hover { transform: translateY(-2px); box-shadow: 0 12px 30px rgba(0,0,0,.4); }
+.veh-grid { gap: 28px; }
+.trust-bar { padding: 40px 20px; background: var(--bk2); border-color: rgba(255,255,255,.06); }
+.showroom-info-row { margin-bottom: 24px; }
+.testi-card, .edito-card { box-shadow: none; }
+.btn-hero-primary { letter-spacing: .04em; font-weight: 700; }
+.btn-veh-reserve { letter-spacing: .03em; }
