@@ -11,6 +11,9 @@ import AnnouncementBar from './AnnouncementBar'
 import TrackingPage from './TrackingPage'
 import VehicleGallery from './VehicleGallery'
 import VehicleCompare from './VehicleCompare'
+import EditorialSelection from './EditorialSelection'
+import TestimonialsSection from './TestimonialsSection'
+import SellVehicleModal from './SellVehicleModal'
 import CONFIG from '../config'
 
 function statutColor(key) {
@@ -28,6 +31,7 @@ function PublicSiteInner() {
   const [settings, setSettings] = useState({})
   const [compareList, setCompareList] = useState([])
   const [compareOpen, setCompareOpen] = useState(false)
+  const [sellOpen, setSellOpen] = useState(false)
 
   const [search, setSearch] = useState('')
   const [brand, setBrand] = useState('all')
@@ -144,6 +148,7 @@ function PublicSiteInner() {
             <a onClick={() => scrollTo('stock')} href="#stock">{t.nav.stock}</a>
             <a onClick={() => scrollTo('showroom')} href="#showroom">{t.nav.showroom}</a>
             <a onClick={e => { e.preventDefault(); setTrackingOpen(true) }} href="#">{t.nav.suivi}</a>
+            <a onClick={e => { e.preventDefault(); setSellOpen(true) }} href="#">Vendre mon véhicule</a>
             <button onClick={toggleLang} className="lang-toggle">{lang === 'fr' ? '🇩🇿 عربي' : '🇫🇷 Français'}</button>
             <a href={waLink('Bonjour ' + s.nom + ', je vous contacte depuis votre site web.', s.whatsapp)} target="_blank" rel="noreferrer" className="nav-wa-btn">💬 {t.nav.whatsapp}</a>
           </div>
@@ -154,6 +159,7 @@ function PublicSiteInner() {
           <a onClick={() => scrollTo('stock')} href="#stock">{t.nav.stock}</a>
           <a onClick={() => scrollTo('showroom')} href="#showroom">{t.nav.showroom}</a>
           <a onClick={e => { e.preventDefault(); setMobileOpen(false); setTrackingOpen(true) }} href="#">{t.nav.suivi}</a>
+          <a onClick={e => { e.preventDefault(); setMobileOpen(false); setSellOpen(true) }} href="#">Vendre mon véhicule</a>
           <button onClick={toggleLang} className="lang-toggle" style={{ marginTop: 6, width: 'fit-content' }}>{lang === 'fr' ? '🇩🇿 عربي' : '🇫🇷 Français'}</button>
           <a href={waLink('Bonjour ' + s.nom + ', je vous contacte depuis votre site web.', s.whatsapp)} target="_blank" rel="noreferrer">💬 {t.nav.whatsapp}</a>
         </div>
@@ -189,6 +195,9 @@ function PublicSiteInner() {
           <div><div className="num">DA</div><div className="lbl">{t.trust.prix}</div></div>
         </div>
       </div>
+
+      {/* ── La Sélection (collections éditorialisées) ── */}
+      {!loading && <EditorialSelection vehicles={vehicles} onOpenVehicle={setOpenVehicle} />}
 
       {/* ── Stock ── */}
       <section id="stock" className="section">
@@ -288,6 +297,9 @@ function PublicSiteInner() {
         )}
       </section>
 
+      {/* ── Témoignages ── */}
+      <TestimonialsSection supabase={supabase} />
+
       {/* ── Showroom ── */}
       <section id="showroom" className="section">
         <div className="section-head">
@@ -381,6 +393,9 @@ function PublicSiteInner() {
 
       {/* ── Suivi de réservation ── */}
       {trackingOpen && <TrackingPage onClose={() => setTrackingOpen(false)} />}
+
+      {/* ── Vendre mon véhicule ── */}
+      {sellOpen && <SellVehicleModal onClose={() => setSellOpen(false)} />}
     </div>
   )
 }
