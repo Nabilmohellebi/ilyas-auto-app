@@ -180,6 +180,10 @@ export default function AdminPanel({ onLogout, onToast }) {
   const [vehicles, setVehicles] = useState([])
   const [reservations, setReservations] = useState([])
   const [bannerMsgs, setBannerMsgs] = useState([])
+  const [testimonials, setTestimonials] = useState([])
+  const [sellRequests, setSellRequests] = useState([])
+  const [newTesti, setNewTesti] = useState({ nom: '', role: '', texte: '', note: 5, photo_url: '' })
+  const [testiUploading, setTestiUploading] = useState(false)
   const [newMsg, setNewMsg] = useState('')
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
@@ -198,7 +202,50 @@ export default function AdminPanel({ onLogout, onToast }) {
     setReservations(data || [])
   }, [])
 
-  useEffect(() => { loadVehicles(); loadReservations(); loadBanner() }, [])
+  useEffect(() => { loadVehicles(); loadReservations(); loadBanner(); loadTestimonials(); loadSellRequests() }, [])
+
+  async function loadTestimonials() {
+    const { data } = await supabase.from('testimonials').select('*').order('position', { ascending: true })
+    setTestimonials(data || [])
+  }
+  async function uploadTestiPhoto(file) {
+    setTestiUploading(true)
+    const path = `testimonials/${Date.now()}.jpg`
+    const { error } = await supabase.storage.from('vehicle-images').upload(path, file, { upsert: true })
+    setTestiUploading(false)
+    if (error) { onToast('❌ Erreur upload photo', 'error'); return '' }
+    const { data: { publicUrl } } = supabase.storage.from('vehicle-images').getPublicUrl(path)
+    return publicUrl
+  }
+  async function addTestimonial() {
+    if (!newTesti.nom.trim() || !newTesti.texte.trim()) return
+    const pos = testimonials.length + 1
+    await supabase.from('testimonials').insert({ ...newTesti, actif: true, position: pos })
+    setNewTesti({ nom: '', role: '', texte: '', note: 5, photo_url: '' })
+    loadTestimonials()
+    onToast('✅ Témoignage ajouté')
+  }
+  async function toggleTesti(id, actif) {
+    await supabase.from('testimonials').update({ actif }).eq('id', id)
+    setTestimonials(prev => prev.map(t => t.id === id ? { ...t, actif } : t))
+  }
+  async function deleteTesti(id) {
+    await supabase.from('testimonials').delete().eq('id', id)
+    setTestimonials(prev => prev.filter(t => t.id !== id))
+  }
+
+  async function loadSellRequests() {
+    const { data } = await supabase.from('sell_requests').select('*').order('created_at', { ascending: false })
+    setSellRequests(data || [])
+  }
+  async function setSellStatus(id, statut) {
+    await supabase.from('sell_requests').update({ statut }).eq('id', id)
+    setSellRequests(prev => prev.map(r => r.id === id ? { ...r, statut } : r))
+  }
+  async function deleteSellRequest(id) {
+    await supabase.from('sell_requests').delete().eq('id', id)
+    setSellRequests(prev => prev.filter(r => r.id !== id))
+  }
 
   async function loadBanner() {
     const { data } = await supabase.from('banner_messages').select('*').order('position', { ascending: true })
@@ -319,7 +366,7 @@ export default function AdminPanel({ onLogout, onToast }) {
       <div className="adm-top">
         <div className="adm-logo">HBR <em>AUTO</em> <span className="adm-badge">ADMIN</span></div>
         <div className="adm-tabs">
-          {[['vehicules', '🚘 Véhicules'], ['reservations', '📩 Réservations'], ['banniere', '📢 Bannière'], ['settings', '⚙️ Paramètres']].map(([k, l]) => (
+          {[['vehicules', '🚘 Véhicules'], ['reservations', '📩 Réservations'], ['reprises', '🔄 Reprises'], ['temoignages', '⭐ Témoignages'], ['banniere', '📢 Bannière'], ['settings', '⚙️ Paramètres']].map(([k, l]) => (
             <button key={k} className={`adm-tab ${tab === k ? 'active' : ''}`} onClick={() => setTab(k)}>{l}</button>
           ))}
         </div>
@@ -407,6 +454,7 @@ export default function AdminPanel({ onLogout, onToast }) {
                 <div className="rescard-info">
                   <span>👤 {r.nom_client}</span>
                   <span>📞 {r.telephone}</span>
+                  {r.date_souhaitee && <span>📅 Créneau souhaité : {r.date_souhaitee}</span>}
                   <span>💰 {fmt(r.vehicule_prix)}</span>
                   {r.message && <span>📝 {r.message}</span>}
                 </div>
@@ -419,6 +467,92 @@ export default function AdminPanel({ onLogout, onToast }) {
                 </div>
               </div>
             ))}
+          </div>
+        )}
+
+        {/* ── TAB REPRISES ── */}
+        {tab === 'reprises' && (
+          <div>
+            <h3 style={{ color: 'white', fontSize: 16, fontWeight: 800, marginBottom: 8 }}>🔄 Demandes de reprise</h3>
+            <p style={{ color: 'rgba(255,255,255,.4)', fontSize: 12, marginBottom: 20 }}>Véhicules que des visiteurs proposent de vous vendre.</p>
+            {sellRequests.length === 0 ? (
+              <div className="empty"><div style={{ fontSize: 40 }}>🔄</div><p>Aucune demande pour le moment.</p></div>
+            ) : sellRequests.map(r => (
+              <div key={r.id} className={`rescard ${r.statut === 'nouvelle' ? 'new' : ''}`}>
+                <div className="rescard-top">
+                  <div>
+                    <div className="rescard-veh">🚘 {r.marque} {r.modele} {r.annee ? `(${r.annee})` : ''}</div>
+                    <div className="rescard-date">{new Date(r.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })}</div>
+                  </div>
+                  <span className={`res-badge ${r.statut}`}>{RES_STATUTS.find(s => s.key === r.statut)?.label || r.statut}</span>
+                </div>
+                <div className="rescard-info">
+                  <span>👤 {r.nom_client}</span>
+                  <span>📞 {r.telephone}</span>
+                  {r.km && <span>🛣️ {Number(r.km).toLocaleString('fr-FR')} km</span>}
+                  {r.prix_souhaite && <span>💰 Prix souhaité : {fmt(r.prix_souhaite)}</span>}
+                  {r.message && <span>📝 {r.message}</span>}
+                </div>
+                <div className="rescard-actions">
+                  <button className="act-btn wa" onClick={() => openWA({ nom_client: r.nom_client, telephone: r.telephone, vehicule_nom: `${r.marque} ${r.modele}`, vehicule_prix: r.prix_souhaite || 0 })}>💬 Contacter WhatsApp</button>
+                  {r.statut !== 'contactee' && <button className="act-btn" onClick={() => setSellStatus(r.id, 'contactee')}>📞 Marquer contactée</button>}
+                  {r.statut !== 'vendue' && <button className="act-btn" onClick={() => setSellStatus(r.id, 'vendue')}>✅ Marquer traitée</button>}
+                  {r.statut !== 'annulee' && <button className="act-btn" onClick={() => setSellStatus(r.id, 'annulee')}>❌ Annuler</button>}
+                  <button className="act-btn danger" onClick={() => deleteSellRequest(r.id)}>🗑️ Supprimer</button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* ── TAB TÉMOIGNAGES ── */}
+        {tab === 'temoignages' && (
+          <div>
+            <h3 style={{ color: 'white', fontSize: 16, fontWeight: 800, marginBottom: 8 }}>⭐ Témoignages clients</h3>
+            <p style={{ color: 'rgba(255,255,255,.4)', fontSize: 12, marginBottom: 20 }}>S'affichent sur le site public, section "Ils nous font confiance".</p>
+
+            <div className="pf-section" style={{ marginBottom: 20 }}>
+              <h3>➕ Ajouter un témoignage</h3>
+              <div className="pf-grid" style={{ marginBottom: 10 }}>
+                <div className="form-field"><label>Nom du client</label><input value={newTesti.nom} onChange={e => setNewTesti(t => ({ ...t, nom: e.target.value }))} /></div>
+                <div className="form-field"><label>Ville / rôle (optionnel)</label><input value={newTesti.role} onChange={e => setNewTesti(t => ({ ...t, role: e.target.value }))} placeholder="Ex : Alger" /></div>
+              </div>
+              <div className="form-field" style={{ marginBottom: 10 }}>
+                <label>Témoignage</label>
+                <textarea rows={3} value={newTesti.texte} onChange={e => setNewTesti(t => ({ ...t, texte: e.target.value }))} placeholder="Ce que le client a dit..." />
+              </div>
+              <div className="pf-grid" style={{ marginBottom: 10, alignItems: 'end' }}>
+                <div className="form-field">
+                  <label>Note</label>
+                  <select value={newTesti.note} onChange={e => setNewTesti(t => ({ ...t, note: Number(e.target.value) }))}>
+                    {[5, 4, 3, 2, 1].map(n => <option key={n} value={n}>{'★'.repeat(n)} ({n}/5)</option>)}
+                  </select>
+                </div>
+                <div className="form-field">
+                  <label>Photo (optionnel)</label>
+                  <input type="file" accept="image/*" onChange={async e => {
+                    const f = e.target.files[0]
+                    if (!f) return
+                    const url = await uploadTestiPhoto(f)
+                    if (url) setNewTesti(t => ({ ...t, photo_url: url }))
+                  }} style={{ background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.1)', borderRadius: 9, padding: 8, color: 'white', fontSize: 12, width: '100%' }} />
+                </div>
+              </div>
+              <button className="btn-save" onClick={addTestimonial} disabled={testiUploading}>{testiUploading ? '⏳...' : '➕ Ajouter'}</button>
+            </div>
+
+            {testimonials.map(t => (
+              <div key={t.id} style={{ display: 'flex', alignItems: 'center', gap: 12, background: 'var(--card)', border: '1px solid var(--brd)', borderRadius: 10, padding: 12, marginBottom: 8, opacity: t.actif ? 1 : .5 }}>
+                {t.photo_url ? <img src={t.photo_url} alt="" style={{ width: 44, height: 44, borderRadius: '50%', objectFit: 'cover' }} /> : <div style={{ width: 44, height: 44, borderRadius: '50%', background: 'rgba(230,57,70,.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#ff5a63', fontWeight: 900 }}>{t.nom?.[0]}</div>}
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ color: 'white', fontWeight: 800, fontSize: 13 }}>{t.nom} {t.role && <span style={{ color: 'rgba(255,255,255,.4)', fontWeight: 400 }}>· {t.role}</span>}</div>
+                  <div style={{ color: 'rgba(255,255,255,.5)', fontSize: 12, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{'★'.repeat(t.note)} {t.texte}</div>
+                </div>
+                <button className="act-btn" onClick={() => toggleTesti(t.id, !t.actif)}>{t.actif ? '✅ Actif' : '⏸ Inactif'}</button>
+                <button className="act-btn danger" onClick={() => deleteTesti(t.id)}>🗑</button>
+              </div>
+            ))}
+            {testimonials.length === 0 && <div className="empty"><p>Aucun témoignage pour le moment.</p></div>}
           </div>
         )}
 
