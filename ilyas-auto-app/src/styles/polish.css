@@ -338,3 +338,80 @@
     transition-duration: .01ms !important;
   }
 }
+
+/* ── CRM clients ── */
+.crm-root { display: flex; flex-direction: column; gap: 18px; }
+.crm-header { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; }
+.crm-header h2 { color: #f4f2ed; font-size: 24px; font-weight: 850; margin: 7px 0; letter-spacing: -.03em; }
+.crm-header p { color: rgba(244,242,237,.5); font-size: 12px; line-height: 1.6; }
+.crm-stats { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 10px; }
+.crm-stat-card { min-width: 0; padding: 15px 16px; border: 1px solid rgba(255,255,255,.075); border-radius: 11px; background: linear-gradient(145deg,rgba(25,30,36,.96),rgba(16,20,25,.96)); }
+.crm-stat-card span { display: block; color: rgba(244,242,237,.5); font-size: 11px; }
+.crm-stat-card strong { display: block; color: #f4f2ed; font-size: 24px; margin-top: 7px; font-weight: 900; font-variant-numeric: tabular-nums; }
+.crm-stat-card strong.crm-highlight { color: #efc28f; }
+.crm-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.crm-search { flex: 1 1 260px; max-width: 420px; }
+.crm-clients { display: flex; flex-direction: column; gap: 10px; }
+.crm-client-card { border: 1px solid rgba(255,255,255,.075); border-radius: 12px; background: linear-gradient(145deg,rgba(25,30,36,.94),rgba(16,20,25,.94)); overflow: hidden; }
+.crm-client-main { display: flex; align-items: center; gap: 13px; padding: 15px; }
+.crm-avatar { width: 42px; height: 42px; flex: 0 0 42px; display: grid; place-items: center; border-radius: 50%; background: rgba(217,170,112,.14); color: #efc28f; font-size: 17px; font-weight: 900; }
+.crm-client-identity { display: flex; min-width: 0; flex: 1; flex-direction: column; gap: 4px; }
+.crm-client-identity strong { color: #f4f2ed; font-size: 13px; }
+.crm-client-identity a { color: #d9aa70; font-size: 12px; text-decoration: none; }
+.crm-client-identity small { color: rgba(244,242,237,.4); font-size: 10px; }
+.crm-client-tags { display: flex; flex-wrap: wrap; gap: 5px; }
+.crm-tag { display: inline-flex; padding: 5px 8px; border-radius: 999px; font-size: 10px; font-weight: 800; white-space: nowrap; }
+.crm-tag.pending { background: rgba(217,170,112,.13); color: #efc28f; }
+.crm-tag.converted { background: rgba(91,185,131,.12); color: #9cdbb5; }
+.crm-client-actions { display: flex; flex-shrink: 0; gap: 6px; }
+.crm-history { padding: 14px 18px 16px 70px; border-top: 1px solid rgba(255,255,255,.07); background: rgba(0,0,0,.12); }
+.crm-history-title { margin-bottom: 12px; color: #e8cf9f; font-size: 10px; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; }
+.crm-history-row { position: relative; display: flex; gap: 12px; padding: 0 0 16px; }
+.crm-history-row:last-child { padding-bottom: 0; }
+.crm-history-dot { position: absolute; left: -28px; top: 4px; width: 8px; height: 8px; border-radius: 50%; background: #d9aa70; box-shadow: 0 0 0 4px rgba(217,170,112,.1); }
+.crm-history-content { min-width: 0; flex: 1; }
+.crm-history-heading { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.crm-history-heading strong { color: rgba(244,242,237,.88); font-size: 12px; line-height: 1.5; }
+.crm-history-content > small { display: block; color: rgba(244,242,237,.38); font-size: 10px; margin-top: 4px; }
+.crm-history-content > p { color: rgba(244,242,237,.58); font-size: 11px; line-height: 1.6; margin-top: 8px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.crm-history-actions { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 9px; }
+.crm-empty { display: grid; justify-items: center; gap: 8px; padding: 38px 18px; border: 1px dashed rgba(255,255,255,.12); border-radius: 12px; text-align: center; }
+.crm-empty > div { font-size: 32px; }
+.crm-empty strong { color: #f4f2ed; font-size: 14px; }
+.crm-empty p,.crm-footnote { max-width: 520px; color: rgba(244,242,237,.42); font-size: 11px; line-height: 1.6; }
+.crm-footnote { max-width: none; margin: 0; }
+
+/* ── Lien partageable sur chaque fiche véhicule ── */
+.vd-share-btn {
+  display: block;
+  width: 100%;
+  min-height: 42px;
+  margin-top: 8px;
+  padding: 10px 14px;
+  border: 1px solid rgba(217,170,112,.32);
+  border-radius: 8px;
+  background: rgba(217,170,112,.08);
+  color: #e8cf9f;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: background .2s ease,border-color .2s ease;
+}
+.vd-share-btn:hover { background: rgba(217,170,112,.16); border-color: rgba(217,170,112,.65); }
+
+@media (max-width: 760px) {
+  .crm-stats { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .crm-header { align-items: stretch; flex-direction: column; }
+  .crm-header > button { align-self: flex-start; }
+}
+@media (max-width: 560px) {
+  .crm-client-main { flex-wrap: wrap; gap: 9px; }
+  .crm-client-identity { flex-basis: calc(100% - 54px); }
+  .crm-client-tags { margin-left: 50px; }
+  .crm-client-actions { width: 100%; margin-left: 50px; }
+  .crm-client-actions .act-btn { flex: 1; }
+  .crm-history { padding-left: 44px; }
+  .crm-history-heading { align-items: flex-start; flex-direction: column; gap: 5px; }
+}
+
