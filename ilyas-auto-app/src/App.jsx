@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { lazy, Suspense, useState } from 'react'
 import AdminLogin from './components/admin/AdminLogin'
-import AdminPanel from './components/admin/AdminPanel'
+const AdminPanel = lazy(() => import('./components/admin/AdminPanel'))
 import PublicSite from './components/PublicSite'
 import { getSettings } from './utils/useSettings'
 
@@ -47,7 +47,9 @@ export default function App() {
     if (!adminAuth) return <AdminLogin onLogin={handleLogin} error={loginError} />
     return (
       <>
-        <AdminPanel onLogout={handleLogout} onToast={toast} />
+        <Suspense fallback={<div className="adm-loading" role="status">Chargement de l’administration…</div>}>
+          <AdminPanel onLogout={handleLogout} onToast={toast} />
+        </Suspense>
         <div className="toasts">
           {toasts.map(t => <div key={t.id} className={`toast-msg ${t.type}`}>{t.msg}</div>)}
         </div>
