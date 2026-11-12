@@ -21,7 +21,7 @@ export default function SellVehicleModal({ onClose, vehicles = [], tradeMarginPe
   const [error, setError] = useState('')
 
   const availableVehicles = useMemo(
-    () => vehicles.filter(v => v.is_active !== false && v.statut !== 'vendu'),
+    () => vehicles.filter(v => v.is_active !== false && v.statut === 'disponible'),
     [vehicles]
   )
   const targetVehicle = availableVehicles.find(v => String(v.id) === String(form.targetVehicleId)) || null
@@ -44,7 +44,7 @@ export default function SellVehicleModal({ onClose, vehicles = [], tradeMarginPe
           : 'Les deux véhicules sont à valeur équivalente selon cette estimation.'
       return `Bonjour HBR AUTO, je souhaite proposer un échange. Mon véhicule : ${vehicleName} (${form.annee || '?'}) — ${form.km || '?'} km. Valeur estimée : ${money(declaredValue)}. Véhicule souhaité : ${targetVehicle ? `${targetVehicle.marque} ${targetVehicle.modele}` : 'à définir'}. Offre de reprise simulée : ${money(tradeOffer)} (marge ${margin} %). ${balanceText}`
     }
-    return `Bonjour HBR AUTO, je souhaite vendre mon véhicule : ${vehicleName} (${form.annee || '?'}) — ${form.km || '?'} km. Prix souhaité : ${form.prix ? money(form.prix) : 'à discuter'} DA.`
+    return `Bonjour HBR AUTO, je souhaite vendre mon véhicule : ${vehicleName} (${form.annee || '?'}) — ${form.km || '?'} km. Prix souhaité : ${form.prix ? money(form.prix) : 'à discuter'}.`
   }
 
   async function submit() {
