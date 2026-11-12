@@ -15,7 +15,6 @@ const DEFAULTS = {
   shop_maps_url:   'https://maps.app.goo.gl/mrnBnx1ZRXTS4xoi6',
   shop_maps_embed: 'https://maps.google.com/maps?q=HBR+MELABA,+Azazga&z=16&output=embed',
   maintenance:     'false',
-  admin_password:  '', // si vide → on retombe sur VITE_ADMIN_PASSWORD
 }
 
 export async function getSettings() {
