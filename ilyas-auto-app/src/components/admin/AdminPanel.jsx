@@ -4,6 +4,7 @@ import { saveSetting, getSettings } from '../../utils/useSettings'
 import { openWA, fmt } from '../../utils/notify'
 import { STATUTS, PLACEHOLDER_IMG, flagURI } from '../../data/vehicles-data'
 import VehicleForm from './VehicleForm'
+import CRMPanel from './CRMPanel'
 
 const RES_STATUTS = [
   { key: 'nouvelle',  label: '🆕 Nouvelle' },
@@ -483,6 +484,7 @@ export default function AdminPanel({ onLogout, onToast }) {
             ['vehicules-neufs', '🚘 Véhicules neufs'],
             ['vehicules-occasion', '🔄 Véhicules d’occasion'],
             ['reservations', '📩 Réservations'],
+            ['crm', '👥 CRM clients'],
             ['reprises', '🔄 Ventes & échanges'],
             ['temoignages', '⭐ Témoignages'],
             ['banniere', '📢 Bannière'],
@@ -727,6 +729,15 @@ export default function AdminPanel({ onLogout, onToast }) {
               )
             })}
           </div>
+        )}
+
+        {tab === 'crm' && (
+          <CRMPanel
+            reservations={reservations}
+            sellRequests={sellRequests}
+            onSetReservationStatus={setResStatus}
+            onSetSellRequestStatus={setSellStatus}
+          />
         )}
 
         {/* ── TAB TÉMOIGNAGES ── */}

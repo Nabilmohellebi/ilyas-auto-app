@@ -107,6 +107,7 @@ export default function VehicleDetail({ vehicle: v, onClose, onReserve }) {
   const { lang, t } = useLang()
   const images = Array.isArray(v.images) && v.images.length > 0 ? v.images : (v.img ? [{ url: v.img }] : [])
   const gallery = Array.isArray(v.images_gallery) ? v.images_gallery : []
+  const [shareStatus, setShareStatus] = useState('')
   const [idx, setIdx] = useState(0)
   const [lb, setLb] = useState(false)
   const touchX = useRef(null)
@@ -118,6 +119,31 @@ export default function VehicleDetail({ vehicle: v, onClose, onReserve }) {
 
   function next() { setIdx(i => (i + 1) % images.length) }
   function prev() { setIdx(i => (i - 1 + images.length) % images.length) }
+
+  async function shareVehicle() {
+    const link = new URL(window.location.pathname, window.location.origin)
+    link.searchParams.set('vehicule', String(v.id))
+    const shareData = {
+      title: `HBR AUTO — ${v.marque} ${v.modele}`,
+      text: `${v.marque} ${v.modele} (${v.annee}) · ${fmt(v.prix)}`,
+      url: link.href,
+    }
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData)
+        return
+      }
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(link.href)
+        setShareStatus('Lien copié !')
+        window.setTimeout(() => setShareStatus(''), 2500)
+        return
+      }
+      window.prompt('Copie le lien de cette voiture :', link.href)
+    } catch (error) {
+      if (error?.name !== 'AbortError') setShareStatus('Partage indisponible')
+    }
+  }
 
   function onTouchStart(e) { touchX.current = e.touches[0].clientX }
   function onTouchEnd(e) {
@@ -188,6 +214,7 @@ export default function VehicleDetail({ vehicle: v, onClose, onReserve }) {
             </button>
 
             <button className="vd-print-btn" onClick={() => printVehicleSheet(v, images)}>🖨️ Fiche PDF / Imprimer</button>
+            <button className="vd-share-btn" onClick={shareVehicle}>↗️ {shareStatus || "Partager la fiche"}</button>
 
             {v.video_url && (() => {
               const embed = getEmbedUrl(v.video_url)
