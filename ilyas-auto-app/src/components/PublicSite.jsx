@@ -1,19 +1,19 @@
-import { useState, useEffect, useMemo } from 'react'
+import { lazy, Suspense, useState, useEffect, useMemo } from 'react'
 import { supabase } from '../supabase'
 import { fmt, waLink } from '../utils/notify'
 import { ORIGINS, flagURI, PLACEHOLDER_IMG, BODY_TYPES } from '../data/vehicles-data'
 import { getSettings } from '../utils/useSettings'
 import { statutLabel } from '../i18n/translations'
 import { LangProvider, useLang } from '../i18n/LangContext'
-import ReservationModal from './ReservationModal'
-import VehicleDetail from './VehicleDetail'
+const ReservationModal = lazy(() => import('./ReservationModal'))
+const VehicleDetail = lazy(() => import('./VehicleDetail'))
 import AnnouncementBar from './AnnouncementBar'
-import TrackingPage from './TrackingPage'
+const TrackingPage = lazy(() => import('./TrackingPage'))
 import VehicleGallery from './VehicleGallery'
-import VehicleCompare from './VehicleCompare'
+const VehicleCompare = lazy(() => import('./VehicleCompare'))
 import EditorialSelection from './EditorialSelection'
 import TestimonialsSection from './TestimonialsSection'
-import SellVehicleModal from './SellVehicleModal'
+const SellVehicleModal = lazy(() => import('./SellVehicleModal'))
 import CONFIG from '../config'
 
 function statutColor(key) {
@@ -104,7 +104,7 @@ function PublicSiteInner() {
 
   const brands = useMemo(() => [...new Set(vehicles.map(v => v.marque))].sort(), [vehicles])
 
-  const heroImages = useMemo(() => vehicles.filter(v => v.img).slice(0, 6).map(v => v.img), [vehicles])
+  const heroImages = useMemo(() => vehicles.filter(v => v.img).slice(0, 3).map(v => v.img), [vehicles])
 
   useEffect(() => {
     if (heroImages.length < 2) return
@@ -417,30 +417,34 @@ function PublicSiteInner() {
 
       {/* ── Modal comparateur ── */}
       {compareOpen && (
-        <VehicleCompare
-          vehicles={compareList}
-          onClose={() => setCompareOpen(false)}
-          onOpenVehicle={v => { setCompareOpen(false); setOpenVehicle(v) }}
-        />
+        <Suspense fallback={<div className="spinner" role="status">Chargement du comparateur…</div>}>
+          <VehicleCompare
+            vehicles={compareList}
+            onClose={() => setCompareOpen(false)}
+            onOpenVehicle={v => { setCompareOpen(false); setOpenVehicle(v) }}
+          />
+        </Suspense>
       )}
 
       {/* ── Fiche détail véhicule ── */}
       {openVehicle && (
-        <VehicleDetail
-          vehicle={openVehicle}
-          onClose={() => setOpenVehicle(null)}
-          onReserve={v => { setOpenVehicle(null); setReserveVehicle(v) }}
-        />
+        <Suspense fallback={<div className="spinner" role="status">Chargement de la fiche…</div>}>
+          <VehicleDetail
+            vehicle={openVehicle}
+            onClose={() => setOpenVehicle(null)}
+            onReserve={v => { setOpenVehicle(null); setReserveVehicle(v) }}
+          />
+        </Suspense>
       )}
 
       {/* ── Modal réservation ── */}
-      {reserveVehicle && <ReservationModal vehicle={reserveVehicle} onClose={() => setReserveVehicle(null)} />}
+      {reserveVehicle && <Suspense fallback={<div className="spinner" role="status">Chargement…</div>}><ReservationModal vehicle={reserveVehicle} onClose={() => setReserveVehicle(null)} /></Suspense>}
 
       {/* ── Suivi de réservation ── */}
-      {trackingOpen && <TrackingPage onClose={() => setTrackingOpen(false)} />}
+      {trackingOpen && <Suspense fallback={<div className="spinner" role="status">Chargement…</div>}><TrackingPage onClose={() => setTrackingOpen(false)} /></Suspense>}
 
       {/* ── Vendre mon véhicule ── */}
-      {sellOpen && <SellVehicleModal onClose={() => setSellOpen(false)} vehicles={vehicles} tradeMarginPercent={settings.trade_margin_percent ?? 5} whatsapp={s.whatsapp} />}
+      {sellOpen && <Suspense fallback={<div className="spinner" role="status">Chargement…</div>}><SellVehicleModal onClose={() => setSellOpen(false)} vehicles={vehicles} tradeMarginPercent={settings.trade_margin_percent ?? 5} whatsapp={s.whatsapp} /></Suspense>}
     </div>
   )
 }
