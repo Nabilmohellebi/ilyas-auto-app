@@ -2,7 +2,7 @@ import { lazy, Suspense, useState } from 'react'
 import AdminLogin from './components/admin/AdminLogin'
 const AdminPanel = lazy(() => import('./components/admin/AdminPanel'))
 import PublicSite from './components/PublicSite'
-import { getSettings } from './utils/useSettings'
+import { supabase } from './supabase'
 
 export default function App() {
   const isAdmin =
@@ -19,32 +19,36 @@ export default function App() {
     setTimeout(() => setToasts(t => t.filter(x => x.id !== id)), 3200)
   }
 
-  async function handleLogin(pw) {
-    try {
-      const s = await getSettings()
-      const validPw = s.admin_password || import.meta.env.VITE_ADMIN_PASSWORD || 'ilyas2026'
-      if (pw === validPw) {
-        localStorage.setItem('ia_admin', '1')
-        setAdminAuth(true)
-        setLoginError(false)
-      } else {
-        setLoginError(true)
-      }
-    } catch (e) {
-      const fallback = import.meta.env.VITE_ADMIN_PASSWORD || 'ilyas2026'
-      if (pw === fallback) { localStorage.setItem('ia_admin', '1'); setAdminAuth(true); setLoginError(false) }
-      else setLoginError(true)
+  async function handleLogin(email, password) {
+    setLoginError('')
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: email.trim(),
+      password,
+    })
+    if (error) {
+      setLoginError('Adresse e-mail ou mot de passe incorrect.')
+      return
     }
+
+    const { data: verified, error: verifyError } = await supabase.auth.getUser()
+    const user = verified?.user || data?.user
+    if (verifyError || user?.app_metadata?.role !== 'admin') {
+      await supabase.auth.signOut()
+      setLoginError("Ce compte n'a pas les droits administrateur.")
+      return
+    }
+    setAdminUser(user)
   }
 
-  function handleLogout() {
-    localStorage.removeItem('ia_admin')
-    setAdminAuth(false)
+  async function handleLogout() {
+    await supabase.auth.signOut()
+    setAdminUser(null)
     window.location.href = '/'
   }
 
   if (isAdmin) {
-    if (!adminAuth) return <AdminLogin onLogin={handleLogin} error={loginError} />
+    if (authLoading) return <div className="adm-loading" role="status">Vérification de la session…</div>
+    if (!adminUser) return <AdminLogin onLogin={handleLogin} error={loginError} />
     return (
       <>
         <Suspense fallback={<div className="adm-loading" role="status">Chargement de l’administration…</div>}>
