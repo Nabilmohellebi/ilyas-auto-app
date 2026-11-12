@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { supabase } from '../../supabase'
 import { fmt } from '../../utils/notify'
 
@@ -87,11 +87,11 @@ export default function FinancePanel({ vehicles = [], onToast }) {
   const invested = rows.reduce((sum, row) => sum + totalCost(row), 0)
   const revenue = soldRows.reduce((sum, row) => sum + num(row.sale_price), 0)
   const realizedProfit = soldRows.reduce((sum, row) => sum + num(row.sale_price) - totalCost(row), 0)
-  const currentMonth = new Date().toISOString().slice(0, 7)
+  const localNow = new Date()
+  const currentMonth = `${localNow.getFullYear()}-${String(localNow.getMonth() + 1).padStart(2, '0')}`
   const monthSales = soldRows.filter(row => row.sale_date?.slice(0, 7) === currentMonth)
   const monthProfit = monthSales.reduce((sum, row) => sum + num(row.sale_price) - totalCost(row), 0)
 
-  const availableVehicleIds = useMemo(() => new Set(rows.map(row => String(row.vehicle_id))), [rows])
   const availableVehicles = vehicles.filter(vehicle => (
     vehicle.is_active !== false ||
     rows.some(row => String(row.vehicle_id) === String(vehicle.id))
