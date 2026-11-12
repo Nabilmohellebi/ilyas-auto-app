@@ -14,7 +14,10 @@ async function sendTelegram(text) {
 export function fmt(n) { return Number(n || 0).toLocaleString('fr-FR') + ' DA' }
 
 export function genId() {
-  return 'IA-' + Date.now().toString(36).toUpperCase().slice(-6)
+  const randomPart = typeof crypto !== 'undefined' && crypto.randomUUID
+    ? crypto.randomUUID().replace(/-/g, '').slice(0, 12)
+    : Array.from(crypto.getRandomValues(new Uint8Array(6)), byte => byte.toString(16).padStart(2, '0')).join('')
+  return 'IA-' + randomPart.toUpperCase()
 }
 
 // ── Notifier une nouvelle réservation sur Telegram ──
