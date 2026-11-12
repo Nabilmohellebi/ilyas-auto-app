@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { supabase } from '../supabase'
-import { genId, waLink } from '../utils/notify'
+import { genId, notifyTelegramSellRequest, waLink } from '../utils/notify'
 
 const DETAILS_PREFIX = 'HBR_REQUEST_V2:'
 
@@ -48,7 +48,32 @@ export default function SellVehicleModal({ onClose, vehicles = [], tradeMarginPe
   }
 
   async function submit() {
-    if (!form.marque.trim() || !form.modele.trim() || !form.nom.trim() || !form.tel.trim()) return
+    const phoneDigits = form.tel.replace(/\D/g, '')
+    const year = form.annee ? Number(form.annee) : null
+    const km = form.km === '' ? null : Number(form.km)
+    const price = form.prix === '' ? null : Number(form.prix)
+    const maxYear = new Date().getFullYear() + 1
+
+    if (!form.marque.trim() || !form.modele.trim() || !form.nom.trim() || !form.tel.trim()) {
+      setError('Renseigne la marque, le modèle, ton nom et ton téléphone.')
+      return
+    }
+    if (phoneDigits.length < 8 || phoneDigits.length > 15) {
+      setError('Vérifie le numéro de téléphone (8 à 15 chiffres).')
+      return
+    }
+    if (year !== null && (!Number.isInteger(year) || year < 1950 || year > maxYear)) {
+      setError(`L’année doit être comprise entre 1950 et ${maxYear}.`)
+      return
+    }
+    if (km !== null && (!Number.isFinite(km) || km < 0)) {
+      setError('Le kilométrage doit être un nombre positif ou nul.')
+      return
+    }
+    if (price !== null && (!Number.isFinite(price) || price <= 0)) {
+      setError('Le prix doit être supérieur à zéro.')
+      return
+    }
     if (type === 'exchange' && (!form.prix || declaredValue <= 0 || !targetVehicle)) {
       setError('Pour simuler un échange, indique une valeur estimée et choisis le véhicule souhaité.')
       return
@@ -80,9 +105,9 @@ export default function SellVehicleModal({ onClose, vehicles = [], tradeMarginPe
       id: genId(),
       marque: form.marque.trim(),
       modele: form.modele.trim(),
-      annee: form.annee ? Number(form.annee) : null,
-      km: form.km ? Number(form.km) : null,
-      prix_souhaite: form.prix ? Number(form.prix) : null,
+      annee: year,
+      km,
+      prix_souhaite: price,
       nom_client: form.nom.trim(),
       telephone: form.tel.trim(),
       message: DETAILS_PREFIX + JSON.stringify(details),
@@ -92,6 +117,7 @@ export default function SellVehicleModal({ onClose, vehicles = [], tradeMarginPe
     try {
       const { error: insertError } = await supabase.from('sell_requests').insert(request)
       if (insertError) throw insertError
+      notifyTelegramSellRequest(request, details)
       setSent(true)
     } catch (err) {
       console.error('HBR AUTO request:', err)

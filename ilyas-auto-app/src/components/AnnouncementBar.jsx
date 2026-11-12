@@ -2,9 +2,9 @@ import { useState, useEffect } from 'react'
 import { supabase } from '../supabase'
 
 const DEFAULT_MSGS = [
-  '🚗 Nouveaux arrivages chaque semaine',
-  '✅ Véhicules contrôlés avant vente',
-  '📞 Réponse rapide sur WhatsApp',
+  '🚗 Découvrez nos véhicules neufs et d’occasion',
+  '🔄 Achat, vente, reprise et échange',
+  '📞 Contactez HBR AUTO sur WhatsApp',
 ]
 
 export default function AnnouncementBar() {

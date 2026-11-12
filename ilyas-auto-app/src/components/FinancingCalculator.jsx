@@ -11,10 +11,13 @@ export default function FinancingCalculator({ prix }) {
   const [duree, setDuree] = useState(36)
 
   const { montantFinance, mensualite } = useMemo(() => {
-    const mf = Math.max(prix - Number(apport || 0), 0)
-    const interet = mf * TAUX_ANNUEL * (duree / 12)
-    const total = mf + interet
-    const m = duree > 0 ? total / duree : 0
+    const mf = Math.max(prix - Math.min(Number(apport || 0), prix), 0)
+    const tauxMensuel = TAUX_ANNUEL / 12
+    const m = duree <= 0 || mf === 0
+      ? 0
+      : tauxMensuel === 0
+        ? mf / duree
+        : mf * tauxMensuel / (1 - Math.pow(1 + tauxMensuel, -duree))
     return { montantFinance: mf, mensualite: m }
   }, [prix, apport, duree])
 

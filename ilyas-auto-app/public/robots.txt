@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://ilyas-auto-app.vercel.app/sitemap.xml

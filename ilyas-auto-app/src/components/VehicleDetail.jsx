@@ -5,10 +5,33 @@ import { statutLabel } from '../i18n/translations'
 import { useLang } from '../i18n/LangContext'
 import FinancingCalculator from './FinancingCalculator'
 
+function escapePrintHtml(value) {
+  return String(value ?? '').replace(/[&<>"']/g, char => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
+  })[char])
+}
+
+function safePrintImageUrl(value) {
+  try {
+    const url = new URL(String(value || ''), window.location.origin)
+    return url.protocol === 'https:' ? url.href : ''
+  } catch {
+    return ''
+  }
+}
+
 function printVehicleSheet(v, images) {
   const specs = Array.isArray(v.specs) ? v.specs : []
+  const name = escapePrintHtml(`${v.marque} ${v.modele}`)
+  const description = escapePrintHtml(v.description)
+  const condition = v.etat_vehicule || (Number(v.km || 0) > 0 ? 'occasion' : 'neuf')
+  const imageUrl = safePrintImageUrl(images[0]?.url)
+  const imageAlt = escapePrintHtml(name)
+  const origin = escapePrintHtml(ORIGINS[v.provenance]?.label || 'Monde')
+  const specItems = specs.map(item => `<li>${escapePrintHtml(item)}</li>`).join('')
   const win = window.open('', '_blank')
-  win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${v.marque} ${v.modele}</title>
+  if (!win) return
+  win.document.write(`<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>${name}</title>
   <style>
     * { margin:0; padding:0; box-sizing:border-box; }
     body { font-family: Arial, sans-serif; color:#111; padding: 28px; }
@@ -30,19 +53,20 @@ function printVehicleSheet(v, images) {
   </style></head><body>
     <button onclick="window.print()" style="background:#e63946;color:white;border:none;padding:10px 24px;border-radius:8px;font-size:13px;cursor:pointer;margin-bottom:16px;">🖨️ Imprimer / Enregistrer en PDF</button>
     <div class="hdr"><div class="brand">HBR <em>AUTO</em></div><div class="date">${new Date().toLocaleDateString('fr-FR')}</div></div>
-    ${images[0] ? `<img class="main" src="${images[0].url}" />` : ''}
-    <h1>${v.marque} ${v.modele}</h1>
+    ${imageUrl ? `<img class="main" src="${escapePrintHtml(imageUrl)}" alt="${imageAlt}" />` : ''}
+    <h1>${name}</h1>
     <div class="price">${fmt(v.prix)}</div>
     <div class="specs">
-      <div>📅 Année : ${v.annee}</div>
-      <div>🛣️ Km : ${v.km ? Number(v.km).toLocaleString('fr-FR') : '0'} km</div>
-      <div>⚙️ Boîte : ${v.transmission}</div>
-      <div>⛽ Carburant : ${v.carburant}</div>
-      <div>🚙 Carrosserie : ${v.carrosserie || '—'}</div>
-      <div>🌍 Provenance : ${ORIGINS[v.provenance]?.label || 'Monde'}</div>
+      <div>🚘 État : ${condition === 'occasion' ? 'Occasion' : 'Neuf'}</div>
+      <div>📅 Année : ${escapePrintHtml(v.annee)}</div>
+      <div>🛣️ Km : ${Number(v.km || 0).toLocaleString('fr-FR')} km</div>
+      <div>⚙️ Boîte : ${escapePrintHtml(v.transmission)}</div>
+      <div>⛽ Carburant : ${escapePrintHtml(v.carburant)}</div>
+      <div>🚙 Carrosserie : ${escapePrintHtml(v.carrosserie || '—')}</div>
+      <div>🌍 Provenance : ${origin}</div>
     </div>
-    ${v.description ? `<div class="section-title">Description</div><p class="desc">${v.description}</p>` : ''}
-    ${specs.length ? `<div class="section-title">Équipements</div><ul>${specs.map(s => `<li>${s}</li>`).join('')}</ul>` : ''}
+    ${description ? `<div class="section-title">Description</div><p class="desc">${description}</p>` : ''}
+    ${specItems ? `<div class="section-title">Équipements</div><ul>${specItems}</ul>` : ''}
     <div class="footer">HBR Auto · Document généré automatiquement · Prix indicatif, sous réserve de disponibilité.</div>
   </body></html>`)
   win.document.close()

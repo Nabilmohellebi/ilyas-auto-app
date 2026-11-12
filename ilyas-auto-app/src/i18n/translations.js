@@ -7,13 +7,13 @@ export const fr = {
   hero: {
     eyebrow: 'Import direct : France · Allemagne · Monde',
     titre1: 'VOTRE PROCHAINE VOITURE', titre2: "VIENT D'EUROPE",
-    desc: (nom, adresse) => `Véhicules neufs & occasion, contrôlés et disponibles immédiatement au showroom ${nom}, ${adresse}.`,
+    desc: (nom, adresse) => `Découvrez les véhicules neufs et d’occasion proposés par ${nom}, à ${adresse}.`,
     voirStock: '🚗 Voir le stock', visiterShowroom: '📍 Visiter le showroom',
   },
-  trust: { livres: 'Véhicules livrés', origine: 'Origine garantie', controles: 'Contrôlés avant vente', prix: 'Prix en dinars' },
+  trust: { stock: 'Véhicules neufs et d’occasion', vente: 'Achat et vente de véhicules', reprise: 'Reprise et échange possibles', accompagnement: 'Accompagnement au showroom' },
   catalogue: {
     titre: 'NOTRE CATALOGUE',
-    desc: 'Véhicules importés, contrôlés et prêts à rouler. Prix affichés en dinars algériens (DA).',
+    desc: 'Découvrez notre sélection de véhicules neufs et d’occasion. Prix affichés en dinars algériens (DA).',
     etat: 'État du véhicule', tousEtats: 'Tous les états', occasion: 'Occasion', neuf: 'Neuf',
     toutesCategories: 'Toutes les voitures', neufs: 'Voitures neuves', occasions: 'Voitures d’occasion',
     rechercher: '🔍 Rechercher un modèle...', toutesMarques: 'Toutes les marques', toutesOrigines: 'Toutes origines',
@@ -37,7 +37,7 @@ export const fr = {
     fermer: 'Fermer', erreur: 'Une erreur est survenue, merci de réessayer.',
   },
   tracking: {
-    titre: '📦 Suivi de réservation', desc: 'Entrez votre numéro de réservation (ex: IA-ABC123)',
+    titre: '📦 Suivi de réservation', desc: 'Entrez votre numéro de réservation (ex. : IA-XXXXXXXXXXXX)',
     vehicule: 'Véhicule', prix: 'Prix', annulee: '❌ Cette réservation a été annulée.', aucune: 'Aucune réservation trouvée avec ce numéro.',
     steps: [
       { icon: '📩', label: 'Demande reçue', desc: 'Votre demande a été enregistrée' },
@@ -52,7 +52,7 @@ export const fr = {
   },
   finance: {
     titre: '💰 Simulateur de financement',
-    desc: 'Estimation indicative — hors frais de dossier, à confirmer avec notre équipe ou votre banque.',
+    desc: 'Simulation illustrative au taux annuel indicatif de 7 %, hors assurance et frais. Ce calcul ne constitue pas une offre de crédit : les conditions sont à confirmer auprès d’un organisme de financement.',
     apport: 'Apport initial', duree: 'Durée du financement', montantFinance: 'Montant financé', mensualite: 'Mensualité estimée', mois: 'mois',
   },
 }
@@ -62,13 +62,13 @@ export const ar = {
   hero: {
     eyebrow: 'استيراد مباشر: فرنسا · ألمانيا · العالم',
     titre1: 'سيارتك القادمة', titre2: 'قادمة من أوروبا',
-    desc: (nom, adresse) => `سيارات جديدة ومستعملة، مفحوصة ومتوفرة فورًا في صالة عرض ${nom}، ${adresse}.`,
+    desc: (nom, adresse) => `اكتشف السيارات الجديدة والمستعملة المتوفرة لدى ${nom}، في ${adresse}.`,
     voirStock: '🚗 عرض المخزون', visiterShowroom: '📍 زيارة صالة العرض',
   },
-  trust: { livres: 'سيارة تم تسليمها', origine: 'أصل مضمون', controles: 'مفحوصة قبل البيع', prix: 'السعر بالدينار' },
+  trust: { stock: 'سيارات جديدة ومستعملة', vente: 'شراء وبيع السيارات', reprise: 'استبدال ومبادلة السيارات', accompagnement: 'مرافقة في صالة العرض' },
   catalogue: {
     titre: 'كتالوجنا',
-    desc: 'سيارات مستوردة، مفحوصة وجاهزة للقيادة. الأسعار بالدينار الجزائري.',
+    desc: 'اكتشف مجموعتنا من السيارات الجديدة والمستعملة. الأسعار بالدينار الجزائري.',
     etat: 'حالة السيارة', tousEtats: 'كل الحالات', occasion: 'مستعملة', neuf: 'جديدة',
     toutesCategories: 'كل السيارات', neufs: 'السيارات الجديدة', occasions: 'السيارات المستعملة',
     rechercher: '🔍 ابحث عن موديل...', toutesMarques: 'كل الماركات', toutesOrigines: 'كل المنشأ',
@@ -92,7 +92,7 @@ export const ar = {
     fermer: 'إغلاق', erreur: 'حدث خطأ، يرجى المحاولة مرة أخرى.',
   },
   tracking: {
-    titre: '📦 تتبع الحجز', desc: 'أدخل رقم حجزك (مثال: IA-ABC123)',
+    titre: '📦 تتبع الحجز', desc: 'أدخل رقم حجزك (مثال: IA-XXXXXXXXXXXX)',
     vehicule: 'السيارة', prix: 'السعر', annulee: '❌ تم إلغاء هذا الحجز.', aucune: 'لم يتم العثور على حجز بهذا الرقم.',
     steps: [
       { icon: '📩', label: 'تم استلام الطلب', desc: 'تم تسجيل طلبك' },
@@ -107,7 +107,7 @@ export const ar = {
   },
   finance: {
     titre: '💰 محاكي التمويل',
-    desc: 'تقدير إرشادي — دون احتساب رسوم الملف، يُرجى التأكيد مع فريقنا أو بنككم.',
+    desc: 'محاكاة توضيحية بمعدل سنوي إرشادي 7٪، دون التأمين والرسوم. هذا الحساب ليس عرض تمويل، ويجب تأكيد الشروط لدى جهة التمويل.',
     apport: 'الدفعة الأولى', duree: 'مدة التمويل', montantFinance: 'المبلغ الممول', mensualite: 'القسط الشهري المقدر', mois: 'شهر',
   },
 }

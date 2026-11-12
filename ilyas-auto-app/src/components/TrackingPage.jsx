@@ -16,8 +16,17 @@ export default function TrackingPage({ onClose }) {
     const q = input.trim().toUpperCase()
     if (!q) return
     setLoading(true); setError(''); setRes(null)
-    const { data } = await supabase.from('reservations').select('*').ilike('id', `%${q}%`).limit(1).maybeSingle()
+    const { data, error: lookupError } = await supabase
+      .from('reservations')
+      .select('id, vehicule_nom, vehicule_prix, statut, created_at')
+      .eq('id', q)
+      .maybeSingle()
     setLoading(false)
+    if (lookupError) {
+      console.error('HBR AUTO tracking:', lookupError)
+      setError('Le suivi est momentanément indisponible. Réessaie dans quelques instants.')
+      return
+    }
     if (!data) { setError(t.tracking.aucune); return }
     setRes(data)
   }
@@ -34,8 +43,8 @@ export default function TrackingPage({ onClose }) {
         <p style={{ fontSize: 12.5, color: 'rgba(255,255,255,.5)', marginBottom: 16 }}>{t.tracking.desc}</p>
 
         <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
-          <input className="track-input" placeholder="IA-XXXXXX" value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => e.key === 'Enter' && search()} />
-          <button className="btn-save" onClick={search} disabled={loading}>{loading ? '…' : '🔍'}</button>
+          <input className="track-input" placeholder="IA-XXXXXXXXXXXX" maxLength={15} aria-label={t.tracking.desc} value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => e.key === 'Enter' && search()} />
+          <button className="btn-save" type="button" aria-label="Rechercher ma réservation" onClick={search} disabled={loading || !input.trim()}>{loading ? '…' : '🔍'}</button>
         </div>
 
         {error && <div style={{ color: '#ffb3b8', fontSize: 12.5, marginBottom: 12 }}>❌ {error}</div>}

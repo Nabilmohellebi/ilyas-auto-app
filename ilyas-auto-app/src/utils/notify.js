@@ -14,7 +14,13 @@ async function sendTelegram(text) {
 export function fmt(n) { return Number(n || 0).toLocaleString('fr-FR') + ' DA' }
 
 export function genId() {
-  return 'IA-' + Date.now().toString(36).toUpperCase().slice(-6)
+  const cryptoApi = typeof crypto !== 'undefined' ? crypto : null
+  const randomPart = cryptoApi?.randomUUID
+    ? cryptoApi.randomUUID().replace(/-/g, '').slice(0, 12)
+    : cryptoApi?.getRandomValues
+      ? Array.from(cryptoApi.getRandomValues(new Uint8Array(6)), byte => byte.toString(16).padStart(2, '0')).join('')
+      : Math.random().toString(36).slice(2, 14)
+  return 'IA-' + randomPart.toUpperCase()
 }
 
 // ── Notifier une nouvelle réservation sur Telegram ──
@@ -30,6 +36,27 @@ export async function notifyTelegram(reservation) {
 👤 *Client :* ${reservation.nom_client}
 📞 *Tél :* ${reservation.telephone}
 ${reservation.message ? `📝 *Message :* ${reservation.message}\n` : ''}━━━━━━━━━━━━━━━━
+`.trim()
+
+  await sendTelegram(msg)
+}
+
+export async function notifyTelegramSellRequest(request, details = {}) {
+  const isExchange = details.type === 'exchange'
+  const trade = details.trade
+  const target = details.targetVehicle
+
+  const msg = `
+${isExchange ? '🔄 *Nouvelle demande d’échange*' : '💰 *Nouvelle proposition de vente*'} — ${CONFIG.nom}
+━━━━━━━━━━━━━━━━
+🆔 *${request.id}*
+🚘 *Véhicule :* ${request.marque} ${request.modele}
+📅 *Année :* ${request.annee || 'Non précisée'}
+🛣️ *Kilométrage :* ${request.km == null ? 'Non précisé' : Number(request.km).toLocaleString('fr-FR') + ' km'}
+💵 *Prix / valeur annoncée :* ${request.prix_souhaite ? fmt(request.prix_souhaite) : 'À discuter'}
+${isExchange && target ? `🚗 *Véhicule souhaité :* ${target.label}\n` : ''}${isExchange && trade ? `📊 *Reprise simulée :* ${fmt(trade.offer)}\n⚖️ *Différence estimée :* ${fmt(Math.abs(trade.balance))}\n` : ''}👤 *Client :* ${request.nom_client}
+📞 *Téléphone :* ${request.telephone}
+${details.note ? `📝 *Note :* ${details.note}\n` : ''}━━━━━━━━━━━━━━━━
 `.trim()
 
   await sendTelegram(msg)

@@ -1,23 +1,40 @@
-// api/telegram.js — Proxy sécurisé pour Telegram
-// Le token Telegram reste 100% côté serveur, jamais dans le navigateur
+// api/telegram.js — Proxy serveur pour les notifications Telegram.
+// Le token et les détails de la réponse Telegram restent côté serveur.
 
 export default async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*')
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS')
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
-  if (req.method === 'OPTIONS') return res.status(200).end()
+  res.setHeader('Cache-Control', 'no-store')
+
+  if (req.method === 'OPTIONS') return res.status(204).end()
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
+
+  // Cette route est appelée depuis le même site. Refuse les appels navigateur cross-origin.
+  const origin = req.headers.origin
+  const host = req.headers.host
+  if (origin && host) {
+    try {
+      if (new URL(origin).host !== host) {
+        return res.status(403).json({ error: 'Forbidden' })
+      }
+    } catch {
+      return res.status(403).json({ error: 'Forbidden' })
+    }
+  }
+
+  const contentType = String(req.headers['content-type'] || '').toLowerCase()
+  if (!contentType.includes('application/json')) {
+    return res.status(415).json({ error: 'Unsupported media type' })
+  }
 
   const token = process.env.TELEGRAM_BOT_TOKEN
   const chatId = process.env.TELEGRAM_CHAT_ID
 
   if (!token || !chatId) {
-    return res.status(500).json({ error: 'Telegram non configuré côté serveur' })
+    return res.status(503).json({ error: 'Notifications non configurées' })
   }
 
   try {
-    const { text } = req.body
-    if (!text || typeof text !== 'string' || text.length > 4000) {
+    const text = req.body?.text
+    if (typeof text !== 'string' || !text.trim() || text.length > 4000) {
       return res.status(400).json({ error: 'Message invalide' })
     }
 
@@ -27,9 +44,14 @@ export default async function handler(req, res) {
       body: JSON.stringify({ chat_id: chatId, text, parse_mode: 'Markdown' }),
     })
 
-    const data = await response.json()
-    return res.status(response.ok ? 200 : 500).json(data)
+    if (!response.ok) {
+      // Ne renvoie pas la réponse Telegram brute (ni ses métadonnées) au navigateur.
+      return res.status(502).json({ error: 'Échec de la notification' })
+    }
+
+    return res.status(200).json({ ok: true })
   } catch (error) {
-    return res.status(500).json({ error: error.message })
+    console.error('Telegram notification failed:', error)
+    return res.status(502).json({ error: 'Notification indisponible' })
   }
 }
