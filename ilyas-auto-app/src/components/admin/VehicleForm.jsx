@@ -3,7 +3,7 @@ import { supabase } from '../../supabase'
 import { BRANDS, TRANSMISSIONS, FUELS, BODY_TYPES, BADGES, STATUTS, ORIGINS } from '../../data/vehicles-data'
 
 export default function VehicleForm({ vehicle, onClose, onSave }) {
-  const isEdit = !!vehicle
+  const isEdit = !!vehicle && !vehicle.__new
   const [form, setForm] = useState({
     marque:        vehicle?.marque || '',
     modele:        vehicle?.modele || '',
@@ -11,6 +11,7 @@ export default function VehicleForm({ vehicle, onClose, onSave }) {
     prix:          vehicle?.prix || '',
     prix_old:      vehicle?.prix_old || '',
     km:            vehicle?.km ?? '',
+    etat_vehicule: vehicle?.etat_vehicule || 'neuf',
     transmission:  vehicle?.transmission || 'Automatique',
     carburant:     vehicle?.carburant || 'Diesel',
     carrosserie:   vehicle?.carrosserie || 'Berline',
@@ -136,6 +137,7 @@ export default function VehicleForm({ vehicle, onClose, onSave }) {
       prix:          Number(form.prix),
       prix_old:      Number(form.prix_old) || null,
       km:            form.km !== '' ? Number(form.km) : 0,
+      etat_vehicule: form.etat_vehicule,
       transmission:  form.transmission,
       carburant:     form.carburant,
       carrosserie:   form.carrosserie,
@@ -177,6 +179,13 @@ export default function VehicleForm({ vehicle, onClose, onSave }) {
               <div className="form-field">
                 <label>Année *</label>
                 <input type="number" min="1990" max="2027" value={form.annee} onChange={e => set('annee', e.target.value)} />
+              </div>
+              <div className="form-field">
+                <label>Catégorie du véhicule *</label>
+                <select value={form.etat_vehicule} onChange={e => set('etat_vehicule', e.target.value)}>
+                  <option value="neuf">🚘 Véhicule neuf</option>
+                  <option value="occasion">🔄 Véhicule d’occasion</option>
+                </select>
               </div>
               <div className="form-field">
                 <label>Kilométrage (km)</label>

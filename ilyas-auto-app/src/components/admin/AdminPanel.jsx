@@ -366,6 +366,7 @@ export default function AdminPanel({ onLogout, onToast }) {
       'Prix (DA)': v.prix,
       'Statut': v.statut,
       'Kilométrage': v.km,
+      'Catégorie': v.etat_vehicule === 'occasion' ? 'Occasion' : 'Neuf',
       'Carburant': v.carburant,
       'Boîte': v.boite,
       'Visible sur le site': v.is_active ? 'Oui' : 'Non',
@@ -437,7 +438,10 @@ export default function AdminPanel({ onLogout, onToast }) {
     onToast('🗑️ Réservation supprimée')
   }
 
+  const vehicleTypeTab = tab === 'vehicules-occasion' ? 'occasion' : 'neuf'
   const filteredVehicles = vehicles.filter(v => {
+    const condition = v.etat_vehicule || (Number(v.km || 0) > 0 ? 'occasion' : 'neuf')
+    if (condition !== vehicleTypeTab) return false
     if (filterStatut !== 'all' && v.statut !== filterStatut) return false
     if (search) {
       const q = search.toLowerCase()
@@ -476,7 +480,8 @@ export default function AdminPanel({ onLogout, onToast }) {
         <div className="adm-tabs">
           {[
             ['dashboard', '📊 Vue d’ensemble'],
-            ['vehicules', '🚘 Véhicules'],
+            ['vehicules-neufs', '🚘 Véhicules neufs'],
+            ['vehicules-occasion', '🔄 Véhicules d’occasion'],
             ['reservations', '📩 Réservations'],
             ['reprises', '🔄 Ventes & échanges'],
             ['temoignages', '⭐ Témoignages'],
@@ -510,7 +515,7 @@ export default function AdminPanel({ onLogout, onToast }) {
                 <h1>Bonjour, bienvenue dans ton showroom.</h1>
                 <p>Retrouve ici les chiffres essentiels et les demandes qui nécessitent ton attention.</p>
               </div>
-              <button className="act-btn primary adm-new-vehicle" onClick={() => { setTab('vehicules'); setEditVeh(false) }}>
+              <button className="act-btn primary adm-new-vehicle" onClick={() => { setTab('vehicules-neufs'); setEditVeh({ __new: true, etat_vehicule: 'neuf' }) }}>
                 + Ajouter un véhicule
               </button>
             </div>
@@ -542,7 +547,7 @@ export default function AdminPanel({ onLogout, onToast }) {
                     <div className="adm-stock-track"><span style={{ width: item.percent + '%', background: item.color || 'var(--br)' }} /></div>
                   </div>
                 ))}
-                <button className="adm-text-link" onClick={() => { setFilterStatut('all'); setTab('vehicules') }}>Gérer tous les véhicules →</button>
+                <button className="adm-text-link" onClick={() => { setFilterStatut('all'); setTab('vehicules-neufs') }}>Gérer tous les véhicules →</button>
               </div>
             </div>
             <div className="adm-overview-card adm-recent-card">
@@ -573,7 +578,7 @@ export default function AdminPanel({ onLogout, onToast }) {
         )}
 
         {/* ── TAB VÉHICULES ── */}
-        {tab === 'vehicules' && (
+        {(tab === 'vehicules-neufs' || tab === 'vehicules-occasion') && (
           <div>
             <div className="adm-toolbar">
               <input className="adm-search" placeholder="Rechercher (marque, modèle...)" value={search} onChange={e => setSearch(e.target.value)} />
@@ -583,7 +588,7 @@ export default function AdminPanel({ onLogout, onToast }) {
                 </button>
               ))}
               <button className="act-btn" onClick={exportVehiclesCsv}>📥 Exporter le stock ({vehicles.length})</button>
-              <button className="act-btn primary" style={{ marginLeft: 'auto' }} onClick={() => setEditVeh(false)}>+ Ajouter un véhicule</button>
+              <button className="act-btn primary" style={{ marginLeft: 'auto' }} onClick={() => setEditVeh({ __new: true, etat_vehicule: vehicleTypeTab })}>+ Ajouter une voiture {vehicleTypeTab === 'occasion' ? 'd’occasion' : 'neuve'}</button>
             </div>
 
             {loading ? <div className="spinner">Chargement…</div> : filteredVehicles.length === 0 ? (
@@ -601,8 +606,12 @@ export default function AdminPanel({ onLogout, onToast }) {
                       <div className="adm-vcard-body">
                         <div className="adm-vcard-name">{v.marque} {v.modele}</div>
                         <div className="adm-vcard-sub">
+                          <span className={`veh-condition-label ${(v.etat_vehicule || (Number(v.km || 0) > 0 ? 'occasion' : 'neuf')) === 'occasion' ? 'used' : 'new'}`}>
+                            {(v.etat_vehicule || (Number(v.km || 0) > 0 ? 'occasion' : 'neuf')) === 'occasion' ? 'Occasion' : 'Neuf'}
+                          </span>
+                          <br />
                           <img src={flagURI(v.provenance)} style={{ width: 14, height: 10, borderRadius: 2, marginRight: 4, verticalAlign: 'middle' }} alt="" />
-                          {v.annee} · {v.km ? Number(v.km).toLocaleString('fr-FR') + ' km' : 'Neuf'}
+                          {v.annee} · {Number(v.km || 0).toLocaleString('fr-FR')} km
                         </div>
                         <div className="adm-vcard-price">{fmt(v.prix)}</div>
                         <div className="adm-vcard-actions">

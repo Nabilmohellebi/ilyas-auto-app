@@ -104,10 +104,13 @@ function PublicSiteInner() {
     [vehicles]
   )
 
+  const getVehicleCondition = v => v.etat_vehicule || (Number(v.km || 0) > 0 ? 'occasion' : 'neuf')
+  const newVehicleCount = vehicles.filter(v => getVehicleCondition(v) === 'neuf').length
+  const usedVehicleCount = vehicles.filter(v => getVehicleCondition(v) === 'occasion').length
+
   const filtered = vehicles.filter(v => {
-    const isUsed = Number(v.km || 0) > 0
-    if (vehicleCondition === 'occasion' && !isUsed) return false
-    if (vehicleCondition === 'neuf' && isUsed) return false
+    const condition = getVehicleCondition(v)
+    if (vehicleCondition !== 'all' && condition !== vehicleCondition) return false
     if (brand !== 'all' && v.marque !== brand) return false
     if (origin !== 'all' && v.provenance !== origin) return false
     if (bodyType !== 'all' && v.carrosserie !== bodyType) return false
@@ -213,6 +216,12 @@ function PublicSiteInner() {
           <p>{t.catalogue.desc}</p>
         </div>
 
+        <div className="vehicle-category-tabs" role="group" aria-label="Catégorie des véhicules">
+          <button type="button" className={vehicleCondition === 'all' ? 'active' : ''} onClick={() => setVehicleCondition('all')}>{t.catalogue.toutesCategories} <span>{vehicles.length}</span></button>
+          <button type="button" className={vehicleCondition === 'neuf' ? 'active' : ''} onClick={() => setVehicleCondition('neuf')}>🚘 {t.catalogue.neufs} <span>{newVehicleCount}</span></button>
+          <button type="button" className={vehicleCondition === 'occasion' ? 'active' : ''} onClick={() => setVehicleCondition('occasion')}>🔄 {t.catalogue.occasions} <span>{usedVehicleCount}</span></button>
+        </div>
+
         <div className="filters-bar">
           <input placeholder={t.catalogue.rechercher} value={search} onChange={e => setSearch(e.target.value)} />
           <select value={brand} onChange={e => setBrand(e.target.value)}>
@@ -281,8 +290,8 @@ function PublicSiteInner() {
                       <div>
                         <h3>{v.marque}</h3>
                         <p>{v.modele}</p>
-                        <span className={`veh-condition-label ${Number(v.km || 0) > 0 ? 'used' : 'new'}`}>
-                          {Number(v.km || 0) > 0 ? t.catalogue.occasion : t.catalogue.neuf}
+                        <span className={`veh-condition-label ${getVehicleCondition(v) === 'occasion' ? 'used' : 'new'}`}>
+                          {getVehicleCondition(v) === 'occasion' ? t.catalogue.occasion : t.catalogue.neuf}
                         </span>
                       </div>
                       <span className="veh-year-badge">{v.annee}</span>
@@ -295,7 +304,7 @@ function PublicSiteInner() {
                     </div>
                     <div className="veh-actions">
                       <button className="btn-veh-reserve" disabled={disabled} onClick={() => setReserveVehicle(v)}>
-                        {disabled ? t.card.vendu : Number(v.km || 0) > 0 ? t.card.acheterOccasion : t.card.reserver}
+                        {disabled ? t.card.vendu : getVehicleCondition(v) === 'occasion' ? t.card.acheterOccasion : t.card.reserver}
                       </button>
                       <button className="btn-veh-wa" title="WhatsApp" onClick={() => waDirect(v)}>💬</button>
                     </div>
