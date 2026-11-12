@@ -24,6 +24,8 @@ function PublicSiteInner() {
   const { lang, t, rtl, toggleLang } = useLang()
   const [vehicles, setVehicles] = useState([])
   const [loading, setLoading] = useState(true)
+  const [stockError, setStockError] = useState('')
+  const [stockReloadKey, setStockReloadKey] = useState(0)
   const [mobileOpen, setMobileOpen] = useState(false)
   const [reserveVehicle, setReserveVehicle] = useState(null)
   const [openVehicle, setOpenVehicle] = useState(null)
@@ -43,18 +45,37 @@ function PublicSiteInner() {
   const [heroIdx, setHeroIdx] = useState(0)
 
   useEffect(() => {
-    async function load() {
-      const { data } = await supabase
-        .from('vehicles')
-        .select('*')
-        .eq('is_active', true)
-        .order('display_order', { ascending: true })
-      setVehicles(data || [])
-      setLoading(false)
+    let active = true
+
+    async function loadStock() {
+      setLoading(true)
+      setStockError('')
+      try {
+        const { data, error } = await supabase
+          .from('vehicles')
+          .select('*')
+          .eq('is_active', true)
+          .order('display_order', { ascending: true })
+        if (error) throw error
+        if (active) setVehicles(data || [])
+      } catch (error) {
+        console.error('HBR AUTO stock:', error)
+        if (active) {
+          setVehicles([])
+          setStockError('Le stock ne peut pas être chargé pour le moment. Vérifie ta connexion puis réessaie.')
+        }
+      } finally {
+        if (active) setLoading(false)
+      }
     }
-    load()
-    getSettings().then(setSettings)
-  }, [])
+
+    loadStock()
+    getSettings().then(data => { if (active) setSettings(data) }).catch(error => {
+      console.warn('HBR AUTO settings:', error)
+    })
+
+    return () => { active = false }
+  }, [stockReloadKey])
 
   const s = useMemo(() => ({
     nom:        settings.shop_name       || CONFIG.nom,
@@ -160,7 +181,7 @@ function PublicSiteInner() {
             <button onClick={toggleLang} className="lang-toggle">{lang === 'fr' ? '🇩🇿 عربي' : '🇫🇷 Français'}</button>
             <a href={waLink('Bonjour ' + s.nom + ', je vous contacte depuis votre site web.', s.whatsapp)} target="_blank" rel="noreferrer" className="nav-wa-btn">💬 {t.nav.whatsapp}</a>
           </div>
-          <button className="nav-burger" onClick={() => setMobileOpen(o => !o)}>☰</button>
+          <button className="nav-burger" type="button" aria-label={mobileOpen ? 'Fermer le menu' : 'Ouvrir le menu'} aria-expanded={mobileOpen} onClick={() => setMobileOpen(o => !o)}>☰</button>
         </div>
         <div className={`nav-mobile ${mobileOpen ? 'open' : ''}`}>
           <a onClick={() => scrollTo('accueil')} href="#accueil">{t.nav.accueil}</a>
@@ -198,10 +219,10 @@ function PublicSiteInner() {
       {/* ── Trust bar ── */}
       <div className="trust-bar">
         <div className="trust-grid">
-          <div><div className="num">+500</div><div className="lbl">{t.trust.livres}</div></div>
-          <div><div className="num">FR · DE</div><div className="lbl">{t.trust.origine}</div></div>
-          <div><div className="num">100%</div><div className="lbl">{t.trust.controles}</div></div>
-          <div><div className="num">DA</div><div className="lbl">{t.trust.prix}</div></div>
+          <div><div className="num">NEUF · OCCASION</div><div className="lbl">{t.trust.stock}</div></div>
+          <div><div className="num">ACHAT · VENTE</div><div className="lbl">{t.trust.vente}</div></div>
+          <div><div className="num">REPRISE</div><div className="lbl">{t.trust.reprise}</div></div>
+          <div><div className="num">HBR AUTO</div><div className="lbl">{t.trust.accompagnement}</div></div>
         </div>
       </div>
 
@@ -236,11 +257,6 @@ function PublicSiteInner() {
             <option value="all">Toutes carrosseries</option>
             {BODY_TYPES.map(b => <option key={b} value={b}>{b}</option>)}
           </select>
-          <select value={vehicleCondition} onChange={e => setVehicleCondition(e.target.value)} aria-label={t.catalogue.etat}>
-            <option value="all">{t.catalogue.tousEtats}</option>
-            <option value="occasion">{t.catalogue.occasion}</option>
-            <option value="neuf">{t.catalogue.neuf}</option>
-          </select>
           <select value={budget} onChange={e => setBudget(e.target.value)}>
             <option value="all">{t.catalogue.toutBudget}</option>
             <option value="low">{t.catalogue.budgetLow}</option>
@@ -258,7 +274,13 @@ function PublicSiteInner() {
         </div>
 
         {loading ? (
-          <div className="spinner">{t.catalogue.chargement}</div>
+          <div className="spinner" role="status" aria-live="polite">{t.catalogue.chargement}</div>
+        ) : stockError ? (
+          <div className="empty" role="alert">
+            <div style={{ fontSize: 36 }}>⚠️</div>
+            <p>{stockError}</p>
+            <button className="btn-hero-primary" onClick={() => setStockReloadKey(key => key + 1)}>Réessayer</button>
+          </div>
         ) : sorted.length === 0 ? (
           <div className="empty">
             <div style={{ fontSize: 44 }}>🚗</div>
@@ -279,7 +301,7 @@ function PublicSiteInner() {
                     </div>
                     {v.badge && <div className="veh-badge-tag">{v.badge}</div>}
                     {v.statut === 'vendu' && <div className="stamp-sold">{lang === 'ar' ? 'مباعة' : 'Vendu'}</div>}
-                    <img src={v.img || PLACEHOLDER_IMG} alt={v.marque} />
+                    <img src={v.img || PLACEHOLDER_IMG} alt={`${v.marque} ${v.modele}`} loading="lazy" decoding="async" />
                     <div className="veh-price-strip">
                       <span className="price">{fmt(v.prix)}</span>
                       {disc > 0 && <span className="old">{fmt(v.prix_old)}</span>}
