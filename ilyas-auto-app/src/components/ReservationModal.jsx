@@ -15,6 +15,12 @@ export default function ReservationModal({ vehicle, onClose }) {
 
   async function submit() {
     if (!form.nom.trim() || !form.tel.trim()) return
+    const phoneDigits = form.tel.replace(/\D/g, '')
+    if (phoneDigits.length < 8 || phoneDigits.length > 15) {
+      setError('Vérifie le numéro de téléphone (8 à 15 chiffres).')
+      return
+    }
+
     setSending(true)
     setError('')
 
@@ -30,13 +36,17 @@ export default function ReservationModal({ vehicle, onClose }) {
       statut: 'nouvelle',
     }
 
-    const { error: err } = await supabase.from('reservations').insert(res)
-    setSending(false)
-
-    if (err) { setError(t.reservation.erreur); return }
-
-    notifyTelegram(res)
-    setSent(true)
+    try {
+      const { error: err } = await supabase.from('reservations').insert(res)
+      if (err) throw err
+      notifyTelegram(res)
+      setSent(true)
+    } catch (err) {
+      console.error('HBR AUTO reservation:', err)
+      setError(t.reservation.erreur)
+    } finally {
+      setSending(false)
+    }
   }
 
   const waConfirmText =
@@ -70,7 +80,7 @@ export default function ReservationModal({ vehicle, onClose }) {
             </div>
             <div className="form-field" style={{ marginBottom: 12 }}>
               <label>{t.reservation.tel}</label>
-              <input placeholder={t.reservation.telPh} type="tel" value={form.tel} onChange={e => set('tel', e.target.value)} />
+              <input placeholder={t.reservation.telPh} type="tel" inputMode="tel" maxLength={30} value={form.tel} onChange={e => set('tel', e.target.value)} />
             </div>
             <div className="form-field" style={{ marginBottom: 12 }}>
               <label>{t.reservation.date}</label>
