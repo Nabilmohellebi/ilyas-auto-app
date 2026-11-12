@@ -1,22 +1,49 @@
-import { lazy, Suspense, useState } from 'react'
+import { lazy, Suspense, useEffect, useState } from 'react'
 import AdminLogin from './components/admin/AdminLogin'
 const AdminPanel = lazy(() => import('./components/admin/AdminPanel'))
 import PublicSite from './components/PublicSite'
 import { supabase } from './supabase'
 
 export default function App() {
-  const isAdmin =
+  const isAdminRoute =
     window.location.search.includes('admin') ||
-    window.location.hash === '#admin' ||
-    localStorage.getItem('ia_admin') === '1'
-  const [adminAuth, setAdminAuth] = useState(() => localStorage.getItem('ia_admin') === '1')
-  const [loginError, setLoginError] = useState(false)
+    window.location.hash === '#admin'
+
+  const [authLoading, setAuthLoading] = useState(true)
+  const [adminUser, setAdminUser] = useState(null)
+  const [loginError, setLoginError] = useState('')
   const [toasts, setToasts] = useState([])
 
+  useEffect(() => {
+    let mounted = true
+
+    supabase.auth.getSession().then(({ data, error }) => {
+      if (!mounted) return
+      if (error) console.error('HBR AUTO auth session:', error)
+      const user = data?.session?.user || null
+      setAdminUser(user?.app_metadata?.role === 'admin' ? user : null)
+      setAuthLoading(false)
+    }).catch(error => {
+      console.error('HBR AUTO auth:', error)
+      if (mounted) setAuthLoading(false)
+    })
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      const user = session?.user || null
+      setAdminUser(user?.app_metadata?.role === 'admin' ? user : null)
+      setAuthLoading(false)
+    })
+
+    return () => {
+      mounted = false
+      subscription.unsubscribe()
+    }
+  }, [])
+
   function toast(msg, type = 'default') {
-    const id = Date.now()
-    setToasts(t => [...t, { id, msg, type }])
-    setTimeout(() => setToasts(t => t.filter(x => x.id !== id)), 3200)
+    const id = Date.now() + Math.random()
+    setToasts(items => [...items, { id, msg, type }])
+    window.setTimeout(() => setToasts(items => items.filter(item => item.id !== id)), 3200)
   }
 
   async function handleLogin(email, password) {
@@ -25,6 +52,7 @@ export default function App() {
       email: email.trim(),
       password,
     })
+
     if (error) {
       setLoginError('Adresse e-mail ou mot de passe incorrect.')
       return
@@ -41,21 +69,26 @@ export default function App() {
   }
 
   async function handleLogout() {
-    await supabase.auth.signOut()
+    const { error } = await supabase.auth.signOut()
+    if (error) toast('Erreur lors de la déconnexion : ' + error.message, 'error')
     setAdminUser(null)
     window.location.href = '/'
   }
 
-  if (isAdmin) {
-    if (authLoading) return <div className="adm-loading" role="status">Vérification de la session…</div>
-    if (!adminUser) return <AdminLogin onLogin={handleLogin} error={loginError} />
+  if (isAdminRoute) {
+    if (authLoading) {
+      return <div className="adm-loading" role="status">Vérification de la session…</div>
+    }
+    if (!adminUser) {
+      return <AdminLogin onLogin={handleLogin} error={loginError} />
+    }
     return (
       <>
         <Suspense fallback={<div className="adm-loading" role="status">Chargement de l’administration…</div>}>
           <AdminPanel onLogout={handleLogout} onToast={toast} />
         </Suspense>
         <div className="toasts">
-          {toasts.map(t => <div key={t.id} className={`toast-msg ${t.type}`}>{t.msg}</div>)}
+          {toasts.map(item => <div key={item.id} className={`toast-msg ${item.type}`}>{item.msg}</div>)}
         </div>
       </>
     )
