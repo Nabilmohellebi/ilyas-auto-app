@@ -108,3 +108,159 @@
   .adm-recent-contact { margin-left: auto; }
   .adm-res-search { max-width: none; flex-basis: 100%; }
 }
+
+/* ── Véhicules neufs / occasion ── */
+.veh-condition-label {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  margin-top: 7px;
+  padding: 4px 9px;
+  border: 1px solid rgba(205, 170, 105, .3);
+  border-radius: 999px;
+  background: rgba(205, 170, 105, .1);
+  color: #e6c990;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+.veh-condition-label.used {
+  border-color: rgba(124, 190, 156, .28);
+  background: rgba(124, 190, 156, .1);
+  color: #a8d9be;
+}
+.veh-condition-label.new {
+  border-color: rgba(205, 170, 105, .3);
+  color: #e6c990;
+}
+
+/* ── Achat d'occasion et demandes d'échange ── */
+.trade-modal {
+  width: min(680px, calc(100vw - 28px));
+  max-height: min(92vh, 940px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.trade-type-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0 0 20px;
+}
+.trade-type-option {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 7px;
+  padding: 14px;
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 12px;
+  background: rgba(255,255,255,.035);
+  color: #f7f4ed;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color .2s ease, background .2s ease;
+}
+.trade-type-option strong { font-size: 13px; font-weight: 800; }
+.trade-type-option small {
+  color: rgba(255,255,255,.48);
+  font-size: 11px;
+  line-height: 1.5;
+}
+.trade-type-option.active {
+  border-color: rgba(205,170,105,.75);
+  background: rgba(205,170,105,.1);
+}
+.trade-form-section {
+  margin: 18px 0;
+  padding: 16px;
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 13px;
+  background: rgba(255,255,255,.025);
+}
+.trade-section-title {
+  margin-bottom: 14px;
+  color: #e4c58d;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.trade-modal .form-field select {
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid rgba(255,255,255,.13);
+  border-radius: 9px;
+  background: #17191d;
+  color: #fff;
+  font: inherit;
+}
+.trade-calculation {
+  margin-top: 15px;
+  padding: 15px;
+  border: 1px solid rgba(205,170,105,.24);
+  border-radius: 12px;
+  background: linear-gradient(145deg, rgba(205,170,105,.09), rgba(255,255,255,.025));
+}
+.trade-calculation-heading {
+  margin-bottom: 10px;
+  color: #e8cf9f;
+  font-size: 12px;
+  font-weight: 900;
+}
+.trade-calculation-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255,255,255,.07);
+  color: rgba(255,255,255,.64);
+  font-size: 12px;
+}
+.trade-calculation-row strong {
+  color: #fff;
+  text-align: right;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+.trade-calculation-row.trade-offer span,
+.trade-calculation-row.trade-offer strong {
+  color: #e8cf9f;
+  font-weight: 900;
+}
+.trade-balance {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-top: 12px;
+  padding: 12px;
+  border-radius: 10px;
+  background: rgba(205,170,105,.13);
+}
+.trade-balance small {
+  color: rgba(255,255,255,.6);
+  font-size: 11px;
+}
+.trade-balance strong {
+  color: #f3d49a;
+  font-size: 20px;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+}
+.trade-disclaimer,
+.trade-muted {
+  margin: 12px 0 0;
+  color: rgba(255,255,255,.42);
+  font-size: 10.5px;
+  line-height: 1.6;
+}
+@media (max-width: 560px) {
+  .trade-type-grid { grid-template-columns: 1fr; }
+  .trade-form-section { padding: 12px; }
+  .trade-calculation-row { font-size: 11px; }
+  .trade-calculation-row strong { font-size: 11px; }
+  .trade-balance strong { font-size: 18px; }
+  .trade-modal { width: calc(100vw - 18px); max-height: 94vh; }
+}
