@@ -4,6 +4,9 @@ const AdminPanel = lazy(() => import('./components/admin/AdminPanel'))
 import PublicSite from './components/PublicSite'
 import { supabase } from './supabase'
 
+// Identifiant technique non distribuable : l'écran de connexion reste password-only.
+const ADMIN_AUTH_ALIAS = 'admin@hbrauto.invalid'
+
 export default function App() {
   const isAdminRoute =
     window.location.search.includes('admin') ||
@@ -46,10 +49,10 @@ export default function App() {
     window.setTimeout(() => setToasts(items => items.filter(item => item.id !== id)), 3200)
   }
 
-  async function handleLogin(email, password) {
+  async function handleLogin(password) {
     setLoginError('')
     const { data, error } = await supabase.auth.signInWithPassword({
-      email: email.trim(),
+      email: ADMIN_AUTH_ALIAS,
       password,
     })
 
