@@ -77,6 +77,23 @@ function PublicSiteInner() {
     return () => { active = false }
   }, [stockReloadKey])
 
+  // Ouvre directement la fiche lorsqu'un visiteur arrive avec un lien partagé.
+  useEffect(() => {
+    if (loading) return
+    const syncVehicleFromUrl = () => {
+      const id = new URLSearchParams(window.location.search).get('vehicule')
+      if (!id) {
+        setOpenVehicle(null)
+        return
+      }
+      const match = vehicles.find(vehicle => String(vehicle.id) === String(id))
+      setOpenVehicle(match || null)
+    }
+    syncVehicleFromUrl()
+    window.addEventListener('popstate', syncVehicleFromUrl)
+    return () => window.removeEventListener('popstate', syncVehicleFromUrl)
+  }, [loading, vehicles])
+
   const s = useMemo(() => ({
     nom:        settings.shop_name       || CONFIG.nom,
     telephone:  settings.shop_phone      || CONFIG.telephone,
@@ -156,6 +173,23 @@ function PublicSiteInner() {
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
   }
 
+  function openVehicleDetail(vehicle) {
+    setOpenVehicle(vehicle)
+    if (!vehicle?.id) return
+    const url = new URL(window.location.href)
+    if (url.searchParams.get('vehicule') === String(vehicle.id)) return
+    url.searchParams.set('vehicule', String(vehicle.id))
+    window.history.pushState({ vehicleId: String(vehicle.id) }, '', url.pathname + url.search + url.hash)
+  }
+
+  function closeVehicleDetail() {
+    setOpenVehicle(null)
+    const url = new URL(window.location.href)
+    if (!url.searchParams.has('vehicule')) return
+    url.searchParams.delete('vehicule')
+    window.history.replaceState({}, '', url.pathname + url.search + url.hash)
+  }
+
   function waDirect(v) {
     const text = `Bonjour ${s.nom}, je suis intéressé par la ${v.marque} ${v.modele} (${v.annee}) affichée à ${fmt(v.prix)}. Est-elle toujours disponible ?`
     window.open(waLink(text, s.whatsapp), '_blank')
@@ -164,7 +198,7 @@ function PublicSiteInner() {
   return (
     <div className="app" dir={rtl ? 'rtl' : 'ltr'}>
       {/* ── Bande nouveautés & promos ── */}
-      {!loading && <VehicleGallery vehicles={recentVehicles} onVehicleClick={setOpenVehicle} newLabel={t.card.nouveau} />}
+      {!loading && <VehicleGallery vehicles={recentVehicles} onVehicleClick={openVehicleDetail} newLabel={t.card.nouveau} />}
 
       <AnnouncementBar />
       {/* ── Navigation ── */}
@@ -293,7 +327,7 @@ function PublicSiteInner() {
               const disabled = v.statut === 'vendu'
               return (
                 <div key={v.id} className="veh-card" style={{ opacity: disabled ? .55 : 1 }}>
-                  <div className="veh-card-img" style={{ cursor: 'pointer' }} onClick={() => setOpenVehicle(v)}>
+                  <div className="veh-card-img" style={{ cursor: 'pointer' }} onClick={() => openVehicleDetail(v)}>
                     <div className="veh-statut-badge" style={{ background: statutColor(v.statut) }}>{statutLabel(v.statut, lang)}</div>
                     <div className="veh-flag-badge">
                       <img src={flagURI(v.provenance)} style={{ width: 14, height: 10, borderRadius: 2 }} alt="" />
@@ -308,7 +342,7 @@ function PublicSiteInner() {
                     </div>
                   </div>
                   <div className="veh-card-body">
-                    <div className="veh-card-top" style={{ cursor: 'pointer' }} onClick={() => setOpenVehicle(v)}>
+                    <div className="veh-card-top" style={{ cursor: 'pointer' }} onClick={() => openVehicleDetail(v)}>
                       <div>
                         <h3>{v.marque}</h3>
                         <p>{v.modele}</p>
@@ -421,7 +455,7 @@ function PublicSiteInner() {
           <VehicleCompare
             vehicles={compareList}
             onClose={() => setCompareOpen(false)}
-            onOpenVehicle={v => { setCompareOpen(false); setOpenVehicle(v) }}
+            onOpenVehicle={v => { setCompareOpen(false); openVehicleDetail(v) }}
           />
         </Suspense>
       )}
@@ -431,7 +465,7 @@ function PublicSiteInner() {
         <Suspense fallback={<div className="spinner" role="status">Chargement de la fiche…</div>}>
           <VehicleDetail
             vehicle={openVehicle}
-            onClose={() => setOpenVehicle(null)}
+            onClose={closeVehicleDetail}
             onReserve={v => { setOpenVehicle(null); setReserveVehicle(v) }}
           />
         </Suspense>
