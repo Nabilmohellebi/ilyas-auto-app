@@ -8,7 +8,7 @@ import VehicleForm from './VehicleForm'
 const RES_STATUTS = [
   { key: 'nouvelle',  label: '🆕 Nouvelle' },
   { key: 'contactee', label: '📞 Contactée' },
-  { key: 'vendue',    label: '✅ Vendue' },
+  { key: 'vendue',    label: '✅ Traitée / vendue' },
   { key: 'annulee',   label: '❌ Annulée' },
 ]
 
@@ -527,7 +527,7 @@ export default function AdminPanel({ onLogout, onToast }) {
                 </button>
                 <button className="adm-queue-row" onClick={() => setTab('reprises')}>
                   <span className="adm-queue-count">{stats.reprisesNouvelles}</span>
-                  <span><strong>Nouvelles reprises</strong><small>Clients souhaitant vendre leur voiture</small></span>
+                  <span><strong>Nouvelles ventes & échanges</strong><small>Propositions d’achat et d’échange de véhicules</small></span>
                   <span className="adm-queue-arrow">›</span>
                 </button>
               </div>
