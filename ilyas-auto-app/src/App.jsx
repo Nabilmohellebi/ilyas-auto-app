@@ -5,11 +5,10 @@ import PublicSite from './components/PublicSite'
 import { getSettings } from './utils/useSettings'
 
 export default function App() {
-  const [isAdmin] = useState(() =>
+  const isAdmin =
     window.location.search.includes('admin') ||
     window.location.hash === '#admin' ||
     localStorage.getItem('ia_admin') === '1'
-  )
   const [adminAuth, setAdminAuth] = useState(() => localStorage.getItem('ia_admin') === '1')
   const [loginError, setLoginError] = useState(false)
   const [toasts, setToasts] = useState([])
