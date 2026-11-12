@@ -14,9 +14,12 @@ async function sendTelegram(text) {
 export function fmt(n) { return Number(n || 0).toLocaleString('fr-FR') + ' DA' }
 
 export function genId() {
-  const randomPart = typeof crypto !== 'undefined' && crypto.randomUUID
-    ? crypto.randomUUID().replace(/-/g, '').slice(0, 12)
-    : Array.from(crypto.getRandomValues(new Uint8Array(6)), byte => byte.toString(16).padStart(2, '0')).join('')
+  const cryptoApi = typeof crypto !== 'undefined' ? crypto : null
+  const randomPart = cryptoApi?.randomUUID
+    ? cryptoApi.randomUUID().replace(/-/g, '').slice(0, 12)
+    : cryptoApi?.getRandomValues
+      ? Array.from(cryptoApi.getRandomValues(new Uint8Array(6)), byte => byte.toString(16).padStart(2, '0')).join('')
+      : Math.random().toString(36).slice(2, 14)
   return 'IA-' + randomPart.toUpperCase()
 }
 
