@@ -368,7 +368,7 @@ export default function AdminPanel({ onLogout, onToast }) {
       'Kilométrage': v.km,
       'Catégorie': v.etat_vehicule === 'occasion' ? 'Occasion' : 'Neuf',
       'Carburant': v.carburant,
-      'Boîte': v.boite,
+      'Boîte': v.transmission,
       'Visible sur le site': v.is_active ? 'Oui' : 'Non',
     }))
     const cols = Object.keys(rows[0])
@@ -515,9 +515,14 @@ export default function AdminPanel({ onLogout, onToast }) {
                 <h1>Bonjour, bienvenue dans ton showroom.</h1>
                 <p>Retrouve ici les chiffres essentiels et les demandes qui nécessitent ton attention.</p>
               </div>
-              <button className="act-btn primary adm-new-vehicle" onClick={() => { setTab('vehicules-neufs'); setEditVeh({ __new: true, etat_vehicule: 'neuf' }) }}>
-                + Ajouter un véhicule
-              </button>
+              <div className="adm-dashboard-add-actions">
+                <button className="act-btn primary adm-new-vehicle" onClick={() => { setTab('vehicules-neufs'); setEditVeh({ __new: true, etat_vehicule: 'neuf' }) }}>
+                  + Ajouter une voiture neuve
+                </button>
+                <button className="act-btn adm-new-vehicle" onClick={() => { setTab('vehicules-occasion'); setEditVeh({ __new: true, etat_vehicule: 'occasion' }) }}>
+                  + Ajouter une occasion
+                </button>
+              </div>
             </div>
             <div className="adm-overview-grid">
               <div className="adm-overview-card">
