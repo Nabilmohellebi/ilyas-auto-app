@@ -90,6 +90,7 @@ export default function VehicleDetail({ vehicle: v, onClose, onReserve }) {
   const disc = v.prix_old && v.prix_old > v.prix ? Math.round(100 - (v.prix / v.prix_old) * 100) : 0
   const disabled = v.statut === 'vendu'
   const specs = Array.isArray(v.specs) ? v.specs : []
+  const vehicleCondition = v.etat_vehicule || (Number(v.km || 0) > 0 ? 'occasion' : 'neuf')
 
   function next() { setIdx(i => (i + 1) % images.length) }
   function prev() { setIdx(i => (i - 1 + images.length) % images.length) }
@@ -141,8 +142,8 @@ export default function VehicleDetail({ vehicle: v, onClose, onReserve }) {
           <div className="vd-info">
             {v.badge && <span className="vd-badge">{v.badge}</span>}
             <h1 className="vd-title">{v.marque} {v.modele}</h1>
-            <span className={`veh-condition-label ${Number(v.km || 0) > 0 ? 'used' : 'new'}`}>
-              {Number(v.km || 0) > 0 ? (lang === 'ar' ? 'مستعملة' : 'Véhicule d’occasion') : (lang === 'ar' ? 'جديدة' : 'Véhicule neuf')}
+            <span className={`veh-condition-label ${vehicleCondition === 'occasion' ? 'used' : 'new'}`}>
+              {vehicleCondition === 'occasion' ? (lang === 'ar' ? 'مستعملة' : 'Véhicule d’occasion') : (lang === 'ar' ? 'جديدة' : 'Véhicule neuf')}
             </span>
             <div className="vd-price-row">
               <span className="vd-price">{fmt(v.prix)}</span>
