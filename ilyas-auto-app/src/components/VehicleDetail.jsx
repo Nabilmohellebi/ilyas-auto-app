@@ -57,7 +57,8 @@ function printVehicleSheet(v, images) {
     <h1>${name}</h1>
     <div class="price">${fmt(v.prix)}</div>
     <div class="specs">
-      <div>🚘 État : ${condition === 'occasion' ? 'Occasion' : 'Neuf'}</div>\n      <div>📅 Année : ${escapePrintHtml(v.annee)}</div>
+      <div>🚘 État : ${condition === 'occasion' ? 'Occasion' : 'Neuf'}</div>
+      <div>📅 Année : ${escapePrintHtml(v.annee)}</div>
       <div>🛣️ Km : ${Number(v.km || 0).toLocaleString('fr-FR')} km</div>
       <div>⚙️ Boîte : ${escapePrintHtml(v.transmission)}</div>
       <div>⛽ Carburant : ${escapePrintHtml(v.carburant)}</div>
