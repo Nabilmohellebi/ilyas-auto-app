@@ -217,9 +217,9 @@ function PublicSiteInner() {
         </div>
 
         <div className="vehicle-category-tabs" role="group" aria-label="Catégorie des véhicules">
-          <button type="button" className={vehicleCondition === 'all' ? 'active' : ''} onClick={() => setVehicleCondition('all')}>Tous <span>{vehicles.length}</span></button>
-          <button type="button" className={vehicleCondition === 'neuf' ? 'active' : ''} onClick={() => setVehicleCondition('neuf')}>🚘 Neufs <span>{newVehicleCount}</span></button>
-          <button type="button" className={vehicleCondition === 'occasion' ? 'active' : ''} onClick={() => setVehicleCondition('occasion')}>🔄 Occasions <span>{usedVehicleCount}</span></button>
+          <button type="button" className={vehicleCondition === 'all' ? 'active' : ''} onClick={() => setVehicleCondition('all')}>{t.catalogue.toutesCategories} <span>{vehicles.length}</span></button>
+          <button type="button" className={vehicleCondition === 'neuf' ? 'active' : ''} onClick={() => setVehicleCondition('neuf')}>🚘 {t.catalogue.neufs} <span>{newVehicleCount}</span></button>
+          <button type="button" className={vehicleCondition === 'occasion' ? 'active' : ''} onClick={() => setVehicleCondition('occasion')}>🔄 {t.catalogue.occasions} <span>{usedVehicleCount}</span></button>
         </div>
 
         <div className="filters-bar">
@@ -304,7 +304,7 @@ function PublicSiteInner() {
                     </div>
                     <div className="veh-actions">
                       <button className="btn-veh-reserve" disabled={disabled} onClick={() => setReserveVehicle(v)}>
-                        {disabled ? t.card.vendu : Number(v.km || 0) > 0 ? t.card.acheterOccasion : t.card.reserver}
+                        {disabled ? t.card.vendu : getVehicleCondition(v) === 'occasion' ? t.card.acheterOccasion : t.card.reserver}
                       </button>
                       <button className="btn-veh-wa" title="WhatsApp" onClick={() => waDirect(v)}>💬</button>
                     </div>
