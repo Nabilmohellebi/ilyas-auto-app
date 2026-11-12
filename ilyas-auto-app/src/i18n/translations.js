@@ -21,7 +21,7 @@ export const fr = {
     anneeRecent: 'Année (récent)', anneeAncien: 'Année (ancien)', kmMoins: 'Kilométrage (moins)',
     chargement: 'Chargement du stock…', aucunVehiculeLigne: 'Aucun véhicule en ligne pour le moment.', aucunCorrespond: 'Aucun véhicule ne correspond à vos critères.',
   },
-  card: { reserver: 'PRENDRE RENDEZ-VOUS', vendu: 'VÉHICULE VENDU', neuf: 'Neuf / 0 km', nouveau: '🆕 Nouveau' },
+  card: { reserver: 'PRENDRE RENDEZ-VOUS', acheterOccasion: 'ACHETER / VISITER', vendu: 'VÉHICULE VENDU', neuf: 'Neuf / 0 km', nouveau: '🆕 Nouveau' },
   showroom: { titre: 'VISITEZ NOTRE SHOWROOM', adresse: 'Adresse', telephone: 'Téléphone / WhatsApp', horaires: 'Horaires', itineraire: '🧭 Itinéraire GPS (Google Maps)' },
   footer: { droits: 'Tous droits réservés.', suivre: '📦 Suivre ma réservation' },
   statut: { disponible: '✅ Disponible', reserve: '⏳ Réservé', vendu: '🚫 Vendu' },
@@ -47,7 +47,7 @@ export const fr = {
   },
   detail: {
     description: '📝 Description', equipements: '⚙️ Équipements & Options', plusPhotos: '📸 Plus de photos',
-    reserver: '📅 Prendre rendez-vous', vendu: '🚫 Véhicule vendu', prix: 'Prix', video: '🎬 Voir la vidéo',
+    reserver: '📅 Prendre rendez-vous', acheterOccasion: '🛒 Acheter / visiter', vendu: '🚫 Véhicule vendu', prix: 'Prix', video: '🎬 Voir la vidéo',
   },
   finance: {
     titre: '💰 Simulateur de financement',
@@ -75,7 +75,7 @@ export const ar = {
     anneeRecent: 'السنة (الأحدث)', anneeAncien: 'السنة (الأقدم)', kmMoins: 'الكيلومترات (الأقل)',
     chargement: 'جارٍ تحميل المخزون…', aucunVehiculeLigne: 'لا توجد سيارات متاحة حاليًا.', aucunCorrespond: 'لا توجد سيارة تطابق معاييرك.',
   },
-  card: { reserver: 'حجز موعد', vendu: 'تم البيع', neuf: 'جديدة / 0 كم', nouveau: '🆕 جديد' },
+  card: { reserver: 'حجز موعد', acheterOccasion: 'شراء / معاينة', vendu: 'تم البيع', neuf: 'جديدة / 0 كم', nouveau: '🆕 جديد' },
   showroom: { titre: 'زوروا صالة العرض', adresse: 'العنوان', telephone: 'الهاتف / واتساب', horaires: 'أوقات العمل', itineraire: '🧭 المسار (خرائط جوجل)' },
   footer: { droits: 'جميع الحقوق محفوظة.', suivre: '📦 تتبع حجزي' },
   statut: { disponible: '✅ متوفرة', reserve: '⏳ محجوزة', vendu: '🚫 مباعة' },
@@ -101,7 +101,7 @@ export const ar = {
   },
   detail: {
     description: '📝 الوصف', equipements: '⚙️ التجهيزات والخيارات', plusPhotos: '📸 المزيد من الصور',
-    reserver: '📅 حجز موعد', vendu: '🚫 السيارة مباعة', prix: 'السعر', video: '🎬 مشاهدة الفيديو',
+    reserver: '📅 حجز موعد', acheterOccasion: '🛒 شراء / معاينة', vendu: '🚫 السيارة مباعة', prix: 'السعر', video: '🎬 مشاهدة الفيديو',
   },
   finance: {
     titre: '💰 محاكي التمويل',
