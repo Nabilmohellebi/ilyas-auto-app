@@ -14,12 +14,25 @@ const RES_STATUTS = [
 
 function statutOf(key) { return STATUTS.find(s => s.key === key) || STATUTS[0] }
 
+const SELL_DETAILS_PREFIX = 'HBR_REQUEST_V2:'
+function parseSellRequestDetails(request) {
+  const raw = request?.message || ''
+  if (!raw.startsWith(SELL_DETAILS_PREFIX)) return { type: 'sell', note: raw, version: 1 }
+  try {
+    return JSON.parse(raw.slice(SELL_DETAILS_PREFIX.length))
+  } catch {
+    return { type: 'sell', note: raw, version: 1 }
+  }
+}
+
 // ═══════════════════════════════════════════════
 //  PARAMÈTRES
 // ═══════════════════════════════════════════════
 function AdminSettings({ onLogout, onToast }) {
   const [shop, setShop] = useState({ name: 'HBR Auto', phone: '213550123456', whatsapp: '213550123456', address: 'HBR Melaba, Azazga, Algérie', email: '', horaires: '', mapsUrl: '', mapsEmbed: '' })
   const [phones, setPhones] = useState([])
+  const [tradeMarginPercent, setTradeMarginPercent] = useState('5')
+  const [tradeMarginSaving, setTradeMarginSaving] = useState(false)
   const [shopSaving, setShopSaving] = useState(false)
   const [pwForm, setPwForm] = useState({ current: '', new1: '', new2: '' })
   const [pwSaving, setPwSaving] = useState(false)
@@ -27,6 +40,7 @@ function AdminSettings({ onLogout, onToast }) {
 
   useEffect(() => {
     getSettings().then(s => {
+      setTradeMarginPercent(String(s.trade_margin_percent ?? '5'))
       setShop({
         name: s.shop_name || 'HBR Auto',
         phone: s.shop_phone || '213550123456',
@@ -68,6 +82,23 @@ function AdminSettings({ onLogout, onToast }) {
       onToast && onToast('❌ Erreur : ' + e.message, 'error')
     }
     setShopSaving(false)
+  }
+
+  async function saveTradeMargin() {
+    const value = Number(tradeMarginPercent)
+    if (!Number.isFinite(value) || value < 0 || value > 30) {
+      onToast && onToast('❌ La marge doit être comprise entre 0 et 30 %', 'error')
+      return
+    }
+    setTradeMarginSaving(true)
+    try {
+      await saveSetting('trade_margin_percent', String(value))
+      onToast && onToast('✅ Marge d’échange enregistrée', 'default')
+    } catch (e) {
+      onToast && onToast('❌ Erreur : ' + e.message, 'error')
+    } finally {
+      setTradeMarginSaving(false)
+    }
   }
 
   async function changePw() {
@@ -146,6 +177,20 @@ function AdminSettings({ onLogout, onToast }) {
           <button className="act-btn" onClick={addPhone}>+ Ajouter un numéro</button>
           <button className="btn-save" onClick={saveShop} disabled={shopSaving}>{shopSaving ? '⏳...' : '💾 Sauvegarder'}</button>
         </div>
+      </div>
+
+      <div className="pf-section" style={{ marginBottom: 14 }}>
+        <h3>🤝 Paramètres des échanges</h3>
+        <p style={{ fontSize: 12, color: 'rgba(255,255,255,.45)', lineHeight: 1.6, marginBottom: 12 }}>
+          Cette marge est déduite de la valeur estimée du véhicule repris pour calculer une offre indicative. Elle est modifiable à tout moment.
+        </p>
+        <div className="form-field" style={{ maxWidth: 260, marginBottom: 12 }}>
+          <label>Marge de sécurité sur la reprise (%)</label>
+          <input type="number" min="0" max="30" step="0.5" value={tradeMarginPercent} onChange={e => setTradeMarginPercent(e.target.value)} />
+        </div>
+        <button className="btn-save" onClick={saveTradeMargin} disabled={tradeMarginSaving}>
+          {tradeMarginSaving ? '⏳...' : '💾 Enregistrer la marge'}
+        </button>
       </div>
 
       <div className="pf-section">
@@ -433,7 +478,7 @@ export default function AdminPanel({ onLogout, onToast }) {
             ['dashboard', '📊 Vue d’ensemble'],
             ['vehicules', '🚘 Véhicules'],
             ['reservations', '📩 Réservations'],
-            ['reprises', '🔄 Reprises'],
+            ['reprises', '🔄 Ventes & échanges'],
             ['temoignages', '⭐ Témoignages'],
             ['banniere', '📢 Bannière'],
             ['settings', '⚙️ Paramètres'],
@@ -626,35 +671,47 @@ export default function AdminPanel({ onLogout, onToast }) {
         {/* ── TAB REPRISES ── */}
         {tab === 'reprises' && (
           <div>
-            <h3 style={{ color: 'white', fontSize: 16, fontWeight: 800, marginBottom: 8 }}>🔄 Demandes de reprise</h3>
-            <p style={{ color: 'rgba(255,255,255,.4)', fontSize: 12, marginBottom: 20 }}>Véhicules que des visiteurs proposent de vous vendre.</p>
+            <h3 style={{ color: 'white', fontSize: 16, fontWeight: 800, marginBottom: 8 }}>🔄 Propositions de vente et d’échange</h3>
+            <p style={{ color: 'rgba(255,255,255,.4)', fontSize: 12, marginBottom: 20 }}>Retrouve ici les véhicules proposés à l’achat par les clients et leurs demandes d’échange.</p>
             {sellRequests.length === 0 ? (
               <div className="empty"><div style={{ fontSize: 40 }}>🔄</div><p>Aucune demande pour le moment.</p></div>
-            ) : sellRequests.map(r => (
-              <div key={r.id} className={`rescard ${r.statut === 'nouvelle' ? 'new' : ''}`}>
-                <div className="rescard-top">
-                  <div>
-                    <div className="rescard-veh">🚘 {r.marque} {r.modele} {r.annee ? `(${r.annee})` : ''}</div>
-                    <div className="rescard-date">{new Date(r.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })}</div>
+            ) : sellRequests.map(r => {
+              const details = parseSellRequestDetails(r)
+              const isExchange = details.type === 'exchange'
+              const trade = details.trade
+              const contactVehicleName = `${r.marque} ${r.modele}${details.targetVehicle?.label ? ` ↔ ${details.targetVehicle.label}` : ''}`
+              return (
+                <div key={r.id} className={`rescard ${r.statut === 'nouvelle' ? 'new' : ''}`}>
+                  <div className="rescard-top">
+                    <div>
+                      <div className="rescard-veh">{isExchange ? '🔁 Échange proposé' : '💰 Vente proposée'} — {r.marque} {r.modele} {r.annee ? `(${r.annee})` : ''}</div>
+                      <div className="rescard-date">{new Date(r.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })}</div>
+                    </div>
+                    <span className={`res-badge ${r.statut}`}>{RES_STATUTS.find(s => s.key === r.statut)?.label || r.statut}</span>
                   </div>
-                  <span className={`res-badge ${r.statut}`}>{RES_STATUTS.find(s => s.key === r.statut)?.label || r.statut}</span>
+                  <div className="rescard-info">
+                    <span>👤 {r.nom_client}</span>
+                    <span>📞 {r.telephone}</span>
+                    {r.km && <span>🛣️ {Number(r.km).toLocaleString('fr-FR')} km</span>}
+                    {r.prix_souhaite && <span>💰 Valeur estimée par le client : {fmt(r.prix_souhaite)}</span>}
+                    {isExchange && details.targetVehicle && <span>🚗 Véhicule souhaité : {details.targetVehicle.label} — {fmt(details.targetVehicle.price)}</span>}
+                    {trade && <span>🏷️ Offre de reprise simulée : {fmt(trade.offer)} (marge {trade.marginPercent} %)</span>}
+                    {trade && trade.balance > 0 && <span>↗️ Complément estimé à payer par le client : {fmt(trade.balance)}</span>}
+                    {trade && trade.balance < 0 && <span>↙️ Complément estimé à verser par HBR AUTO : {fmt(Math.abs(trade.balance))}</span>}
+                    {trade && trade.balance === 0 && <span>⚖️ Valeurs équivalentes selon la simulation</span>}
+                    {details.note && <span>📝 Message : {details.note}</span>}
+                    {!details.version && r.message && <span>📝 {r.message}</span>}
+                  </div>
+                  <div className="rescard-actions">
+                    <button className="act-btn wa" onClick={() => openWA({ nom_client: r.nom_client, telephone: r.telephone, vehicule_nom: contactVehicleName, vehicule_prix: trade?.offer || r.prix_souhaite || 0 })}>💬 Contacter WhatsApp</button>
+                    {r.statut !== 'contactee' && <button className="act-btn" onClick={() => setSellStatus(r.id, 'contactee')}>📞 Marquer contactée</button>}
+                    {r.statut !== 'vendue' && <button className="act-btn" onClick={() => setSellStatus(r.id, 'vendue')}>✅ Marquer traitée</button>}
+                    {r.statut !== 'annulee' && <button className="act-btn" onClick={() => setSellStatus(r.id, 'annulee')}>❌ Annuler</button>}
+                    <button className="act-btn danger" onClick={() => deleteSellRequest(r.id)}>🗑️ Supprimer</button>
+                  </div>
                 </div>
-                <div className="rescard-info">
-                  <span>👤 {r.nom_client}</span>
-                  <span>📞 {r.telephone}</span>
-                  {r.km && <span>🛣️ {Number(r.km).toLocaleString('fr-FR')} km</span>}
-                  {r.prix_souhaite && <span>💰 Prix souhaité : {fmt(r.prix_souhaite)}</span>}
-                  {r.message && <span>📝 {r.message}</span>}
-                </div>
-                <div className="rescard-actions">
-                  <button className="act-btn wa" onClick={() => openWA({ nom_client: r.nom_client, telephone: r.telephone, vehicule_nom: `${r.marque} ${r.modele}`, vehicule_prix: r.prix_souhaite || 0 })}>💬 Contacter WhatsApp</button>
-                  {r.statut !== 'contactee' && <button className="act-btn" onClick={() => setSellStatus(r.id, 'contactee')}>📞 Marquer contactée</button>}
-                  {r.statut !== 'vendue' && <button className="act-btn" onClick={() => setSellStatus(r.id, 'vendue')}>✅ Marquer traitée</button>}
-                  {r.statut !== 'annulee' && <button className="act-btn" onClick={() => setSellStatus(r.id, 'annulee')}>❌ Annuler</button>}
-                  <button className="act-btn danger" onClick={() => deleteSellRequest(r.id)}>🗑️ Supprimer</button>
-                </div>
-              </div>
-            ))}
+              )
+            })
           </div>
         )}
 
