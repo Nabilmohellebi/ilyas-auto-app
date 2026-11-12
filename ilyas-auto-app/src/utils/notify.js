@@ -41,6 +41,27 @@ ${reservation.message ? `📝 *Message :* ${reservation.message}\n` : ''}━━�
   await sendTelegram(msg)
 }
 
+export async function notifyTelegramSellRequest(request, details = {}) {
+  const isExchange = details.type === 'exchange'
+  const trade = details.trade
+  const target = details.targetVehicle
+
+  const msg = `
+${isExchange ? '🔄 *Nouvelle demande d’échange*' : '💰 *Nouvelle proposition de vente*'} — ${CONFIG.nom}
+━━━━━━━━━━━━━━━━
+🆔 *${request.id}*
+🚘 *Véhicule :* ${request.marque} ${request.modele}
+📅 *Année :* ${request.annee || 'Non précisée'}
+🛣️ *Kilométrage :* ${request.km == null ? 'Non précisé' : Number(request.km).toLocaleString('fr-FR') + ' km'}
+💵 *Prix / valeur annoncée :* ${request.prix_souhaite ? fmt(request.prix_souhaite) : 'À discuter'}
+${isExchange && target ? `🚗 *Véhicule souhaité :* ${target.label}\n` : ''}${isExchange && trade ? `📊 *Reprise simulée :* ${fmt(trade.offer)}\n⚖️ *Différence estimée :* ${fmt(Math.abs(trade.balance))}\n` : ''}👤 *Client :* ${request.nom_client}
+📞 *Téléphone :* ${request.telephone}
+${details.note ? `📝 *Note :* ${details.note}\n` : ''}━━━━━━━━━━━━━━━━
+`.trim()
+
+  await sendTelegram(msg)
+}
+
 export function buildWAMessage(reservation) {
   return encodeURIComponent(
     `Bonjour ${reservation.nom_client}, ici ${CONFIG.nom} 👋\n` +
