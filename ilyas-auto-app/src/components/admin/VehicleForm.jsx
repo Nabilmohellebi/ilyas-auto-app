@@ -28,15 +28,26 @@ export default function VehicleForm({ vehicle, onClose, onSave }) {
   })
   const [newSpec, setNewSpec] = useState('')
   const [uploading, setUploading] = useState(false)
+  const [saveError, setSaveError] = useState('')
   const fileRef = useRef()
 
   function set(k, v) { setForm(f => ({ ...f, [k]: v })) }
 
   async function uploadFile(file) {
+    const allowedTypes = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp', 'image/gif': 'gif' }
+    if (!allowedTypes[file.type]) {
+      alert('Format non accepté. Utilise JPG, PNG, WebP ou GIF.')
+      return null
+    }
+    if (file.size > 15 * 1024 * 1024) {
+      alert('La photo dépasse la limite de 15 Mo.')
+      return null
+    }
+
     setUploading(true)
-    const isGif = file.type === 'image/gif' || (file.name || '').toLowerCase().endsWith('.gif')
+    const isGif = file.type === 'image/gif'
     let fileToUpload = file
-    let ext = (file.name || '').split('.').pop()?.toLowerCase() || 'jpg'
+    let ext = allowedTypes[file.type]
 
     if (!isGif && file.size > 350 * 1024) {
       try {
@@ -77,8 +88,11 @@ export default function VehicleForm({ vehicle, onClose, onSave }) {
     for (const file of files) {
       const url = await uploadFile(file)
       if (url) {
-        set('images', [...form.images, { url }])
-        if (!form.img) set('img', url)
+        setForm(current => ({
+          ...current,
+          images: [...current.images, { url }],
+          img: current.img || url,
+        }))
       }
     }
     e.target.value = ''
@@ -105,7 +119,7 @@ export default function VehicleForm({ vehicle, onClose, onSave }) {
     const files = Array.from(e.target.files)
     for (const file of files) {
       const url = await uploadFile(file)
-      if (url) set('images_gallery', [...form.images_gallery, { url }])
+      if (url) setForm(current => ({ ...current, images_gallery: [...current.images_gallery, { url }] }))
     }
     e.target.value = ''
   }
@@ -128,7 +142,37 @@ export default function VehicleForm({ vehicle, onClose, onSave }) {
   function removeSpec(i) { set('specs', form.specs.filter((_, idx) => idx !== i)) }
 
   function handleSave() {
-    if (!form.marque || !form.modele || !form.prix) return
+    const year = Number(form.annee)
+    const price = Number(form.prix)
+    const km = form.km === '' ? 0 : Number(form.km)
+    const maxYear = new Date().getFullYear() + 1
+
+    if (!form.marque.trim() || !form.modele.trim()) {
+      setSaveError('Indique la marque et le modèle du véhicule.')
+      return
+    }
+    if (!Number.isInteger(year) || year < 1950 || year > maxYear) {
+      setSaveError(`L’année doit être comprise entre 1950 et ${maxYear}.`)
+      return
+    }
+    if (!Number.isFinite(price) || price <= 0) {
+      setSaveError('Le prix de vente doit être supérieur à zéro.')
+      return
+    }
+    if (!Number.isFinite(km) || km < 0) {
+      setSaveError('Le kilométrage ne peut pas être négatif.')
+      return
+    }
+    if (form.prix_old && (!Number.isFinite(Number(form.prix_old)) || Number(form.prix_old) < 0)) {
+      setSaveError('L’ancien prix doit être un nombre positif.')
+      return
+    }
+    if (uploading) {
+      setSaveError('Attends la fin du téléversement des photos.')
+      return
+    }
+
+    setSaveError('')
     onSave({
       ...(isEdit ? { id: vehicle.id } : {}),
       marque:        form.marque.trim(),
@@ -178,7 +222,7 @@ export default function VehicleForm({ vehicle, onClose, onSave }) {
               </div>
               <div className="form-field">
                 <label>Année *</label>
-                <input type="number" min="1990" max="2027" value={form.annee} onChange={e => set('annee', e.target.value)} />
+                <input type="number" min="1950" max={new Date().getFullYear() + 1} value={form.annee} onChange={e => set('annee', e.target.value)} />
               </div>
               <div className="form-field">
                 <label>Catégorie du véhicule *</label>
@@ -316,7 +360,7 @@ export default function VehicleForm({ vehicle, onClose, onSave }) {
                 const files = Array.from(e.dataTransfer.files)
                 for (const f of files) {
                   const url = await uploadFile(f)
-                  if (url) { set('images', [...form.images, { url }]); if (!form.img) set('img', url) }
+                  if (url) setForm(current => ({ ...current, images: [...current.images, { url }], img: current.img || url }))
                 }
               }}
             >
@@ -364,7 +408,7 @@ export default function VehicleForm({ vehicle, onClose, onSave }) {
                 const files = Array.from(e.dataTransfer.files)
                 for (const f of files) {
                   const url = await uploadFile(f)
-                  if (url) set('images_gallery', [...form.images_gallery, { url }])
+                  if (url) setForm(current => ({ ...current, images_gallery: [...current.images_gallery, { url }] }))
                 }
               }}
             >
@@ -407,9 +451,10 @@ export default function VehicleForm({ vehicle, onClose, onSave }) {
         </div>
 
         <div className="pf-footer">
+          {saveError && <div role="alert" style={{ flex: '1 1 100%', color: '#ffb3b8', fontSize: 12, lineHeight: 1.5 }}>{saveError}</div>}
           <button className="btn-cancel" onClick={onClose}>Annuler</button>
-          <button className="btn-save" onClick={handleSave} disabled={!form.marque || !form.modele || !form.prix}>
-            {isEdit ? '💾 Enregistrer' : '➕ Ajouter au stock'}
+          <button className="btn-save" onClick={handleSave} disabled={uploading || !form.marque.trim() || !form.modele.trim() || !form.prix}>
+            {uploading ? '⏳ Photos en cours…' : isEdit ? '💾 Enregistrer' : '➕ Ajouter au stock'}
           </button>
         </div>
       </div>
