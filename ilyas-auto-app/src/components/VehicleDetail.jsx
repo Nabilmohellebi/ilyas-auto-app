@@ -159,7 +159,7 @@ export default function VehicleDetail({ vehicle: v, onClose, onReserve }) {
             </div>
 
             <button className="btn-hero-primary vd-reserve-desktop" disabled={disabled} onClick={() => !disabled && onReserve(v)}>
-              {disabled ? t.detail.vendu : t.detail.reserver}
+              {disabled ? t.detail.vendu : Number(v.km || 0) > 0 ? t.detail.acheterOccasion : t.detail.reserver}
             </button>
 
             <button className="vd-print-btn" onClick={() => printVehicleSheet(v, images)}>🖨️ Fiche PDF / Imprimer</button>
@@ -224,7 +224,7 @@ export default function VehicleDetail({ vehicle: v, onClose, onReserve }) {
           <strong>{fmt(v.prix)}</strong>
         </div>
         <button className="btn-hero-primary" style={{ flex: 1, justifyContent: 'center' }} disabled={disabled} onClick={() => !disabled && onReserve(v)}>
-          {disabled ? t.detail.vendu : t.detail.reserver}
+          {disabled ? t.detail.vendu : Number(v.km || 0) > 0 ? t.detail.acheterOccasion : t.detail.reserver}
         </button>
       </div>
 
