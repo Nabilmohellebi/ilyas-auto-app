@@ -312,3 +312,10 @@
   .vehicle-category-tabs { justify-content: flex-start; gap: 7px; }
   .vehicle-category-tabs button { padding: 10px 13px; font-size: 11px; }
 }
+
+/* ── Actions rapides du tableau de bord ── */
+.adm-dashboard-add-actions { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
+@media (max-width: 640px) {
+  .adm-dashboard-add-actions { width: 100%; justify-content: stretch; }
+  .adm-dashboard-add-actions .adm-new-vehicle { flex: 1 1 100%; }
+}
