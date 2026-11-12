@@ -176,7 +176,9 @@ function AdminSettings({ onLogout, onToast }) {
 //  ADMIN PANEL PRINCIPAL
 // ═══════════════════════════════════════════════
 export default function AdminPanel({ onLogout, onToast }) {
-  const [tab, setTab] = useState('vehicules')
+  const [tab, setTab] = useState('dashboard')
+  const [refreshing, setRefreshing] = useState(false)
+  const [resSearch, setResSearch] = useState('')
   const [vehicles, setVehicles] = useState([])
   const [reservations, setReservations] = useState([])
   const [bannerMsgs, setBannerMsgs] = useState([])
@@ -306,6 +308,53 @@ export default function AdminPanel({ onLogout, onToast }) {
     onToast(`✅ ${rows.length} réservations exportées`, 'default')
   }
 
+  function exportVehiclesCsv() {
+    if (vehicles.length === 0) {
+      onToast('Aucun véhicule à exporter', 'error')
+      return
+    }
+    const rows = vehicles.map(v => ({
+      'ID': v.id,
+      'Marque': v.marque,
+      'Modèle': v.modele,
+      'Année': v.annee,
+      'Prix (DA)': v.prix,
+      'Statut': v.statut,
+      'Kilométrage': v.km,
+      'Carburant': v.carburant,
+      'Boîte': v.boite,
+      'Visible sur le site': v.is_active ? 'Oui' : 'Non',
+    }))
+    const cols = Object.keys(rows[0])
+    const cell = value => '"' + String(value ?? '').replace(/"/g, '""') + '"'
+    const csv = '\uFEFF' + [
+      cols.map(cell).join(';'),
+      ...rows.map(row => cols.map(col => cell(row[col])).join(';')),
+    ].join('\r\n')
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = 'hbr-auto-stock-' + new Date().toISOString().slice(0, 10) + '.csv'
+    document.body.appendChild(link)
+    link.click()
+    link.remove()
+    window.setTimeout(() => URL.revokeObjectURL(url), 1000)
+    onToast('✅ ' + rows.length + ' véhicules exportés')
+  }
+
+  async function refreshAll() {
+    setRefreshing(true)
+    try {
+      await Promise.all([loadVehicles(), loadReservations(), loadBanner(), loadTestimonials(), loadSellRequests()])
+      onToast('✅ Données actualisées')
+    } catch (error) {
+      onToast('❌ Actualisation impossible : ' + error.message, 'error')
+    } finally {
+      setRefreshing(false)
+    }
+  }
+
   async function saveVehicle(data) {
     if (data.id) {
       const { error } = await supabase.from('vehicles').update(data).eq('id', data.id)
@@ -352,24 +401,49 @@ export default function AdminPanel({ onLogout, onToast }) {
     return true
   })
 
-  const filteredRes = reservations.filter(r => resFilter === 'all' || r.statut === resFilter)
+  const filteredRes = reservations.filter(r => {
+    if (resFilter !== 'all' && r.statut !== resFilter) return false
+    const q = resSearch.trim().toLowerCase()
+    if (!q) return true
+    return [r.nom_client, r.telephone, r.vehicule_nom, r.message, r.id].join(' ').toLowerCase().includes(q)
+  })
 
   const stats = {
     total: vehicles.length,
     disponibles: vehicles.filter(v => v.statut === 'disponible').length,
     valeurStock: vehicles.filter(v => v.statut !== 'vendu').reduce((s, v) => s + Number(v.prix || 0), 0),
     resNouvelles: reservations.filter(r => r.statut === 'nouvelle').length,
+    reprisesNouvelles: sellRequests.filter(r => r.statut === 'nouvelle').length,
   }
+  const stockBreakdown = STATUTS.map(status => {
+    const count = vehicles.filter(v => v.statut === status.key).length
+    return { ...status, count, percent: vehicles.length ? Math.round(count / vehicles.length * 100) : 0 }
+  })
+  const recentReservations = [...reservations]
+    .sort((a, b) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime())
+    .slice(0, 5)
+
 
   return (
     <div className="adm">
       <div className="adm-top">
         <div className="adm-logo">HBR <em>AUTO</em> <span className="adm-badge">ADMIN</span></div>
         <div className="adm-tabs">
-          {[['vehicules', '🚘 Véhicules'], ['reservations', '📩 Réservations'], ['reprises', '🔄 Reprises'], ['temoignages', '⭐ Témoignages'], ['banniere', '📢 Bannière'], ['settings', '⚙️ Paramètres']].map(([k, l]) => (
+          {[
+            ['dashboard', '📊 Vue d’ensemble'],
+            ['vehicules', '🚘 Véhicules'],
+            ['reservations', '📩 Réservations'],
+            ['reprises', '🔄 Reprises'],
+            ['temoignages', '⭐ Témoignages'],
+            ['banniere', '📢 Bannière'],
+            ['settings', '⚙️ Paramètres'],
+          ].map(([k, l]) => (
             <button key={k} className={`adm-tab ${tab === k ? 'active' : ''}`} onClick={() => setTab(k)}>{l}</button>
           ))}
         </div>
+        <button className="adm-refresh" onClick={refreshAll} disabled={refreshing} title="Recharger les données">
+          {refreshing ? '↻ Actualisation…' : '↻ Actualiser'}
+        </button>
         <button className="adm-logout" onClick={onLogout}>Déconnexion</button>
       </div>
 
@@ -382,6 +456,77 @@ export default function AdminPanel({ onLogout, onToast }) {
           <div className="stat-card"><div className="label">📩 Réservations nouvelles</div><div className="value red">{stats.resNouvelles}</div></div>
         </div>
 
+        {/* ── TABLEAU DE BORD ── */}
+        {tab === 'dashboard' && (
+          <section className="adm-dashboard">
+            <div className="adm-welcome">
+              <div>
+                <div className="adm-eyebrow">ESPACE DE PILOTAGE</div>
+                <h1>Bonjour, bienvenue dans ton showroom.</h1>
+                <p>Retrouve ici les chiffres essentiels et les demandes qui nécessitent ton attention.</p>
+              </div>
+              <button className="act-btn primary adm-new-vehicle" onClick={() => { setTab('vehicules'); setEditVeh(false) }}>
+                + Ajouter un véhicule
+              </button>
+            </div>
+            <div className="adm-overview-grid">
+              <div className="adm-overview-card">
+                <div className="adm-overview-heading">
+                  <div><span className="adm-eyebrow">À TRAITER</span><h3>Demandes en attente</h3></div>
+                  <span className="adm-overview-icon">📬</span>
+                </div>
+                <button className="adm-queue-row" onClick={() => { setResFilter('nouvelle'); setResSearch(''); setTab('reservations') }}>
+                  <span className="adm-queue-count">{stats.resNouvelles}</span>
+                  <span><strong>Nouvelles réservations</strong><small>Demandes de rendez-vous clients</small></span>
+                  <span className="adm-queue-arrow">›</span>
+                </button>
+                <button className="adm-queue-row" onClick={() => setTab('reprises')}>
+                  <span className="adm-queue-count">{stats.reprisesNouvelles}</span>
+                  <span><strong>Nouvelles reprises</strong><small>Clients souhaitant vendre leur voiture</small></span>
+                  <span className="adm-queue-arrow">›</span>
+                </button>
+              </div>
+              <div className="adm-overview-card">
+                <div className="adm-overview-heading">
+                  <div><span className="adm-eyebrow">INVENTAIRE</span><h3>Répartition du stock</h3></div>
+                  <span className="adm-overview-icon">🚘</span>
+                </div>
+                {stockBreakdown.map(item => (
+                  <div className="adm-stock-item" key={item.key}>
+                    <div className="adm-stock-label"><span>{item.label}</span><strong>{item.count}</strong></div>
+                    <div className="adm-stock-track"><span style={{ width: item.percent + '%', background: item.color || 'var(--br)' }} /></div>
+                  </div>
+                ))}
+                <button className="adm-text-link" onClick={() => { setFilterStatut('all'); setTab('vehicules') }}>Gérer tous les véhicules →</button>
+              </div>
+            </div>
+            <div className="adm-overview-card adm-recent-card">
+              <div className="adm-overview-heading">
+                <div><span className="adm-eyebrow">DERNIÈRE ACTIVITÉ</span><h3>Réservations récentes</h3></div>
+                <button className="adm-text-link" onClick={() => setTab('reservations')}>Voir toutes →</button>
+              </div>
+              {recentReservations.length === 0 ? (
+                <div className="adm-empty-inline">Aucune réservation pour le moment. Les nouvelles demandes apparaîtront ici.</div>
+              ) : (
+                <div className="adm-recent-list">
+                  {recentReservations.map(r => (
+                    <div className="adm-recent-row" key={r.id}>
+                      <div className="adm-recent-avatar">{(r.nom_client || 'C').trim().charAt(0).toUpperCase()}</div>
+                      <div className="adm-recent-main">
+                        <strong>{r.nom_client || 'Client'}</strong>
+                        <span>{r.vehicule_nom || 'Véhicule non précisé'}</span>
+                        <small>{r.created_at ? new Date(r.created_at).toLocaleString('fr-FR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }) : 'Date inconnue'}</small>
+                      </div>
+                      <span className={'res-badge ' + (r.statut || 'nouvelle')}>{RES_STATUTS.find(s => s.key === r.statut)?.label || r.statut || 'Nouvelle'}</span>
+                      <button className="act-btn wa adm-recent-contact" onClick={() => openWA(r)}>WhatsApp</button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </section>
+        )}
+
         {/* ── TAB VÉHICULES ── */}
         {tab === 'vehicules' && (
           <div>
@@ -392,6 +537,7 @@ export default function AdminPanel({ onLogout, onToast }) {
                   {k === 'all' ? 'Tous' : statutOf(k).label}
                 </button>
               ))}
+              <button className="act-btn" onClick={exportVehiclesCsv}>📥 Exporter le stock ({vehicles.length})</button>
               <button className="act-btn primary" style={{ marginLeft: 'auto' }} onClick={() => setEditVeh(false)}>+ Ajouter un véhicule</button>
             </div>
 
@@ -432,6 +578,13 @@ export default function AdminPanel({ onLogout, onToast }) {
         {tab === 'reservations' && (
           <div>
             <div className="adm-toolbar">
+              <input
+                className="adm-search adm-res-search"
+                placeholder="Chercher un client, téléphone ou véhicule…"
+                value={resSearch}
+                onChange={e => setResSearch(e.target.value)}
+                aria-label="Rechercher une réservation"
+              />
               {['all', ...RES_STATUTS.map(s => s.key)].map(k => (
                 <button key={k} className={`filter-btn ${resFilter === k ? 'active' : ''}`} onClick={() => setResFilter(k)}>
                   {k === 'all' ? 'Toutes' : RES_STATUTS.find(s => s.key === k).label}
