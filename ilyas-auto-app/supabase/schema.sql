@@ -13,6 +13,7 @@ create table if not exists public.vehicles (
   prix          numeric not null,
   prix_old      numeric,
   km            integer default 0,
+  etat_vehicule text not null default 'neuf' check (etat_vehicule in ('neuf', 'occasion')),
   transmission  text default 'Automatique',
   carburant     text default 'Diesel',
   provenance    text default 'france',
@@ -31,6 +32,7 @@ create table if not exists public.vehicles (
 
 alter table public.vehicles add column if not exists images_gallery jsonb default '[]';
 alter table public.vehicles add column if not exists video_url text;
+alter table public.vehicles add column if not exists etat_vehicule text not null default 'neuf' check (etat_vehicule in ('neuf', 'occasion'));
 
 -- ── Table Reservations ────────────────────────────────────
 create table if not exists public.reservations (
