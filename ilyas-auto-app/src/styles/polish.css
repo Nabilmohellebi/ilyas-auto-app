@@ -264,3 +264,51 @@
   .trade-balance strong { font-size: 18px; }
   .trade-modal { width: calc(100vw - 18px); max-height: 94vh; }
 }
+
+/* ── Sélection visible des catégories du catalogue ── */
+.vehicle-category-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  justify-content: center;
+  margin: 0 auto 22px;
+}
+.vehicle-category-tabs button {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 11px 17px;
+  border: 1px solid rgba(205,170,105,.22);
+  border-radius: 999px;
+  background: rgba(255,255,255,.035);
+  color: rgba(255,255,255,.65);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: background .2s ease, border-color .2s ease, color .2s ease, transform .2s ease;
+}
+.vehicle-category-tabs button:hover { transform: translateY(-1px); border-color: rgba(205,170,105,.55); color: #fff; }
+.vehicle-category-tabs button.active {
+  background: linear-gradient(135deg, rgba(205,170,105,.2), rgba(205,170,105,.08));
+  border-color: rgba(205,170,105,.8);
+  color: #f1d8aa;
+  box-shadow: 0 8px 24px rgba(0,0,0,.13);
+}
+.vehicle-category-tabs button span {
+  display: inline-grid;
+  place-items: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.08);
+  color: inherit;
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+}
+.adm-tabs { flex-wrap: wrap; }
+@media (max-width: 650px) {
+  .vehicle-category-tabs { justify-content: flex-start; gap: 7px; }
+  .vehicle-category-tabs button { padding: 10px 13px; font-size: 11px; }
+}
