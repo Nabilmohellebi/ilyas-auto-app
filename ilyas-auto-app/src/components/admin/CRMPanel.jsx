@@ -14,7 +14,7 @@ function requestDetails(record) {
 }
 
 function phoneKey(value) {
-  let digits = String(value || '').replace(/\\D/g, '')
+  let digits = String(value || '').replace(/\D/g, '')
   if (digits.startsWith('00')) digits = digits.slice(2)
   if (digits.startsWith('0')) digits = '213' + digits.slice(1)
   return digits
@@ -39,7 +39,7 @@ function exportContacts(contacts) {
       client.pendingCount,
     ]),
   ]
-  const csv = '\\uFEFF' + rows.map(row => row.map(safeCsv).join(';')).join('\\r\\n')
+  const csv = '\uFEFF' + rows.map(row => row.map(safeCsv).join(';')).join('\r\n')
   const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
   const url = URL.createObjectURL(blob)
   const link = document.createElement('a')
@@ -177,7 +177,7 @@ export default function CRMPanel({
                 <div className="crm-avatar">{(client.name || 'C').trim().charAt(0).toUpperCase()}</div>
                 <div className="crm-client-identity">
                   <strong>{client.name}</strong>
-                  <a href={client.phone ? `tel:${client.phone.replace(/[^+\\d]/g, '')}` : undefined}>{client.phone || 'Téléphone non renseigné'}</a>
+                  <a href={client.phone ? `tel:${client.phone.replace(/[^+\d]/g, '')}` : undefined}>{client.phone || 'Téléphone non renseigné'}</a>
                   <small>{client.interactions.length} demande{client.interactions.length > 1 ? 's' : ''} · Dernière activité : {client.lastAt ? new Date(client.lastAt).toLocaleDateString('fr-FR') : '—'}</small>
                 </div>
                 <div className="crm-client-tags">
