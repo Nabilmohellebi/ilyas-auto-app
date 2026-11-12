@@ -1,0 +1,31 @@
+/* HBR AUTO - final responsive polish */
+.app .announce-bar { overflow: hidden; }
+.app .announce-track {
+  justify-content: flex-start;
+  animation: bannerScroll 24s linear infinite !important;
+}
+.app .announce-item { flex: 0 0 auto; white-space: nowrap; }
+.app .veh-card-img { position: relative; isolation: isolate; }
+.app .veh-card-img::after { z-index: 1; }
+.app .veh-flag-badge, .app .veh-statut-badge, .app .veh-badge-tag,
+.app .veh-price-strip, .app .stamp-sold { z-index: 2; }
+.app .veh-card-top h3 { overflow: hidden; text-overflow: ellipsis; }
+.app .veh-specs span { min-width: 0; overflow-wrap: anywhere; }
+.app .btn-veh-reserve, .app .btn-veh-wa, .app .btn-hero-primary, .app .btn-hero-secondary { min-height: 44px; }
+.app :dir(rtl) .section-head { text-align: right; }
+.app :dir(rtl) .section-head .bar { margin-right: 0; margin-left: 0; }
+@media (max-width: 780px) {
+  .app .veh-card:hover { transform: none; }
+  .app .nav-inner { gap: 12px; }
+  .app .section-head p { max-width: 100%; }
+}
+@media (max-width: 420px) {
+  .app .veh-grid { grid-template-columns: minmax(0,1fr); }
+  .app .veh-card-body { padding: 15px; }
+  .app .veh-card-top { align-items: center; }
+  .app .veh-actions { gap: 7px; }
+  .app .btn-veh-wa { width: 46px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .app .announce-track { animation: none !important; }
+}
