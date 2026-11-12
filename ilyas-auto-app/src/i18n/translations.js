@@ -52,7 +52,7 @@ export const fr = {
   },
   finance: {
     titre: '💰 Simulateur de financement',
-    desc: 'Estimation indicative — hors frais de dossier, à confirmer avec notre équipe ou votre banque.',
+    desc: 'Simulation illustrative au taux annuel indicatif de 7 %, hors assurance et frais. Ce calcul ne constitue pas une offre de crédit : les conditions sont à confirmer auprès d’un organisme de financement.',
     apport: 'Apport initial', duree: 'Durée du financement', montantFinance: 'Montant financé', mensualite: 'Mensualité estimée', mois: 'mois',
   },
 }
@@ -107,7 +107,7 @@ export const ar = {
   },
   finance: {
     titre: '💰 محاكي التمويل',
-    desc: 'تقدير إرشادي — دون احتساب رسوم الملف، يُرجى التأكيد مع فريقنا أو بنككم.',
+    desc: 'محاكاة توضيحية بمعدل سنوي إرشادي 7٪، دون التأمين والرسوم. هذا الحساب ليس عرض تمويل، ويجب تأكيد الشروط لدى جهة التمويل.',
     apport: 'الدفعة الأولى', duree: 'مدة التمويل', montantFinance: 'المبلغ الممول', mensualite: 'القسط الشهري المقدر', mois: 'شهر',
   },
 }
