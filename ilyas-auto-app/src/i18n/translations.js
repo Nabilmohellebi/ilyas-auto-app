@@ -10,7 +10,7 @@ export const fr = {
     desc: (nom, adresse) => `Véhicules neufs & occasion, contrôlés et disponibles immédiatement au showroom ${nom}, ${adresse}.`,
     voirStock: '🚗 Voir le stock', visiterShowroom: '📍 Visiter le showroom',
   },
-  trust: { livres: 'Véhicules livrés', origine: 'Origine garantie', controles: 'Contrôlés avant vente', prix: 'Prix en dinars' },
+  trust: { stock: 'Véhicules neufs et d’occasion', vente: 'Achat et vente de véhicules', reprise: 'Reprise et échange possibles', accompagnement: 'Accompagnement au showroom' },
   catalogue: {
     titre: 'NOTRE CATALOGUE',
     desc: 'Véhicules importés, contrôlés et prêts à rouler. Prix affichés en dinars algériens (DA).',
@@ -65,7 +65,7 @@ export const ar = {
     desc: (nom, adresse) => `سيارات جديدة ومستعملة، مفحوصة ومتوفرة فورًا في صالة عرض ${nom}، ${adresse}.`,
     voirStock: '🚗 عرض المخزون', visiterShowroom: '📍 زيارة صالة العرض',
   },
-  trust: { livres: 'سيارة تم تسليمها', origine: 'أصل مضمون', controles: 'مفحوصة قبل البيع', prix: 'السعر بالدينار' },
+  trust: { stock: 'سيارات جديدة ومستعملة', vente: 'شراء وبيع السيارات', reprise: 'استبدال ومبادلة السيارات', accompagnement: 'مرافقة في صالة العرض' },
   catalogue: {
     titre: 'كتالوجنا',
     desc: 'سيارات مستوردة، مفحوصة وجاهزة للقيادة. الأسعار بالدينار الجزائري.',
