@@ -295,7 +295,7 @@ function PublicSiteInner() {
                     </div>
                     <div className="veh-actions">
                       <button className="btn-veh-reserve" disabled={disabled} onClick={() => setReserveVehicle(v)}>
-                        {disabled ? t.card.vendu : t.card.reserver}
+                        {disabled ? t.card.vendu : Number(v.km || 0) > 0 ? t.card.acheterOccasion : t.card.reserver}
                       </button>
                       <button className="btn-veh-wa" title="WhatsApp" onClick={() => waDirect(v)}>💬</button>
                     </div>
