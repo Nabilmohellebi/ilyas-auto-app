@@ -141,6 +141,9 @@ export default function VehicleDetail({ vehicle: v, onClose, onReserve }) {
           <div className="vd-info">
             {v.badge && <span className="vd-badge">{v.badge}</span>}
             <h1 className="vd-title">{v.marque} {v.modele}</h1>
+            <span className={`veh-condition-label ${Number(v.km || 0) > 0 ? 'used' : 'new'}`}>
+              {Number(v.km || 0) > 0 ? (lang === 'ar' ? 'مستعملة' : 'Véhicule d’occasion') : (lang === 'ar' ? 'جديدة' : 'Véhicule neuf')}
+            </span>
             <div className="vd-price-row">
               <span className="vd-price">{fmt(v.prix)}</span>
               {disc > 0 && <><span className="vd-old-price">{fmt(v.prix_old)}</span><span className="vd-disc">-{disc}%</span></>}
