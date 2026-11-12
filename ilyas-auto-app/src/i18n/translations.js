@@ -3,7 +3,7 @@
 // ══════════════════════════════════════════════
 
 export const fr = {
-  nav: { accueil: 'Accueil', stock: 'Notre Stock', showroom: 'Showroom', suivi: 'Suivi commande', whatsapp: 'WhatsApp' },
+  nav: { accueil: 'Accueil', stock: 'Notre Stock', showroom: 'Showroom', suivi: 'Suivi commande', whatsapp: 'WhatsApp', occasion: 'Acheter une occasion', venteEchange: 'Vendre / Échanger' },
   hero: {
     eyebrow: 'Import direct : France · Allemagne · Monde',
     titre1: 'VOTRE PROCHAINE VOITURE', titre2: "VIENT D'EUROPE",
@@ -14,6 +14,7 @@ export const fr = {
   catalogue: {
     titre: 'NOTRE CATALOGUE',
     desc: 'Véhicules importés, contrôlés et prêts à rouler. Prix affichés en dinars algériens (DA).',
+    etat: 'État du véhicule', tousEtats: 'Tous les états', occasion: 'Occasion', neuf: 'Neuf',
     rechercher: '🔍 Rechercher un modèle...', toutesMarques: 'Toutes les marques', toutesOrigines: 'Toutes origines',
     toutBudget: 'Tout budget', budgetLow: 'Moins de 4 000 000 DA', budgetMid: '4 000 000 – 7 000 000 DA', budgetHigh: 'Plus de 7 000 000 DA',
     triDefaut: 'Tri par défaut', prixCroissant: 'Prix croissant', prixDecroissant: 'Prix décroissant',
@@ -56,7 +57,7 @@ export const fr = {
 }
 
 export const ar = {
-  nav: { accueil: 'الرئيسية', stock: 'مخزوننا', showroom: 'صالة العرض', suivi: 'تتبع الطلب', whatsapp: 'واتساب' },
+  nav: { accueil: 'الرئيسية', stock: 'مخزوننا', showroom: 'صالة العرض', suivi: 'تتبع الطلب', whatsapp: 'واتساب', occasion: 'شراء سيارة مستعملة', venteEchange: 'بيع / مبادلة' },
   hero: {
     eyebrow: 'استيراد مباشر: فرنسا · ألمانيا · العالم',
     titre1: 'سيارتك القادمة', titre2: 'قادمة من أوروبا',
@@ -67,6 +68,7 @@ export const ar = {
   catalogue: {
     titre: 'كتالوجنا',
     desc: 'سيارات مستوردة، مفحوصة وجاهزة للقيادة. الأسعار بالدينار الجزائري.',
+    etat: 'حالة السيارة', tousEtats: 'كل الحالات', occasion: 'مستعملة', neuf: 'جديدة',
     rechercher: '🔍 ابحث عن موديل...', toutesMarques: 'كل الماركات', toutesOrigines: 'كل المنشأ',
     toutBudget: 'كل الميزانيات', budgetLow: 'أقل من 4,000,000 دج', budgetMid: '4,000,000 – 7,000,000 دج', budgetHigh: 'أكثر من 7,000,000 دج',
     triDefaut: 'الترتيب الافتراضي', prixCroissant: 'السعر تصاعديًا', prixDecroissant: 'السعر تنازليًا',
