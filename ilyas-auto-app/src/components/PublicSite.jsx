@@ -32,6 +32,7 @@ function PublicSiteInner() {
   const [compareList, setCompareList] = useState([])
   const [compareOpen, setCompareOpen] = useState(false)
   const [sellOpen, setSellOpen] = useState(false)
+  const [vehicleCondition, setVehicleCondition] = useState('all')
 
   const [search, setSearch] = useState('')
   const [brand, setBrand] = useState('all')
@@ -104,6 +105,9 @@ function PublicSiteInner() {
   )
 
   const filtered = vehicles.filter(v => {
+    const isUsed = Number(v.km || 0) > 0
+    if (vehicleCondition === 'occasion' && !isUsed) return false
+    if (vehicleCondition === 'neuf' && isUsed) return false
     if (brand !== 'all' && v.marque !== brand) return false
     if (origin !== 'all' && v.provenance !== origin) return false
     if (bodyType !== 'all' && v.carrosserie !== bodyType) return false
@@ -148,7 +152,8 @@ function PublicSiteInner() {
             <a onClick={() => scrollTo('stock')} href="#stock">{t.nav.stock}</a>
             <a onClick={() => scrollTo('showroom')} href="#showroom">{t.nav.showroom}</a>
             <a onClick={e => { e.preventDefault(); setTrackingOpen(true) }} href="#">{t.nav.suivi}</a>
-            <a onClick={e => { e.preventDefault(); setSellOpen(true) }} href="#">Vendre mon véhicule</a>
+            <a onClick={e => { e.preventDefault(); setVehicleCondition('occasion'); scrollTo('stock') }} href="#stock">{t.nav.occasion}</a>
+            <a onClick={e => { e.preventDefault(); setSellOpen(true) }} href="#">{t.nav.venteEchange}</a>
             <button onClick={toggleLang} className="lang-toggle">{lang === 'fr' ? '🇩🇿 عربي' : '🇫🇷 Français'}</button>
             <a href={waLink('Bonjour ' + s.nom + ', je vous contacte depuis votre site web.', s.whatsapp)} target="_blank" rel="noreferrer" className="nav-wa-btn">💬 {t.nav.whatsapp}</a>
           </div>
@@ -159,7 +164,8 @@ function PublicSiteInner() {
           <a onClick={() => scrollTo('stock')} href="#stock">{t.nav.stock}</a>
           <a onClick={() => scrollTo('showroom')} href="#showroom">{t.nav.showroom}</a>
           <a onClick={e => { e.preventDefault(); setMobileOpen(false); setTrackingOpen(true) }} href="#">{t.nav.suivi}</a>
-          <a onClick={e => { e.preventDefault(); setMobileOpen(false); setSellOpen(true) }} href="#">Vendre mon véhicule</a>
+          <a onClick={e => { e.preventDefault(); setMobileOpen(false); setVehicleCondition('occasion'); scrollTo('stock') }} href="#stock">{t.nav.occasion}</a>
+          <a onClick={e => { e.preventDefault(); setMobileOpen(false); setSellOpen(true) }} href="#">{t.nav.venteEchange}</a>
           <button onClick={toggleLang} className="lang-toggle" style={{ marginTop: 6, width: 'fit-content' }}>{lang === 'fr' ? '🇩🇿 عربي' : '🇫🇷 Français'}</button>
           <a href={waLink('Bonjour ' + s.nom + ', je vous contacte depuis votre site web.', s.whatsapp)} target="_blank" rel="noreferrer">💬 {t.nav.whatsapp}</a>
         </div>
@@ -221,6 +227,11 @@ function PublicSiteInner() {
             <option value="all">Toutes carrosseries</option>
             {BODY_TYPES.map(b => <option key={b} value={b}>{b}</option>)}
           </select>
+          <select value={vehicleCondition} onChange={e => setVehicleCondition(e.target.value)} aria-label={t.catalogue.etat}>
+            <option value="all">{t.catalogue.tousEtats}</option>
+            <option value="occasion">{t.catalogue.occasion}</option>
+            <option value="neuf">{t.catalogue.neuf}</option>
+          </select>
           <select value={budget} onChange={e => setBudget(e.target.value)}>
             <option value="all">{t.catalogue.toutBudget}</option>
             <option value="low">{t.catalogue.budgetLow}</option>
@@ -270,6 +281,9 @@ function PublicSiteInner() {
                       <div>
                         <h3>{v.marque}</h3>
                         <p>{v.modele}</p>
+                        <span className={`veh-condition-label ${Number(v.km || 0) > 0 ? 'used' : 'new'}`}>
+                          {Number(v.km || 0) > 0 ? t.catalogue.occasion : t.catalogue.neuf}
+                        </span>
                       </div>
                       <span className="veh-year-badge">{v.annee}</span>
                     </div>
@@ -395,7 +409,7 @@ function PublicSiteInner() {
       {trackingOpen && <TrackingPage onClose={() => setTrackingOpen(false)} />}
 
       {/* ── Vendre mon véhicule ── */}
-      {sellOpen && <SellVehicleModal onClose={() => setSellOpen(false)} />}
+      {sellOpen && <SellVehicleModal onClose={() => setSellOpen(false)} vehicles={vehicles} tradeMarginPercent={settings.trade_margin_percent ?? 5} whatsapp={s.whatsapp} />}
     </div>
   )
 }
