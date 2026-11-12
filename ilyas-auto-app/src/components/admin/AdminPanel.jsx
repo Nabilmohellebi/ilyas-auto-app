@@ -104,21 +104,18 @@ function AdminSettings({ onLogout, onToast }) {
   }
 
   async function changePw() {
-    if (pwForm.new1.length < 8) { onToast && onToast('❌ Utilise au moins 8 caractères', 'error'); return }
+    if (pwForm.new1.length < 12) { onToast && onToast('❌ Utilise au moins 12 caractères', 'error'); return }
     if (pwForm.new1 !== pwForm.new2) { onToast && onToast('❌ Les deux mots de passe ne correspondent pas', 'error'); return }
     setPwSaving(true)
     try {
-      const { data: { user }, error: userError } = await supabase.auth.getUser()
-      if (userError || !user?.email) throw new Error("Session administrateur introuvable.")
-      const { error: reauthError } = await supabase.auth.signInWithPassword({
-        email: user.email,
-        password: pwForm.current,
+      const { data, error } = await supabase.rpc('admin_change_password', {
+        p_current_password: pwForm.current,
+        p_new_password: pwForm.new1,
       })
-      if (reauthError) throw new Error('Mot de passe actuel incorrect.')
-      const { error: updateError } = await supabase.auth.updateUser({ password: pwForm.new1 })
-      if (updateError) throw updateError
+      if (error) throw error
+      if (data !== true) throw new Error('Mot de passe actuel incorrect.')
       setPwForm({ current: '', new1: '', new2: '' })
-      onToast && onToast('✅ Mot de passe de connexion mis à jour', 'default')
+      onToast && onToast('✅ Mot de passe administrateur mis à jour', 'default')
     } catch (e) {
       onToast && onToast('❌ Erreur : ' + e.message, 'error')
     } finally {
