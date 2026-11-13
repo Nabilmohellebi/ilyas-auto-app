@@ -120,6 +120,11 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(204).end()
   if (req.method !== 'POST') return json(res, 405, { error: 'Méthode non autorisée.' })
 
+  // This project ID and token belong to the live Vercel project. Never mutate them from Preview deployments.
+  if (process.env.VERCEL_ENV !== 'production') {
+    return json(res, 403, { code: 'PRODUCTION_ONLY', error: 'Le renommage du projet est désactivé dans les aperçus Vercel.' })
+  }
+
   const origin = req.headers.origin
   const host = req.headers.host
   if (origin && host) {
