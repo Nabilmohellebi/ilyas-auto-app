@@ -240,7 +240,7 @@ export default function SellVehicleModal({ onClose, vehicles = [], tradeMarginPe
                 <div className="trade-calculation-row trade-offer"><span>Offre de reprise simulée</span><strong>{money(tradeOffer)}</strong></div>
                 <div className="trade-calculation-row"><span>Véhicule souhaité</span><strong>{money(targetPrice)}</strong></div>
                 <div className="trade-balance">
-                  <small>{balance > 0 ? 'Complément estimé à ajouter par vous' : balance < 0 ? 'Complément estimé versé par HBR AUTO' : 'Valeurs équivalentes'}</small>
+                  <small>{balance > 0 ? 'Complément estimé à ajouter par vous' : balance < 0 ? `Complément estimé versé par ${shopName}` : 'Valeurs équivalentes'}</small>
                   <strong>{money(Math.abs(balance))}</strong>
                 </div>
               </div>
