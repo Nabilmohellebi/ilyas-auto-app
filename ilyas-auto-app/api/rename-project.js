@@ -1,3 +1,5 @@
+import { createCipheriv, createHash, randomBytes } from 'node:crypto'
+
 // Vercel serverless function: rename the customer project from the admin settings.
 // The Vercel API token is read server-side only and is never returned to the browser.
 
@@ -78,6 +80,33 @@ async function assignDomainToLatestProduction(projectId, domain, token, teamId) 
     error: 'Le domaine est enregistré, mais Vercel n’a pas confirmé son association au dernier déploiement de production.',
   }
 }
+
+function projectDomains(project) {
+  const domains = Array.isArray(project?.domains) ? project.domains : []
+  return domains
+    .map(item => typeof item === 'string' ? item : item?.name)
+    .filter(domain => typeof domain === 'string' && domain.length > 0)
+}
+
+function createDomainHandoffToken(claims, secret) {
+  const key = createHash('sha256')
+    .update('garage-domain-handoff:v1:')
+    .update(secret)
+    .digest()
+  const iv = randomBytes(12)
+  const cipher = createCipheriv('aes-256-gcm', key, iv)
+  const encrypted = Buffer.concat([
+    cipher.update(JSON.stringify(claims), 'utf8'),
+    cipher.final(),
+  ])
+  const tag = cipher.getAuthTag()
+  return [
+    iv.toString('base64url'),
+    encrypted.toString('base64url'),
+    tag.toString('base64url'),
+  ].join('.')
+}
+
 export default async function handler(req, res) {
   res.setHeader('Cache-Control', 'no-store')
 
@@ -231,12 +260,34 @@ export default async function handler(req, res) {
       })
     }
 
+    // Prépare un transfert chiffré de la session admin vers le nouveau domaine.
+    // Les anciens domaines sont limités aux domaines .vercel.app explicitement liés à ce projet.
+    const previousDomains = new Set(projectDomains(current.payload))
+    if (currentName && currentName !== activeDomain.replace(/\.vercel\.app$/, '')) {
+      previousDomains.add(currentName + '.vercel.app')
+    }
+    const cleanupDomains = [...previousDomains].filter(domain =>
+      /^[a-z0-9-]+\.vercel\.app$/i.test(domain) && domain !== activeDomain
+    )
+    const issuedAt = Date.now()
+    const handoffToken = createDomainHandoffToken({
+      version: 1,
+      projectId,
+      teamId: teamId || null,
+      newDomain: activeDomain,
+      previousDomains: cleanupDomains,
+      adminSession,
+      issuedAt,
+      expiresAt: issuedAt + (10 * 60 * 1000),
+    }, vercelToken)
+
     return json(res, 200, {
       ok: true,
-      projectName: activeDomain.replace(/\\.vercel\\.app$/, ''),
+      projectName: activeDomain.replace(/\.vercel\.app$/, ''),
       domain: activeDomain,
-      url: `https://${activeDomain}`,
-      previousDomainKept: true,
+      url: 'https://' + activeDomain,
+      handoffToken,
+      previousDomainCleanupScheduled: cleanupDomains.length > 0,
     })
   } catch (error) {
     console.error('Vercel project rename failed:', error)
