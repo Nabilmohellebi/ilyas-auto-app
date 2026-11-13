@@ -488,6 +488,7 @@ function PublicSiteInner() {
       {openVehicle && (
         <Suspense fallback={<div className="spinner" role="status">Chargement de la fiche…</div>}>
           <VehicleDetail
+            shopName={s.nom}
             vehicle={openVehicle}
             onClose={closeVehicleDetail}
             onReserve={v => { setOpenVehicle(null); setReserveVehicle(v) }}
@@ -496,13 +497,13 @@ function PublicSiteInner() {
       )}
 
       {/* ── Modal réservation ── */}
-      {reserveVehicle && <Suspense fallback={<div className="spinner" role="status">Chargement…</div>}><ReservationModal vehicle={reserveVehicle} onClose={() => setReserveVehicle(null)} /></Suspense>}
+      {reserveVehicle && <Suspense fallback={<div className="spinner" role="status">Chargement…</div>}><ReservationModal vehicle={reserveVehicle} shopName={s.nom} whatsapp={s.whatsapp} onClose={() => setReserveVehicle(null)} /></Suspense>}
 
       {/* ── Suivi de réservation ── */}
       {trackingOpen && <Suspense fallback={<div className="spinner" role="status">Chargement…</div>}><TrackingPage onClose={() => setTrackingOpen(false)} /></Suspense>}
 
       {/* ── Vendre mon véhicule ── */}
-      {sellOpen && <Suspense fallback={<div className="spinner" role="status">Chargement…</div>}><SellVehicleModal onClose={() => setSellOpen(false)} vehicles={vehicles} tradeMarginPercent={settings.trade_margin_percent ?? 5} whatsapp={s.whatsapp} /></Suspense>}
+      {sellOpen && <Suspense fallback={<div className="spinner" role="status">Chargement…</div>}><SellVehicleModal onClose={() => setSellOpen(false)} vehicles={vehicles} tradeMarginPercent={settings.trade_margin_percent ?? 5} whatsapp={s.whatsapp} shopName={s.nom} /></Suspense>}
     </div>
   )
 }
