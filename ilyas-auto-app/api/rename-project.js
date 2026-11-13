@@ -37,11 +37,7 @@ async function vercelRequest(path, token, options = {}) {
 function projectDomain(project, requestedDomain) {
   const domains = Array.isArray(project?.domains) ? project.domains : []
   const exact = domains.find(item => (typeof item === 'string' ? item : item?.name) === requestedDomain)
-  if (exact) return requestedDomain
-  const vercelDomain = domains
-    .map(item => typeof item === 'string' ? item : item?.name)
-    .find(name => typeof name === 'string' && name.endsWith('.vercel.app'))
-  return vercelDomain || null
+  return exact ? requestedDomain : null
 }
 
 export default async function handler(req, res) {
