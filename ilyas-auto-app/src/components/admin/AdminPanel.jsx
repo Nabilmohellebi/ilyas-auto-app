@@ -30,7 +30,7 @@ function parseSellRequestDetails(request) {
 //  PARAMÈTRES
 // ═══════════════════════════════════════════════
 function AdminSettings({ onLogout, onToast, onBrandNameChange }) {
-  const [shop, setShop] = useState({ name: 'Nabil Auto', phone: '213550123456', whatsapp: '213550123456', address: 'HBR Melaba, Azazga, Algérie', email: '', horaires: '', mapsUrl: '', mapsEmbed: '' })
+  const [shop, setShop] = useState({ name: 'Nabil Auto', phone: '', whatsapp: '', address: '', email: '', horaires: '', mapsUrl: '', mapsEmbed: '' })
   const [phones, setPhones] = useState([])
   const [tradeMarginPercent, setTradeMarginPercent] = useState('5')
   const [tradeMarginSaving, setTradeMarginSaving] = useState(false)
@@ -44,20 +44,20 @@ function AdminSettings({ onLogout, onToast, onBrandNameChange }) {
       setTradeMarginPercent(String(s.trade_margin_percent ?? '5'))
       setShop({
         name: s.shop_name || 'Nabil Auto',
-        phone: s.shop_phone || '213550123456',
-        whatsapp: s.shop_whatsapp || s.shop_phone || '213550123456',
-        address: s.shop_address || 'HBR Melaba, Azazga, Algérie',
+        phone: s.shop_phone || '',
+        whatsapp: s.shop_whatsapp || s.shop_phone || '',
+        address: s.shop_address || '',
         email: s.shop_email || '',
-        horaires: s.shop_horaires || 'Samedi – Jeudi : 09h00 – 19h00 · Vendredi : fermé',
+        horaires: s.shop_horaires || '',
         mapsUrl: s.shop_maps_url || '',
         mapsEmbed: s.shop_maps_embed || '',
       })
       // Liste de numéros — si jamais configurée, on part du numéro principal
       try {
         const parsed = JSON.parse(s.shop_phones || '[]')
-        setPhones(Array.isArray(parsed) && parsed.length > 0 ? parsed : [{ label: 'Ventes', number: s.shop_phone || '213550123456' }])
+        setPhones(Array.isArray(parsed) ? parsed : (s.shop_phone ? [{ label: 'Ventes', number: s.shop_phone }] : []))
       } catch {
-        setPhones([{ label: 'Ventes', number: s.shop_phone || '213550123456' }])
+        setPhones(s.shop_phone ? [{ label: 'Ventes', number: s.shop_phone }] : [])
       }
     })
   }, [])
@@ -727,7 +727,7 @@ export default function AdminPanel({ onLogout, onToast }) {
                     {isExchange && details.targetVehicle && <span>🚗 Véhicule souhaité : {details.targetVehicle.label} — {fmt(details.targetVehicle.price)}</span>}
                     {trade && <span>🏷️ Offre de reprise simulée : {fmt(trade.offer)} (marge {trade.marginPercent} %)</span>}
                     {trade && trade.balance > 0 && <span>↗️ Complément estimé à payer par le client : {fmt(trade.balance)}</span>}
-                    {trade && trade.balance < 0 && <span>↙️ Complément estimé à verser par HBR AUTO : {fmt(Math.abs(trade.balance))}</span>}
+                    {trade && trade.balance < 0 && <span>↙️ Complément estimé à verser par {shopName} : {fmt(Math.abs(trade.balance))}</span>}
                     {trade && trade.balance === 0 && <span>⚖️ Valeurs équivalentes selon la simulation</span>}
                     {details.note && <span>📝 Message : {details.note}</span>}
                     {!details.version && r.message && <span>📝 {r.message}</span>}
