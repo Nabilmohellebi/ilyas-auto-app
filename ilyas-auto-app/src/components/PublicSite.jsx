@@ -139,8 +139,13 @@ function PublicSiteInner() {
     setMeta('meta[name="twitter:title"]', title)
     setMeta('meta[name="twitter:description"]', description)
     setMeta('meta[property="og:url"]', window.location.origin + '/')
-    const canonical = document.querySelector('link[rel="canonical"]')
-    if (canonical) canonical.setAttribute('href', window.location.origin + '/')
+    let canonical = document.querySelector('link[rel="canonical"]')
+    if (!canonical) {
+      canonical = document.createElement('link')
+      canonical.setAttribute('rel', 'canonical')
+      document.head.appendChild(canonical)
+    }
+    canonical.setAttribute('href', window.location.origin + '/')
   }, [s.nom])
 
   const brands = useMemo(() => [...new Set(vehicles.map(v => v.marque))].sort(), [vehicles])
