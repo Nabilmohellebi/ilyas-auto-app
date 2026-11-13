@@ -1,7 +1,7 @@
 import { useState } from 'react'
 
 export default function AdminLogin({ onLogin, error, shopName = 'Nabil Auto' }) {
-  const brandWords = String(shopName || 'Nabil Auto').trim().split(/\\s+/).filter(Boolean)
+  const brandWords = String(shopName || 'Nabil Auto').trim().split(/\s+/).filter(Boolean)
   const brandAccent = brandWords.pop() || 'Auto'
   const brandPrefix = brandWords.join(' ')
   const [password, setPassword] = useState('')
