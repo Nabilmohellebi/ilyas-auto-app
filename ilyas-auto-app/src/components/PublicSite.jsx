@@ -285,7 +285,7 @@ function PublicSiteInner() {
           <div><div className="num">NEUF · OCCASION</div><div className="lbl">{t.trust.stock}</div></div>
           <div><div className="num">ACHAT · VENTE</div><div className="lbl">{t.trust.vente}</div></div>
           <div><div className="num">REPRISE</div><div className="lbl">{t.trust.reprise}</div></div>
-          <div><div className="num">HBR AUTO</div><div className="lbl">{t.trust.accompagnement}</div></div>
+          <div><div className="num">{s.nom}</div><div className="lbl">{t.trust.accompagnement}</div></div>
         </div>
       </div>
 
