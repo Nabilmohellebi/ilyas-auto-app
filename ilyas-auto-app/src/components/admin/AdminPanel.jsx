@@ -79,8 +79,33 @@ function AdminSettings({ onLogout, onToast, onBrandNameChange }) {
       await saveSetting('shop_maps_url', shop.mapsUrl)
       await saveSetting('shop_maps_embed', shop.mapsEmbed)
       await saveSetting('shop_phones', JSON.stringify(phones.filter(p => p.number.trim())))
-      onBrandNameChange?.(shop.name.trim() || 'Nabil Auto')
-      onToast && onToast('✅ Informations sauvegardées', 'default')
+      const brandName = shop.name.trim() || 'Nabil Auto'
+      onBrandNameChange?.(brandName)
+
+      // Le nom commercial est sauvegardé même si le renommage Vercel n'est pas configuré.
+      // Le jeton Vercel reste exclusivement côté serveur.
+      try {
+        const adminSession = window.sessionStorage.getItem('hbr_admin_session')
+        const response = await fetch('/api/rename-project', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(adminSession ? { 'x-hbr-admin-session': adminSession } : {}),
+          },
+          body: JSON.stringify({ shopName: brandName }),
+        })
+        const result = await response.json().catch(() => ({}))
+
+        if (response.ok && result.url) {
+          onToast && onToast('✅ Informations enregistrées · Nouvelle adresse : ' + result.url, 'default')
+        } else if (result.code === 'VERCEL_RENAME_NOT_CONFIGURED') {
+          onToast && onToast('✅ Nom enregistré. Configure le renommage Vercel dans CLIENT_TEMPLATE_SETUP.md pour changer aussi l’adresse.', 'default')
+        } else {
+          onToast && onToast('✅ Nom enregistré. Adresse Vercel non modifiée : ' + (result.error || 'vérifie la configuration Vercel.'), 'error')
+        }
+      } catch {
+        onToast && onToast('✅ Informations enregistrées. Le renommage de l’adresse Vercel n’a pas pu être vérifié.', 'error')
+      }
     } catch (e) {
       onToast && onToast('❌ Erreur : ' + e.message, 'error')
     }
@@ -131,7 +156,13 @@ function AdminSettings({ onLogout, onToast, onBrandNameChange }) {
       <div className="pf-section" style={{ marginBottom: 14 }}>
         <h3>🏪 Informations du showroom</h3>
         <div className="pf-grid" style={{ marginBottom: 10 }}>
-          <div className="form-field"><label>Nom</label><input value={shop.name} onChange={e => setShop(s => ({ ...s, name: e.target.value }))} /></div>
+          <div className="form-field">
+            <label>Nom du garage</label>
+            <input value={shop.name} maxLength={100} onChange={e => setShop(s => ({ ...s, name: e.target.value }))} />
+            <small style={{ display: 'block', color: 'rgba(255,255,255,.42)', fontSize: 11, lineHeight: 1.5, marginTop: 6 }}>
+              Sur les copies configurées avec l’API Vercel, enregistrer ce nom renomme aussi le projet et tente de mettre à jour son adresse .vercel.app.
+            </small>
+          </div>
           <div className="form-field"><label>Téléphone</label><input value={shop.phone} onChange={e => setShop(s => ({ ...s, phone: e.target.value }))} type="tel" /></div>
           <div className="form-field"><label>WhatsApp</label><input value={shop.whatsapp} onChange={e => setShop(s => ({ ...s, whatsapp: e.target.value }))} type="tel" /></div>
           <div className="form-field"><label>Email</label><input value={shop.email} onChange={e => setShop(s => ({ ...s, email: e.target.value }))} type="email" /></div>
