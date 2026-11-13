@@ -30,8 +30,8 @@ function parseSellRequestDetails(request) {
 // ═══════════════════════════════════════════════
 //  PARAMÈTRES
 // ═══════════════════════════════════════════════
-function AdminSettings({ onLogout, onToast }) {
-  const [shop, setShop] = useState({ name: 'HBR Auto', phone: '213550123456', whatsapp: '213550123456', address: 'HBR Melaba, Azazga, Algérie', email: '', horaires: '', mapsUrl: '', mapsEmbed: '' })
+function AdminSettings({ onLogout, onToast, onBrandNameChange }) {
+  const [shop, setShop] = useState({ name: 'Nabil Auto', phone: '213550123456', whatsapp: '213550123456', address: 'HBR Melaba, Azazga, Algérie', email: '', horaires: '', mapsUrl: '', mapsEmbed: '' })
   const [phones, setPhones] = useState([])
   const [tradeMarginPercent, setTradeMarginPercent] = useState('5')
   const [tradeMarginSaving, setTradeMarginSaving] = useState(false)
@@ -44,7 +44,7 @@ function AdminSettings({ onLogout, onToast }) {
     getSettings().then(s => {
       setTradeMarginPercent(String(s.trade_margin_percent ?? '5'))
       setShop({
-        name: s.shop_name || 'HBR Auto',
+        name: s.shop_name || 'Nabil Auto',
         phone: s.shop_phone || '213550123456',
         whatsapp: s.shop_whatsapp || s.shop_phone || '213550123456',
         address: s.shop_address || 'HBR Melaba, Azazga, Algérie',
@@ -79,6 +79,7 @@ function AdminSettings({ onLogout, onToast }) {
       await saveSetting('shop_maps_url', shop.mapsUrl)
       await saveSetting('shop_maps_embed', shop.mapsEmbed)
       await saveSetting('shop_phones', JSON.stringify(phones.filter(p => p.number.trim())))
+      onBrandNameChange?.(shop.name.trim() || 'Nabil Auto')
       onToast && onToast('✅ Informations sauvegardées', 'default')
     } catch (e) {
       onToast && onToast('❌ Erreur : ' + e.message, 'error')
@@ -223,6 +224,15 @@ function AdminSettings({ onLogout, onToast }) {
 // ═══════════════════════════════════════════════
 export default function AdminPanel({ onLogout, onToast }) {
   const [tab, setTab] = useState('dashboard')
+  const [shopName, setShopName] = useState('Nabil Auto')
+
+  useEffect(() => {
+    let active = true
+    getSettings().then(settings => {
+      if (active) setShopName((settings.shop_name || 'Nabil Auto').trim() || 'Nabil Auto')
+    })
+    return () => { active = false }
+  }, [])
   const [refreshing, setRefreshing] = useState(false)
   const [resSearch, setResSearch] = useState('')
   const [vehicles, setVehicles] = useState([])
@@ -473,11 +483,15 @@ export default function AdminPanel({ onLogout, onToast }) {
     .sort((a, b) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime())
     .slice(0, 5)
 
+  const brandWords = (shopName || 'Nabil Auto').trim().split(/\s+/).filter(Boolean)
+  const brandAccent = brandWords.pop() || 'Auto'
+  const brandPrefix = brandWords.join(' ')
+
 
   return (
     <div className="adm">
       <div className="adm-top">
-        <div className="adm-logo">HBR <em>AUTO</em> <span className="adm-badge">ADMIN</span></div>
+        <div className="adm-logo">{brandPrefix && brandPrefix + ' '}<em>{brandAccent}</em> <span className="adm-badge">ADMIN</span></div>
         <div className="adm-tabs">
           {[
             ['dashboard', '📊 Vue d’ensemble'],
@@ -841,7 +855,7 @@ export default function AdminPanel({ onLogout, onToast }) {
         )}
 
         {/* ── TAB PARAMÈTRES ── */}
-        {tab === 'settings' && <AdminSettings onLogout={onLogout} onToast={onToast} />}
+        {tab === 'settings' && <AdminSettings onLogout={onLogout} onToast={onToast} onBrandNameChange={setShopName} />}
       </div>
 
       {editVeh !== null && (
