@@ -1,4 +1,5 @@
 import CONFIG from '../config'
+import { getSettings } from './useSettings'
 
 // Telegram via proxy serveur sécurisé — le token ne quitte jamais Vercel
 async function sendTelegram(text) {
@@ -25,8 +26,10 @@ export function genId() {
 
 // ── Notifier une nouvelle réservation sur Telegram ──
 export async function notifyTelegram(reservation) {
+  const settings = await getSettings().catch(() => ({}))
+  const shopName = settings.shop_name || CONFIG.nom
   const msg = `
-🚗 *Nouvelle réservation — ${CONFIG.nom}*
+🚗 *Nouvelle réservation — ${shopName}*
 ━━━━━━━━━━━━━━━━
 🆔 *${reservation.id}*
 
@@ -42,6 +45,8 @@ ${reservation.message ? `📝 *Message :* ${reservation.message}\n` : ''}━━�
 }
 
 export async function notifyTelegramSellRequest(request, details = {}) {
+  const settings = await getSettings().catch(() => ({}))
+  const shopName = settings.shop_name || CONFIG.nom
   const isExchange = details.type === 'exchange'
   const trade = details.trade
   const target = details.targetVehicle
