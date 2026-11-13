@@ -96,19 +96,19 @@ function PublicSiteInner() {
 
   const s = useMemo(() => ({
     nom:        settings.shop_name       || 'Nabil Auto',
-    telephone:  settings.shop_phone      || CONFIG.telephone,
-    whatsapp:   settings.shop_whatsapp   || CONFIG.whatsapp,
-    adresse:    settings.shop_address    || CONFIG.adresse,
-    horaires:   settings.shop_horaires   || CONFIG.horaires,
-    mapsUrl:    settings.shop_maps_url   || CONFIG.mapsUrl,
-    mapsEmbed:  settings.shop_maps_embed || CONFIG.mapsEmbed,
+    telephone:  settings.shop_phone      ?? CONFIG.telephone,
+    whatsapp:   settings.shop_whatsapp   ?? CONFIG.whatsapp,
+    adresse:    settings.shop_address    ?? CONFIG.adresse,
+    horaires:   settings.shop_horaires   ?? CONFIG.horaires,
+    mapsUrl:    settings.shop_maps_url   ?? CONFIG.mapsUrl,
+    mapsEmbed:  settings.shop_maps_embed ?? CONFIG.mapsEmbed,
     facebook:   CONFIG.facebook,
     instagram:  CONFIG.instagram,
     phones:     (() => {
       try {
         const parsed = JSON.parse(settings.shop_phones || '[]')
-        return Array.isArray(parsed) && parsed.length > 0 ? parsed : [{ label: '', number: settings.shop_phone || CONFIG.telephone }]
-      } catch { return [{ label: '', number: settings.shop_phone || CONFIG.telephone }] }
+        return Array.isArray(parsed) ? parsed : []
+      } catch { return [] }
     })(),
   }), [settings])
 
@@ -256,7 +256,7 @@ function PublicSiteInner() {
           <div><div className="num">NEUF · OCCASION</div><div className="lbl">{t.trust.stock}</div></div>
           <div><div className="num">ACHAT · VENTE</div><div className="lbl">{t.trust.vente}</div></div>
           <div><div className="num">REPRISE</div><div className="lbl">{t.trust.reprise}</div></div>
-          <div><div className="num">HBR AUTO</div><div className="lbl">{t.trust.accompagnement}</div></div>
+          <div><div className="num">{s.nom}</div><div className="lbl">{t.trust.accompagnement}</div></div>
         </div>
       </div>
 
