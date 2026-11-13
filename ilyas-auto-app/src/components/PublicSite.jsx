@@ -237,7 +237,7 @@ function PublicSiteInner() {
             <a onClick={e => { e.preventDefault(); setVehicleCondition('occasion'); scrollTo('stock') }} href="#stock">{t.nav.occasion}</a>
             <a onClick={e => { e.preventDefault(); setSellOpen(true) }} href="#">{t.nav.venteEchange}</a>
             <button onClick={toggleLang} className="lang-toggle">{lang === 'fr' ? '🇩🇿 عربي' : '🇫🇷 Français'}</button>
-            <a href={waLink('Bonjour ' + s.nom + ', je vous contacte depuis votre site web.', s.whatsapp)} target="_blank" rel="noreferrer" className="nav-wa-btn">💬 {t.nav.whatsapp}</a>
+            {s.whatsapp && <a href={waLink('Bonjour ' + s.nom + ', je vous contacte depuis votre site web.', s.whatsapp)} target="_blank" rel="noreferrer" className="nav-wa-btn">💬 {t.nav.whatsapp}</a>}
           </div>
           <button className="nav-burger" type="button" aria-label={mobileOpen ? 'Fermer le menu' : 'Ouvrir le menu'} aria-expanded={mobileOpen} onClick={() => setMobileOpen(o => !o)}>☰</button>
         </div>
@@ -249,7 +249,7 @@ function PublicSiteInner() {
           <a onClick={e => { e.preventDefault(); setMobileOpen(false); setVehicleCondition('occasion'); scrollTo('stock') }} href="#stock">{t.nav.occasion}</a>
           <a onClick={e => { e.preventDefault(); setMobileOpen(false); setSellOpen(true) }} href="#">{t.nav.venteEchange}</a>
           <button onClick={toggleLang} className="lang-toggle" style={{ marginTop: 6, width: 'fit-content' }}>{lang === 'fr' ? '🇩🇿 عربي' : '🇫🇷 Français'}</button>
-          <a href={waLink('Bonjour ' + s.nom + ', je vous contacte depuis votre site web.', s.whatsapp)} target="_blank" rel="noreferrer">💬 {t.nav.whatsapp}</a>
+          {s.whatsapp && <a href={waLink('Bonjour ' + s.nom + ', je vous contacte depuis votre site web.', s.whatsapp)} target="_blank" rel="noreferrer">💬 {t.nav.whatsapp}</a>}
         </div>
       </nav>
 
@@ -445,7 +445,7 @@ function PublicSiteInner() {
             <div className="footer-sub">© {new Date().getFullYear()} {s.nom} — {t.footer.droits}</div>
           </div>
           <div className="footer-social">
-            <a href={waLink('Bonjour ' + s.nom, s.whatsapp)} target="_blank" rel="noreferrer">💬</a>
+            {s.whatsapp && <a href={waLink('Bonjour ' + s.nom, s.whatsapp)} target="_blank" rel="noreferrer">💬</a>}
             <button onClick={() => setTrackingOpen(true)} className="footer-track-btn">{t.footer.suivre}</button>
             {s.facebook && <a href={s.facebook} target="_blank" rel="noreferrer">📘</a>}
             {s.instagram && <a href={s.instagram} target="_blank" rel="noreferrer">📷</a>}
@@ -454,7 +454,7 @@ function PublicSiteInner() {
       </footer>
 
       {/* ── WhatsApp flottant ── */}
-      <a className="wa-float" href={waLink('Bonjour ' + s.nom + ', je vous contacte depuis votre site web.', s.whatsapp)} target="_blank" rel="noreferrer">💬</a>
+      {s.whatsapp && <a className="wa-float" href={waLink('Bonjour ' + s.nom + ', je vous contacte depuis votre site web.', s.whatsapp)} target="_blank" rel="noreferrer">💬</a>}
 
       {/* ── Barre flottante comparateur ── */}
       {compareList.length > 0 && (
