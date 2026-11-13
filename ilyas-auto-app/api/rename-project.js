@@ -81,8 +81,15 @@ async function assignDomainToLatestProduction(projectId, domain, token, teamId) 
   }
 }
 
-function projectDomains(project) {
-  const domains = Array.isArray(project?.domains) ? project.domains : []
+async function listAttachedProjectDomains(projectId, token, teamId) {
+  const params = new URLSearchParams({ limit: '100' })
+  if (teamId) params.set('teamId', teamId)
+  const listed = await vercelRequest(
+    '/v9/projects/' + encodeURIComponent(projectId) + '/domains?' + params.toString(),
+    token,
+  )
+  if (!listed.response.ok) return []
+  const domains = Array.isArray(listed.payload?.domains) ? listed.payload.domains : []
   return domains
     .map(item => typeof item === 'string' ? item : item?.name)
     .filter(domain => typeof domain === 'string' && domain.length > 0)
@@ -262,7 +269,7 @@ export default async function handler(req, res) {
 
     // Prépare un transfert chiffré de la session admin vers le nouveau domaine.
     // Les anciens domaines sont limités aux domaines .vercel.app explicitement liés à ce projet.
-    const previousDomains = new Set(projectDomains(current.payload))
+    const previousDomains = new Set(await listAttachedProjectDomains(projectId, vercelToken, teamId))
     if (currentName && currentName !== activeDomain.replace(/\.vercel\.app$/, '')) {
       previousDomains.add(currentName + '.vercel.app')
     }
