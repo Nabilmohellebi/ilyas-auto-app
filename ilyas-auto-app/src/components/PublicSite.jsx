@@ -107,8 +107,13 @@ function PublicSiteInner() {
     phones:     (() => {
       try {
         const parsed = JSON.parse(settings.shop_phones || '[]')
-        return Array.isArray(parsed) && parsed.length > 0 ? parsed : [{ label: '', number: settings.shop_phone || CONFIG.telephone }]
-      } catch { return [{ label: '', number: settings.shop_phone || CONFIG.telephone }] }
+        const savedPhones = Array.isArray(parsed) ? parsed.filter(phone => phone?.number) : []
+        const fallbackPhone = settings.shop_phone || CONFIG.telephone
+        return savedPhones.length > 0 ? savedPhones : (fallbackPhone ? [{ label: '', number: fallbackPhone }] : [])
+      } catch {
+        const fallbackPhone = settings.shop_phone || CONFIG.telephone
+        return fallbackPhone ? [{ label: '', number: fallbackPhone }] : []
+      }
     })(),
   }), [settings])
 
@@ -410,25 +415,25 @@ function PublicSiteInner() {
               <span className="ic">📍</span>
               <div><h4>{t.showroom.adresse}</h4><p>{s.nom}<br />{s.adresse}</p></div>
             </div>
-            <div className="showroom-info-row">
+            {s.phones.length > 0 && <div className="showroom-info-row">
               <span className="ic">📞</span>
               <div><h4>{t.showroom.telephone}</h4>
                 {s.phones.map((p, i) => (
                   <p key={i}>{p.label && <strong style={{ color: 'rgba(255,255,255,.85)' }}>{p.label} : </strong>}<a href={`tel:+${p.number}`} style={{ color: 'inherit', textDecoration: 'none' }}>+{p.number}</a></p>
                 ))}
               </div>
-            </div>
+            </div>}
             <div className="showroom-info-row">
               <span className="ic">🕐</span>
               <div><h4>{t.showroom.horaires}</h4><p>{s.horaires}</p></div>
             </div>
-            <a href={s.mapsUrl} target="_blank" rel="noreferrer" className="btn-hero-primary" style={{ marginTop: 10 }}>
+            {s.mapsUrl && <a href={s.mapsUrl} target="_blank" rel="noreferrer" className="btn-hero-primary" style={{ marginTop: 10 }}>
               {t.showroom.itineraire}
-            </a>
+            </a>}
           </div>
-          <div className="showroom-map">
+          {s.mapsEmbed && <div className="showroom-map">
             <iframe title="Showroom" src={s.mapsEmbed} loading="lazy" />
-          </div>
+          </div>}
         </div>
       </section>
 
