@@ -1,0 +1,205 @@
+// Vercel serverless function: rename the customer project from the admin settings.
+// The Vercel API token is read server-side only and is never returned to the browser.
+
+function json(res, status, payload) {
+  res.status(status).setHeader('Cache-Control', 'no-store').json(payload)
+}
+
+function slugifyProjectName(value) {
+  const slug = String(value || '')
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 42)
+    .replace(/-+$/g, '')
+  return slug.length >= 3 ? slug : 'garage-auto'
+}
+
+function teamQuery(teamId) {
+  return teamId ? `?teamId=${encodeURIComponent(teamId)}` : ''
+}
+
+async function vercelRequest(path, token, options = {}) {
+  const response = await fetch(`https://api.vercel.com${path}`, {
+    ...options,
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+      ...(options.headers || {}),
+    },
+  })
+  const payload = await response.json().catch(() => ({}))
+  return { response, payload }
+}
+
+function projectDomain(project, requestedDomain) {
+  const domains = Array.isArray(project?.domains) ? project.domains : []
+  const exact = domains.find(item => (typeof item === 'string' ? item : item?.name) === requestedDomain)
+  if (exact) return requestedDomain
+  const vercelDomain = domains
+    .map(item => typeof item === 'string' ? item : item?.name)
+    .find(name => typeof name === 'string' && name.endsWith('.vercel.app'))
+  return vercelDomain || null
+}
+
+export default async function handler(req, res) {
+  res.setHeader('Cache-Control', 'no-store')
+
+  if (req.method === 'OPTIONS') return res.status(204).end()
+  if (req.method !== 'POST') return json(res, 405, { error: 'Méthode non autorisée.' })
+
+  const origin = req.headers.origin
+  const host = req.headers.host
+  if (origin && host) {
+    try {
+      if (new URL(origin).host !== host) return json(res, 403, { error: 'Origine non autorisée.' })
+    } catch {
+      return json(res, 403, { error: 'Origine non autorisée.' })
+    }
+  }
+
+  if (!String(req.headers['content-type'] || '').toLowerCase().includes('application/json')) {
+    return json(res, 415, { error: 'Format de requête invalide.' })
+  }
+
+  const body = req.body || {}
+  if (typeof body.shopName !== 'string' || body.shopName.trim().length < 2 || body.shopName.length > 100) {
+    return json(res, 400, { error: 'Le nom du garage doit contenir entre 2 et 100 caractères.' })
+  }
+
+  const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL
+  const supabaseAnonKey = process.env.SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY
+  const vercelToken = process.env.VERCEL_RENAME_TOKEN
+  const projectId = process.env.VERCEL_RENAME_PROJECT_ID
+  const teamId = process.env.VERCEL_RENAME_TEAM_ID
+  const adminSession = String(req.headers['x-hbr-admin-session'] || '')
+
+  if (!supabaseUrl || !supabaseAnonKey) {
+    return json(res, 503, { code: 'SUPABASE_SERVER_CONFIG_MISSING', error: 'La validation de la session admin n’est pas configurée côté serveur.' })
+  }
+
+  if (!adminSession || adminSession.length < 32 || adminSession.length > 128) {
+    return json(res, 401, { error: 'Session administrateur manquante.' })
+  }
+
+  try {
+    const sessionResponse = await fetch(`${supabaseUrl.replace(/\/$/, '')}/rest/v1/rpc/admin_check_session`, {
+      method: 'POST',
+      headers: {
+        apikey: supabaseAnonKey,
+        Authorization: `Bearer ${supabaseAnonKey}`,
+        'Content-Type': 'application/json',
+        'x-hbr-admin-session': adminSession,
+      },
+      body: '{}',
+    })
+
+    if (!sessionResponse.ok || await sessionResponse.json().catch(() => false) !== true) {
+      return json(res, 401, { error: 'Session administrateur invalide ou expirée.' })
+    }
+  } catch {
+    return json(res, 503, { error: 'Impossible de vérifier la session administrateur.' })
+  }
+
+  if (!vercelToken || !projectId) {
+    return json(res, 503, {
+      code: 'VERCEL_RENAME_NOT_CONFIGURED',
+      error: 'Le changement automatique du domaine n’est pas encore configuré sur ce projet.',
+    })
+  }
+
+  const query = teamQuery(teamId)
+  const projectPath = `/v9/projects/${encodeURIComponent(projectId)}${query}`
+  const desiredSlug = slugifyProjectName(body.shopName)
+  const desiredDomain = `${desiredSlug}.vercel.app`
+
+  try {
+    const current = await vercelRequest(projectPath, vercelToken)
+    if (!current.response.ok) {
+      return json(res, current.response.status, {
+        error: 'Vercel ne reconnaît pas le projet configuré. Vérifie VERCEL_RENAME_PROJECT_ID et VERCEL_RENAME_TEAM_ID.',
+      })
+    }
+
+    const currentName = current.payload?.name || ''
+    const currentDomain = projectDomain(current.payload, desiredDomain)
+    if (currentName === desiredSlug && currentDomain === desiredDomain) {
+      return json(res, 200, { ok: true, unchanged: true, projectName: currentName, domain: desiredDomain, url: `https://${desiredDomain}` })
+    }
+
+    const rename = await vercelRequest(projectPath, vercelToken, {
+      method: 'PATCH',
+      body: JSON.stringify({ name: desiredSlug }),
+    })
+
+    if (!rename.response.ok) {
+      const message = rename.response.status === 409
+        ? 'Ce nom de projet est déjà utilisé dans ce compte Vercel. Essaie un nom légèrement différent.'
+        : 'Vercel a refusé le changement de nom du projet.'
+      return json(res, rename.response.status, { error: message })
+    }
+
+    // Renommer le projet suffit souvent à mettre à jour son domaine par défaut.
+    // Si l'alias exact n'est pas présent, on tente de l'ajouter sans supprimer l'ancien.
+    let refreshed = await vercelRequest(projectPath, vercelToken)
+    let activeDomain = projectDomain(refreshed.payload, desiredDomain)
+
+    if (activeDomain !== desiredDomain) {
+      const addPath = `/v10/projects/${encodeURIComponent(projectId)}/domains${query}`
+      const add = await vercelRequest(addPath, vercelToken, {
+        method: 'POST',
+        body: JSON.stringify({ name: desiredDomain }),
+      })
+
+      if (add.response.ok && add.payload?.verified !== false) {
+        activeDomain = add.payload?.name || desiredDomain
+      } else {
+        // Les noms *.vercel.app sont globaux. En cas de collision, essaie une variante
+        // déterministe liée à l'ID du projet plutôt que d'écraser un domaine existant.
+        const suffix = String(projectId).replace(/[^a-z0-9]/gi, '').slice(-5).toLowerCase()
+        const fallbackSlug = `${desiredSlug.slice(0, 35)}-${suffix}`
+        const fallbackDomain = `${fallbackSlug}.vercel.app`
+        const fallbackRename = await vercelRequest(projectPath, vercelToken, {
+          method: 'PATCH',
+          body: JSON.stringify({ name: fallbackSlug }),
+        })
+
+        if (fallbackRename.response.ok) {
+          const fallbackAdd = await vercelRequest(addPath, vercelToken, {
+            method: 'POST',
+            body: JSON.stringify({ name: fallbackDomain }),
+          })
+          if (fallbackAdd.response.ok && fallbackAdd.payload?.verified !== false) {
+            activeDomain = fallbackAdd.payload?.name || fallbackDomain
+          }
+        }
+
+        if (!activeDomain) {
+          refreshed = await vercelRequest(projectPath, vercelToken)
+          activeDomain = projectDomain(refreshed.payload, fallbackDomain)
+        }
+      }
+    }
+
+    if (!activeDomain) {
+      return json(res, 502, {
+        code: 'PROJECT_RENAMED_DOMAIN_PENDING',
+        projectName: rename.payload?.name || desiredSlug,
+        error: 'Le projet a été renommé, mais Vercel n’a pas encore confirmé son nouveau domaine. Vérifie l’onglet Domains du projet.',
+      })
+    }
+
+    return json(res, 200, {
+      ok: true,
+      projectName: activeDomain.replace(/\.vercel\.app$/, ''),
+      domain: activeDomain,
+      url: `https://${activeDomain}`,
+      previousDomainKept: true,
+    })
+  } catch (error) {
+    console.error('Vercel project rename failed:', error)
+    return json(res, 502, { error: 'Service Vercel temporairement indisponible. Le nom commercial reste bien enregistré.' })
+  }
+}
