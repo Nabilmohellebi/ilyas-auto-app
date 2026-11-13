@@ -67,7 +67,7 @@ ${details.note ? `📝 *Note :* ${details.note}\n` : ''}━━━━━━━━
   await sendTelegram(msg)
 }
 
-export function buildWAMessage(reservation) {
+export function buildWAMessage(reservation, shopName = CONFIG.nom) {
   return encodeURIComponent(
     `Bonjour ${reservation.nom_client}, ici ${shopName} 👋\n` +
     `Nous avons bien reçu votre demande concernant :\n` +
@@ -77,10 +77,10 @@ export function buildWAMessage(reservation) {
 }
 
 // Ouvrir WA avec le client concerné pour une réservation (usage admin)
-export function openWA(reservation) {
+export function openWA(reservation, shopName = CONFIG.nom) {
   const phone = String(reservation.telephone || '').replace(/\D/g, '')
   const normalized = phone.startsWith('0') ? '213' + phone.slice(1) : phone
-  window.open(`https://wa.me/${normalized}?text=${buildWAMessage(reservation)}`, '_blank')
+  window.open(`https://wa.me/${normalized}?text=${buildWAMessage(reservation, shopName)}`, '_blank')
 }
 
 // Lien WA générique (bouton flottant, footer, etc.) — phone optionnel, sinon celui de config.js
