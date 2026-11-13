@@ -11,6 +11,9 @@
 -- Ne pas utiliser ce fichier seul comme configuration finale de production.
 -- ═══════════════════════════════════════════════════════════════
 
+create schema if not exists extensions;
+create extension if not exists pgcrypto with schema extensions;
+
 -- ── STOCK ───────────────────────────────────────────────────────
 create table if not exists public.vehicles (
   id bigserial primary key,
