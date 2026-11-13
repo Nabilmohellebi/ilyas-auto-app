@@ -6,7 +6,7 @@ let cacheTime = 0
 const CACHE_TTL = 2 * 60 * 1000 // 2 minutes
 
 const DEFAULTS = {
-  shop_name:       'HBR Auto',
+  shop_name:       'Nabil Auto',
   shop_phone:      '213550123456',
   shop_whatsapp:   '213550123456',
   shop_email:      'contact@hbrauto.com',
