@@ -107,11 +107,11 @@ export default function ReservationModal({ vehicle, onClose, shopName = 'Nabil A
             <div style={{ width: 64, height: 64, borderRadius: '50%', background: 'rgba(34,197,94,.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 30, margin: '0 auto 16px' }}>✅</div>
             <h2 style={{ fontFamily: 'var(--ff)', fontSize: 20, fontWeight: 900, color: 'white', marginBottom: 8 }}>{t.reservation.envoye}</h2>
             <p style={{ fontSize: 13, color: 'rgba(255,255,255,.55)', marginBottom: 20, lineHeight: 1.6 }}>
-              {t.reservation.merci}<br />{whatsapp ? t.reservation.confirmerWA : 'Le showroom vous recontactera avec les coordonnées indiquées.'}
+              {t.reservation.merci}<br />{t.reservation.confirmerWA}
             </p>
-            {whatsapp && <a href={waLink(`Bonjour ${shopName}, ${waConfirmText}`, whatsapp)} target="_blank" rel="noreferrer" className="btn-hero-primary" style={{ width: '100%', justifyContent: 'center', marginBottom: 10 }}>
+            <a href={waLink(`Bonjour ${shopName}, ${waConfirmText}`, whatsapp)} target="_blank" rel="noreferrer" className="btn-hero-primary" style={{ width: '100%', justifyContent: 'center', marginBottom: 10 }}>
               {t.reservation.confirmerBtn}
-            </a>}
+            </a>
             <button onClick={onClose} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,.4)', fontSize: 12.5, textDecoration: 'underline', cursor: 'pointer' }}>{t.reservation.fermer}</button>
           </div>
         )}
