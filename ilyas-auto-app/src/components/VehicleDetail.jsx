@@ -20,9 +20,10 @@ function safePrintImageUrl(value) {
   }
 }
 
-function printVehicleSheet(v, images) {
+function printVehicleSheet(v, images, shopName = 'Nabil Auto') {
   const specs = Array.isArray(v.specs) ? v.specs : []
   const name = escapePrintHtml(`${v.marque} ${v.modele}`)
+  const safeShopName = escapePrintHtml(shopName)
   const description = escapePrintHtml(v.description)
   const condition = v.etat_vehicule || (Number(v.km || 0) > 0 ? 'occasion' : 'neuf')
   const imageUrl = safePrintImageUrl(images[0]?.url)
@@ -52,7 +53,7 @@ function printVehicleSheet(v, images) {
     @media print { button { display:none !important; } }
   </style></head><body>
     <button onclick="window.print()" style="background:#e63946;color:white;border:none;padding:10px 24px;border-radius:8px;font-size:13px;cursor:pointer;margin-bottom:16px;">🖨️ Imprimer / Enregistrer en PDF</button>
-    <div class="hdr"><div class="brand">HBR <em>AUTO</em></div><div class="date">${new Date().toLocaleDateString('fr-FR')}</div></div>
+    <div class="hdr"><div class="brand">${safeShopName}</div><div class="date">${new Date().toLocaleDateString('fr-FR')}</div></div>
     ${imageUrl ? `<img class="main" src="${escapePrintHtml(imageUrl)}" alt="${imageAlt}" />` : ''}
     <h1>${name}</h1>
     <div class="price">${fmt(v.prix)}</div>
@@ -67,7 +68,7 @@ function printVehicleSheet(v, images) {
     </div>
     ${description ? `<div class="section-title">Description</div><p class="desc">${description}</p>` : ''}
     ${specItems ? `<div class="section-title">Équipements</div><ul>${specItems}</ul>` : ''}
-    <div class="footer">HBR Auto · Document généré automatiquement · Prix indicatif, sous réserve de disponibilité.</div>
+    <div class="footer">${safeShopName} · Document généré automatiquement · Prix indicatif, sous réserve de disponibilité.</div>
   </body></html>`)
   win.document.close()
 }
@@ -103,7 +104,7 @@ function getEmbedUrl(url) {
   return { type: 'external', src: url }
 }
 
-export default function VehicleDetail({ vehicle: v, onClose, onReserve }) {
+export default function VehicleDetail({ vehicle: v, onClose, onReserve, shopName = 'Nabil Auto' }) {
   const { lang, t } = useLang()
   const images = Array.isArray(v.images) && v.images.length > 0 ? v.images : (v.img ? [{ url: v.img }] : [])
   const gallery = Array.isArray(v.images_gallery) ? v.images_gallery : []
@@ -124,7 +125,7 @@ export default function VehicleDetail({ vehicle: v, onClose, onReserve }) {
     const link = new URL(window.location.pathname, window.location.origin)
     link.searchParams.set('vehicule', String(v.id))
     const shareData = {
-      title: `HBR AUTO — ${v.marque} ${v.modele}`,
+      title: `${shopName} — ${v.marque} ${v.modele}`,
       text: `${v.marque} ${v.modele} (${v.annee}) · ${fmt(v.prix)}`,
       url: link.href,
     }
@@ -213,7 +214,7 @@ export default function VehicleDetail({ vehicle: v, onClose, onReserve }) {
               {disabled ? t.detail.vendu : vehicleCondition === 'occasion' ? t.detail.acheterOccasion : t.detail.reserver}
             </button>
 
-            <button className="vd-print-btn" onClick={() => printVehicleSheet(v, images)}>🖨️ Fiche PDF / Imprimer</button>
+            <button className="vd-print-btn" onClick={() => printVehicleSheet(v, images, shopName)}>🖨️ Fiche PDF / Imprimer</button>
             <button className="vd-share-btn" onClick={shareVehicle}>↗️ {shareStatus || "Partager la fiche"}</button>
 
             {v.video_url && (() => {
