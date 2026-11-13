@@ -245,9 +245,9 @@ export default function SellVehicleModal({ onClose, vehicles = [], tradeMarginPe
                 </div>
               </div>
             )}
-            {whatsapp && <a href={waLink(buildWhatsAppText(), whatsapp)} target="_blank" rel="noreferrer" className="btn-hero-primary" style={{ width: '100%', justifyContent: 'center', marginBottom: 10 }}>
+            <a href={waLink(buildWhatsAppText(), whatsapp)} target="_blank" rel="noreferrer" className="btn-hero-primary" style={{ width: '100%', justifyContent: 'center', marginBottom: 10 }}>
               💬 Confirmer sur WhatsApp
-            </a>}
+            </a>
             <button onClick={onClose} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,.4)', fontSize: 12.5, textDecoration: 'underline', cursor: 'pointer' }}>Fermer</button>
           </div>
         )}
