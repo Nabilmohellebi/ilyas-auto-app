@@ -13,13 +13,13 @@ const PUBLIC_SETTING_KEYS = [
 
 const DEFAULTS = {
   shop_name:       'Nabil Auto',
-  shop_phone:      '213550123456',
-  shop_whatsapp:   '213550123456',
-  shop_email:      'contact@hbrauto.com',
-  shop_address:    'HBR Melaba, Azazga, Algérie',
-  shop_horaires:   'Samedi – Jeudi : 09h00 – 19h00 · Vendredi : fermé',
-  shop_maps_url:   'https://maps.app.goo.gl/mrnBnx1ZRXTS4xoi6',
-  shop_maps_embed: 'https://maps.google.com/maps?q=HBR+MELABA,+Azazga&z=16&output=embed',
+  shop_phone:      '',
+  shop_whatsapp:   '',
+  shop_email:      '',
+  shop_address:    '',
+  shop_horaires:   '',
+  shop_maps_url:   '',
+  shop_maps_embed: '',
   maintenance:     'false',
 }
 
