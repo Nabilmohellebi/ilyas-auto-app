@@ -759,7 +759,7 @@ export default function AdminPanel({ onLogout, onToast }) {
                     {isExchange && details.targetVehicle && <span>🚗 Véhicule souhaité : {details.targetVehicle.label} — {fmt(details.targetVehicle.price)}</span>}
                     {trade && <span>🏷️ Offre de reprise simulée : {fmt(trade.offer)} (marge {trade.marginPercent} %)</span>}
                     {trade && trade.balance > 0 && <span>↗️ Complément estimé à payer par le client : {fmt(trade.balance)}</span>}
-                    {trade && trade.balance < 0 && <span>↙️ Complément estimé à verser par HBR AUTO : {fmt(Math.abs(trade.balance))}</span>}
+                    {trade && trade.balance < 0 && <span>↙️ Complément estimé à verser par {shopName} : {fmt(Math.abs(trade.balance))}</span>}
                     {trade && trade.balance === 0 && <span>⚖️ Valeurs équivalentes selon la simulation</span>}
                     {details.note && <span>📝 Message : {details.note}</span>}
                     {!details.version && r.message && <span>📝 {r.message}</span>}
