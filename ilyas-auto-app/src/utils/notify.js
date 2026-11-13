@@ -1,4 +1,5 @@
 import CONFIG from '../config'
+import { getSettings } from './useSettings'
 
 // Telegram via proxy serveur sécurisé — le token ne quitte jamais Vercel
 async function sendTelegram(text) {
@@ -25,8 +26,10 @@ export function genId() {
 
 // ── Notifier une nouvelle réservation sur Telegram ──
 export async function notifyTelegram(reservation) {
+  const settings = await getSettings().catch(() => ({}))
+  const shopName = settings.shop_name || CONFIG.nom
   const msg = `
-🚗 *Nouvelle réservation — ${CONFIG.nom}*
+🚗 *Nouvelle réservation — ${shopName}*
 ━━━━━━━━━━━━━━━━
 🆔 *${reservation.id}*
 
@@ -42,6 +45,8 @@ ${reservation.message ? `📝 *Message :* ${reservation.message}\n` : ''}━━�
 }
 
 export async function notifyTelegramSellRequest(request, details = {}) {
+  const settings = await getSettings().catch(() => ({}))
+  const shopName = settings.shop_name || CONFIG.nom
   const isExchange = details.type === 'exchange'
   const trade = details.trade
   const target = details.targetVehicle
@@ -62,9 +67,9 @@ ${details.note ? `📝 *Note :* ${details.note}\n` : ''}━━━━━━━━
   await sendTelegram(msg)
 }
 
-export function buildWAMessage(reservation) {
+export function buildWAMessage(reservation, shopName = CONFIG.nom) {
   return encodeURIComponent(
-    `Bonjour ${reservation.nom_client}, ici ${CONFIG.nom} 👋\n` +
+    `Bonjour ${reservation.nom_client}, ici ${shopName} 👋\n` +
     `Nous avons bien reçu votre demande concernant :\n` +
     `🚘 ${reservation.vehicule_nom} — ${fmt(reservation.vehicule_prix)}\n\n` +
     `Un conseiller va vous recontacter très vite pour confirmer les détails.`
@@ -72,14 +77,15 @@ export function buildWAMessage(reservation) {
 }
 
 // Ouvrir WA avec le client concerné pour une réservation (usage admin)
-export function openWA(reservation) {
+export function openWA(reservation, shopName = CONFIG.nom) {
   const phone = String(reservation.telephone || '').replace(/\D/g, '')
   const normalized = phone.startsWith('0') ? '213' + phone.slice(1) : phone
-  window.open(`https://wa.me/${normalized}?text=${buildWAMessage(reservation)}`, '_blank')
+  window.open(`https://wa.me/${normalized}?text=${buildWAMessage(reservation, shopName)}`, '_blank')
 }
 
 // Lien WA générique (bouton flottant, footer, etc.) — phone optionnel, sinon celui de config.js
 export function waLink(text, phone) {
-  const p = phone || CONFIG.whatsapp || '213550123456'
+  const p = phone || CONFIG.whatsapp
+  if (!p) return '#'
   return `https://wa.me/${p}?text=${encodeURIComponent(text)}`
 }
