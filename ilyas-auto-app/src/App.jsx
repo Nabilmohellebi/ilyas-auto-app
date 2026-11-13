@@ -1,4 +1,4 @@
-import { lazy, Suspense, useState } from 'react'
+import { lazy, Suspense, useEffect, useState } from 'react'
 import AdminLogin from './components/admin/AdminLogin'
 const AdminPanel = lazy(() => import('./components/admin/AdminPanel'))
 import PublicSite from './components/PublicSite'
@@ -12,6 +12,15 @@ export default function App() {
   const [adminAuth, setAdminAuth] = useState(() => localStorage.getItem('ia_admin') === '1')
   const [loginError, setLoginError] = useState(false)
   const [toasts, setToasts] = useState([])
+  const [shopName, setShopName] = useState('Nabil Auto')
+
+  useEffect(() => {
+    let active = true
+    getSettings().then(settings => {
+      if (active) setShopName(settings.shop_name || 'Nabil Auto')
+    }).catch(() => {})
+    return () => { active = false }
+  }, [])
 
   function toast(msg, type = 'default') {
     const id = Date.now()
@@ -44,7 +53,7 @@ export default function App() {
   }
 
   if (isAdmin) {
-    if (!adminAuth) return <AdminLogin onLogin={handleLogin} error={loginError} />
+    if (!adminAuth) return <AdminLogin onLogin={handleLogin} error={loginError} shopName={shopName} />
     return (
       <>
         <Suspense fallback={<div className="adm-loading" role="status">Chargement de l’administration…</div>}>
