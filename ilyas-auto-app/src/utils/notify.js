@@ -52,7 +52,7 @@ export async function notifyTelegramSellRequest(request, details = {}) {
   const target = details.targetVehicle
 
   const msg = `
-${isExchange ? '🔄 *Nouvelle demande d’échange*' : '💰 *Nouvelle proposition de vente*'} — ${CONFIG.nom}
+${isExchange ? '🔄 *Nouvelle demande d’échange*' : '💰 *Nouvelle proposition de vente*'} — ${shopName}
 ━━━━━━━━━━━━━━━━
 🆔 *${request.id}*
 🚘 *Véhicule :* ${request.marque} ${request.modele}
@@ -69,7 +69,7 @@ ${details.note ? `📝 *Note :* ${details.note}\n` : ''}━━━━━━━━
 
 export function buildWAMessage(reservation) {
   return encodeURIComponent(
-    `Bonjour ${reservation.nom_client}, ici ${CONFIG.nom} 👋\n` +
+    `Bonjour ${reservation.nom_client}, ici ${shopName} 👋\n` +
     `Nous avons bien reçu votre demande concernant :\n` +
     `🚘 ${reservation.vehicule_nom} — ${fmt(reservation.vehicule_prix)}\n\n` +
     `Un conseiller va vous recontacter très vite pour confirmer les détails.`
@@ -85,6 +85,7 @@ export function openWA(reservation) {
 
 // Lien WA générique (bouton flottant, footer, etc.) — phone optionnel, sinon celui de config.js
 export function waLink(text, phone) {
-  const p = phone || CONFIG.whatsapp || '213550123456'
+  const p = phone || CONFIG.whatsapp
+  if (!p) return '#'
   return `https://wa.me/${p}?text=${encodeURIComponent(text)}`
 }
