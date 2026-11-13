@@ -8,7 +8,7 @@ import { getSettings } from './utils/useSettings'
 export default function App() {
   const isAdminRoute =
     window.location.search.includes('admin') ||
-    window.location.hash === '#admin'
+    window.location.hash.split('&')[0] === '#admin'
 
   const [authLoading, setAuthLoading] = useState(true)
   const [adminSession, setAdminSession] = useState(false)
@@ -26,28 +26,79 @@ export default function App() {
 
   useEffect(() => {
     let mounted = true
-    async function checkSession() {
-      const token = window.sessionStorage.getItem('hbr_admin_session')
+
+    async function bootstrapSession() {
+      let token = window.sessionStorage.getItem('hbr_admin_session')
+      const hashParams = new URLSearchParams(window.location.hash.slice(1))
+      const handoffToken = hashParams.get('domainHandoff')
+
+      if (handoffToken) {
+        // Retire immédiatement le jeton de l'adresse visible et de l'historique.
+        const cleanHash = window.location.hash
+          .slice(1)
+          .split('&')
+          .filter(part => !part.startsWith('domainHandoff='))
+          .join('&')
+        const cleanUrl = window.location.pathname + window.location.search + (cleanHash ? '#' + cleanHash : '')
+        window.history.replaceState(null, '', cleanUrl)
+
+        try {
+          const response = await fetch('/api/complete-domain-handoff', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ token: handoffToken }),
+          })
+          const result = await response.json().catch(() => ({}))
+
+          if (response.ok && typeof result.adminSession === 'string') {
+            token = result.adminSession
+            window.sessionStorage.setItem('hbr_admin_session', token)
+            if (result.warnings?.length) {
+              toast('Adresse modifiée. Certains anciens alias restent à vérifier dans Vercel.', 'error')
+            } else if (result.removedDomains?.length) {
+              toast('✅ Nouvelle adresse active · Ancien domaine supprimé.', 'default')
+            }
+          } else {
+            token = null
+            window.sessionStorage.removeItem('hbr_admin_session')
+            if (mounted) setLoginError('Le domaine a changé. Reconnecte-toi avec ton mot de passe administrateur.')
+          }
+        } catch {
+          token = null
+          window.sessionStorage.removeItem('hbr_admin_session')
+          if (mounted) setLoginError('Le transfert de session n’a pas abouti. Reconnecte-toi avec ton mot de passe administrateur.')
+        }
+      }
+
       if (!token) {
         if (mounted) setAuthLoading(false)
         return
       }
-      const { data, error } = await supabase.rpc('admin_check_session')
-      if (mounted) {
+
+      try {
+        const { data, error } = await supabase.rpc('admin_check_session')
+        if (!mounted) return
         if (error || data !== true) {
           window.sessionStorage.removeItem('hbr_admin_session')
           setAdminSession(false)
         } else {
           setAdminSession(true)
         }
-        setAuthLoading(false)
+      } catch (error) {
+        console.error('Admin session check failed:', error)
+        window.sessionStorage.removeItem('hbr_admin_session')
+        if (mounted) setAdminSession(false)
+      } finally {
+        if (mounted) setAuthLoading(false)
       }
     }
-    checkSession().catch(error => {
-      console.error('HBR AUTO admin session:', error)
+
+    bootstrapSession().catch(error => {
+      console.error('Admin session bootstrap failed:', error)
       window.sessionStorage.removeItem('hbr_admin_session')
       if (mounted) setAuthLoading(false)
     })
+
     return () => { mounted = false }
   }, [])
 
