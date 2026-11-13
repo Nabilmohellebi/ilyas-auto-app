@@ -194,6 +194,8 @@ export default async function handler(req, res) {
     }
 
     const currentName = current.payload?.name || ''
+    // Capture les domaines réellement attachés avant que le renommage puisse modifier les alias.
+    const initialProjectDomains = await listAttachedProjectDomains(projectId, vercelToken, teamId)
     const currentDomain = projectDomain(current.payload, desiredDomain)
 
     if (currentName !== desiredSlug) {
@@ -269,7 +271,7 @@ export default async function handler(req, res) {
 
     // Prépare un transfert chiffré de la session admin vers le nouveau domaine.
     // Les anciens domaines sont limités aux domaines .vercel.app explicitement liés à ce projet.
-    const previousDomains = new Set(await listAttachedProjectDomains(projectId, vercelToken, teamId))
+    const previousDomains = new Set(initialProjectDomains)
     if (currentName && currentName !== activeDomain.replace(/\.vercel\.app$/, '')) {
       previousDomains.add(currentName + '.vercel.app')
     }
