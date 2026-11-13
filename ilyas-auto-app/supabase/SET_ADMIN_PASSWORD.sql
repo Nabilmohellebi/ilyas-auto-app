@@ -6,11 +6,24 @@
 --
 -- Prépare la table de credentials pour une nouvelle installation.
 -- Le hardening complet des politiques sera appliqué par la migration ensuite.
+create schema if not exists extensions;
+create extension if not exists pgcrypto with schema extensions;
+
 create schema if not exists private;
 create table if not exists private.hbr_admin_credentials (
   singleton boolean primary key default true check (singleton = true),
   password_hash text not null,
   updated_at timestamptz not null default now()
+);
+create table if not exists private.hbr_admin_sessions (
+  token_hash text primary key,
+  expires_at timestamptz not null,
+  created_at timestamptz not null default now()
+);
+create table if not exists private.hbr_admin_login_attempts (
+  client_key text primary key,
+  attempts integer not null default 0,
+  window_started_at timestamptz not null default now()
 );
 
 -- Le mot de passe est immédiatement transformé en hash bcrypt.
