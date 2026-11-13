@@ -1,27 +1,47 @@
 import { useState } from 'react'
 
-export default function AdminLogin({ onLogin, error }) {
-  const [pw, setPw] = useState('')
+export default function AdminLogin({ onLogin, error, shopName = 'Nabil Auto' }) {
+  const brandWords = String(shopName || 'Nabil Auto').trim().split(/\s+/).filter(Boolean)
+  const brandAccent = brandWords.pop() || 'Auto'
+  const brandPrefix = brandWords.join(' ')
+  const [password, setPassword] = useState('')
+  const [submitting, setSubmitting] = useState(false)
+
+  async function submit(event) {
+    event?.preventDefault()
+    if (!password || submitting) return
+    setSubmitting(true)
+    try {
+      await onLogin(password)
+    } finally {
+      setSubmitting(false)
+    }
+  }
 
   return (
     <div className="login-wrap">
-      <div className="login-box">
+      <form className="login-box" onSubmit={submit}>
         <div style={{ fontSize: 48 }}>🚗</div>
-        <h1>HBR <em>AUTO</em></h1>
+        <h1>{brandPrefix ? brandPrefix + ' ' : ''}<em>{brandAccent}</em></h1>
         <p>Espace administrateur — Gestion du showroom</p>
 
-        {error && <div className="login-error">❌ Mot de passe incorrect.</div>}
+        {error && <div className="login-error" role="alert">❌ {error}</div>}
 
+        <label className="login-label" htmlFor="admin-password">Mot de passe administrateur</label>
         <input
+          id="admin-password"
           type="password"
-          placeholder="Mot de passe"
-          value={pw}
-          onChange={e => setPw(e.target.value)}
-          onKeyDown={e => e.key === 'Enter' && onLogin(pw)}
+          autoComplete="current-password"
+          placeholder="Saisis ton mot de passe"
+          value={password}
+          onChange={event => setPassword(event.target.value)}
           autoFocus
+          required
         />
-        <button onClick={() => onLogin(pw)}>Connexion →</button>
-      </div>
+        <button type="submit" disabled={submitting || !password}>
+          {submitting ? 'Connexion…' : 'Connexion →'}
+        </button>
+      </form>
     </div>
   )
 }
