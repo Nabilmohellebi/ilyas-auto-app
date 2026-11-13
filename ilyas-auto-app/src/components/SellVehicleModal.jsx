@@ -8,7 +8,7 @@ function money(value) {
   return `${Math.round(Number(value) || 0).toLocaleString('fr-FR')} DA`
 }
 
-export default function SellVehicleModal({ onClose, vehicles = [], tradeMarginPercent = 5, whatsapp }) {
+export default function SellVehicleModal({ onClose, vehicles = [], tradeMarginPercent = 5, whatsapp, shopName = 'Nabil Auto' }) {
   const marginValue = Number(tradeMarginPercent)
   const margin = Number.isFinite(marginValue) ? Math.min(30, Math.max(0, marginValue)) : 5
   const [type, setType] = useState('sell')
@@ -40,11 +40,11 @@ export default function SellVehicleModal({ onClose, vehicles = [], tradeMarginPe
       const balanceText = balance > 0
         ? `Le client ajouterait environ ${money(balance)}.`
         : balance < 0
-          ? `HBR AUTO verserait environ ${money(Math.abs(balance))} au client.`
+          ? `${shopName} verserait environ ${money(Math.abs(balance))} au client.`
           : 'Les deux véhicules sont à valeur équivalente selon cette estimation.'
-      return `Bonjour HBR AUTO, je souhaite proposer un échange. Mon véhicule : ${vehicleName} (${form.annee || '?'}) — ${form.km || '?'} km. Valeur estimée : ${money(declaredValue)}. Véhicule souhaité : ${targetVehicle ? `${targetVehicle.marque} ${targetVehicle.modele}` : 'à définir'}. Offre de reprise simulée : ${money(tradeOffer)} (marge ${margin} %). ${balanceText}`
+      return `Bonjour ${shopName}, je souhaite proposer un échange. Mon véhicule : ${vehicleName} (${form.annee || '?'}) — ${form.km || '?'} km. Valeur estimée : ${money(declaredValue)}. Véhicule souhaité : ${targetVehicle ? `${targetVehicle.marque} ${targetVehicle.modele}` : 'à définir'}. Offre de reprise simulée : ${money(tradeOffer)} (marge ${margin} %). ${balanceText}`
     }
-    return `Bonjour HBR AUTO, je souhaite vendre mon véhicule : ${vehicleName} (${form.annee || '?'}) — ${form.km || '?'} km. Prix souhaité : ${form.prix ? money(form.prix) : 'à discuter'}.`
+    return `Bonjour ${shopName}, je souhaite vendre mon véhicule : ${vehicleName} (${form.annee || '?'}) — ${form.km || '?'} km. Prix souhaité : ${form.prix ? money(form.prix) : 'à discuter'}.`
   }
 
   async function submit() {
@@ -141,12 +141,12 @@ export default function SellVehicleModal({ onClose, vehicles = [], tradeMarginPe
               Vendre ou échanger votre véhicule
             </h2>
             <p style={{ fontSize: 12.5, color: 'rgba(255,255,255,.55)', marginBottom: 16, lineHeight: 1.6 }}>
-              HBR AUTO étudie aussi les véhicules d’occasion. Décrivez votre voiture et choisissez le type de proposition.
+              {shopName} étudie aussi les véhicules d’occasion. Décrivez votre voiture et choisissez le type de proposition.
             </p>
 
             <div className="trade-type-grid">
               <button type="button" className={`trade-type-option ${type === 'sell' ? 'active' : ''}`} onClick={() => setType('sell')}>
-                <strong>💰 Vendre à HBR AUTO</strong>
+                <strong>💰 Vendre à {shopName}</strong>
                 <small>Nous proposons une offre après étude du véhicule</small>
               </button>
               <button type="button" className={`trade-type-option ${type === 'exchange' ? 'active' : ''}`} onClick={() => setType('exchange')}>
@@ -174,7 +174,7 @@ export default function SellVehicleModal({ onClose, vehicles = [], tradeMarginPe
                 <div className="trade-section-title">2. Le véhicule que vous souhaitez recevoir</div>
                 {availableVehicles.length > 0 ? (
                   <div className="form-field">
-                    <label>Choisir dans le stock HBR AUTO *</label>
+                    <label>Choisir dans le stock {shopName} *</label>
                     <select value={form.targetVehicleId} onChange={e => set('targetVehicleId', e.target.value)}>
                       <option value="">Sélectionner un véhicule…</option>
                       {availableVehicles.map(v => (
@@ -191,7 +191,7 @@ export default function SellVehicleModal({ onClose, vehicles = [], tradeMarginPe
                 <div className="trade-calculation">
                   <div className="trade-calculation-heading">Simulation de l’échange</div>
                   <div className="trade-calculation-row"><span>Valeur estimée de votre voiture</span><strong>{money(declaredValue)}</strong></div>
-                  <div className="trade-calculation-row"><span>Marge de sécurité HBR AUTO ({margin} %)</span><strong>− {money(declaredValue - tradeOffer)}</strong></div>
+                  <div className="trade-calculation-row"><span>Marge de sécurité {shopName} ({margin} %)</span><strong>− {money(declaredValue - tradeOffer)}</strong></div>
                   <div className="trade-calculation-row trade-offer"><span>Offre de reprise simulée</span><strong>{money(tradeOffer)}</strong></div>
                   <div className="trade-calculation-row"><span>Prix du véhicule choisi</span><strong>{targetVehicle ? money(targetPrice) : '—'}</strong></div>
                   {targetVehicle && (
@@ -199,11 +199,11 @@ export default function SellVehicleModal({ onClose, vehicles = [], tradeMarginPe
                       {balance > 0
                         ? <><small>Complément estimé à ajouter par le client</small><strong>{money(balance)}</strong></>
                         : balance < 0
-                          ? <><small>Complément estimé à verser par HBR AUTO</small><strong>{money(Math.abs(balance))}</strong></>
+                          ? <><small>Complément estimé à verser par {shopName}</small><strong>{money(Math.abs(balance))}</strong></>
                           : <><small>Échange à valeur équivalente</small><strong>0 DA</strong></>}
                     </div>
                   )}
-                  <p className="trade-disclaimer">Simulation indicative basée sur les valeurs saisies et une marge réglable par HBR AUTO. L’offre définitive dépendra de l’inspection, de l’état mécanique et des documents du véhicule.</p>
+                  <p className="trade-disclaimer">Simulation indicative basée sur les valeurs saisies et une marge réglable par {shopName}. L’offre définitive dépendra de l’inspection, de l’état mécanique et des documents du véhicule.</p>
                 </div>
               </div>
             )}
