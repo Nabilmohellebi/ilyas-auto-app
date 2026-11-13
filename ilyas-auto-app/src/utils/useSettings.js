@@ -12,7 +12,7 @@ const PUBLIC_SETTING_KEYS = [
 ]
 
 const DEFAULTS = {
-  shop_name:       'HBR Auto',
+  shop_name:       'Nabil Auto',
   shop_phone:      '213550123456',
   shop_whatsapp:   '213550123456',
   shop_email:      'contact@hbrauto.com',
