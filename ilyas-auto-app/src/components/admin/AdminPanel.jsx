@@ -49,7 +49,7 @@ function AdminSettings({ onLogout, onToast, onBrandNameChange }) {
         whatsapp: s.shop_whatsapp || s.shop_phone || '',
         address: s.shop_address || '',
         email: s.shop_email || '',
-        horaires: s.shop_horaires || 'Samedi – Jeudi : 09h00 – 19h00 · Vendredi : fermé',
+        horaires: s.shop_horaires || '',
         mapsUrl: s.shop_maps_url || '',
         mapsEmbed: s.shop_maps_embed || '',
       })
@@ -160,7 +160,7 @@ function AdminSettings({ onLogout, onToast, onBrandNameChange }) {
             <label>Nom du garage</label>
             <input value={shop.name} maxLength={100} onChange={e => setShop(s => ({ ...s, name: e.target.value }))} />
             <small style={{ display: 'block', color: 'rgba(255,255,255,.42)', fontSize: 11, lineHeight: 1.5, marginTop: 6 }}>
-              Sur les copies configurées avec l’API Vercel, enregistrer ce nom renomme aussi le projet et tente de mettre à jour son adresse .vercel.app.
+              Après l’enregistrement, le nom et l’adresse .vercel.app du garage sont synchronisés automatiquement avec Vercel.
             </small>
           </div>
           <div className="form-field"><label>Téléphone</label><input value={shop.phone} onChange={e => setShop(s => ({ ...s, phone: e.target.value }))} type="tel" /></div>
