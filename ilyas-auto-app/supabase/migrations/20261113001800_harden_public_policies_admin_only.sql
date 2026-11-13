@@ -61,7 +61,7 @@ $$;
 revoke all on function private.hbr_admin_session_valid() from public;
 grant execute on function private.hbr_admin_session_valid() to anon, authenticated;
 
-create or replace function public.admin_login(p_password text)
+create or replace function private.hbr_admin_login(p_password text)
 returns text
 language plpgsql
 security definer
@@ -128,6 +128,16 @@ begin
 end;
 $$;
 
+revoke all on function private.hbr_admin_login(text) from public;
+grant execute on function private.hbr_admin_login(text) to anon, authenticated;
+
+create or replace function public.admin_login(p_password text)
+returns text
+language sql
+security invoker
+set search_path = ''
+as $$ select private.hbr_admin_login(p_password); $$;
+
 revoke all on function public.admin_login(text) from public;
 grant execute on function public.admin_login(text) to anon, authenticated;
 
@@ -137,14 +147,12 @@ language sql
 stable
 security invoker
 set search_path = ''
-as $$
-  select private.hbr_admin_session_valid();
-$$;
+as $$ select private.hbr_admin_session_valid(); $$;
 
 revoke all on function public.admin_check_session() from public;
 grant execute on function public.admin_check_session() to anon, authenticated;
 
-create or replace function public.admin_logout()
+create or replace function private.hbr_admin_logout()
 returns boolean
 language plpgsql
 security definer
@@ -164,10 +172,20 @@ begin
 end;
 $$;
 
+revoke all on function private.hbr_admin_logout() from public;
+grant execute on function private.hbr_admin_logout() to anon, authenticated;
+
+create or replace function public.admin_logout()
+returns boolean
+language sql
+security invoker
+set search_path = ''
+as $$ select private.hbr_admin_logout(); $$;
+
 revoke all on function public.admin_logout() from public;
 grant execute on function public.admin_logout() to anon, authenticated;
 
-create or replace function public.admin_change_password(p_current_password text, p_new_password text)
+create or replace function private.hbr_admin_change_password(p_current_password text, p_new_password text)
 returns boolean
 language plpgsql
 security definer
@@ -208,6 +226,16 @@ begin
   return true;
 end;
 $$;
+
+revoke all on function private.hbr_admin_change_password(text, text) from public;
+grant execute on function private.hbr_admin_change_password(text, text) to anon, authenticated;
+
+create or replace function public.admin_change_password(p_current_password text, p_new_password text)
+returns boolean
+language sql
+security invoker
+set search_path = ''
+as $$ select private.hbr_admin_change_password(p_current_password, p_new_password); $$;
 
 revoke all on function public.admin_change_password(text, text) from public;
 grant execute on function public.admin_change_password(text, text) to anon, authenticated;
