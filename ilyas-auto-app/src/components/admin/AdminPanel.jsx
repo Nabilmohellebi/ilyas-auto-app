@@ -79,11 +79,10 @@ function AdminSettings({ onLogout, onToast, onBrandNameChange }) {
       await saveSetting('shop_maps_url', shop.mapsUrl)
       await saveSetting('shop_maps_embed', shop.mapsEmbed)
       await saveSetting('shop_phones', JSON.stringify(phones.filter(p => p.number.trim())))
+
       const brandName = shop.name.trim() || 'Nabil Auto'
       onBrandNameChange?.(brandName)
 
-      // Le nom commercial est sauvegardé même si le renommage Vercel n'est pas configuré.
-      // Le jeton Vercel reste exclusivement côté serveur.
       try {
         const adminSession = window.sessionStorage.getItem('hbr_admin_session')
         const response = await fetch('/api/rename-project', {
@@ -97,19 +96,56 @@ function AdminSettings({ onLogout, onToast, onBrandNameChange }) {
         const result = await response.json().catch(() => ({}))
 
         if (response.ok && result.url) {
-          onToast && onToast('✅ Informations enregistrées · Nouvelle adresse : ' + result.url, 'default')
+          const target = new URL(result.url)
+          target.pathname = window.location.pathname
+          target.search = window.location.search
+
+          // Conserve l'accès admin dans le fragment, sans exposer le jeton dans les requêtes HTTP.
+          const adminRoute = window.location.hash.split('&')[0] === '#admin' ? 'admin' : ''
+          const handoffPart = result.handoffToken
+            ? 'domainHandoff=' + encodeURIComponent(result.handoffToken)
+            : ''
+          target.hash = [adminRoute, handoffPart].filter(Boolean).join('&')
+
+          if (target.hostname.toLowerCase() !== window.location.hostname.toLowerCase()) {
+            onToast && onToast('✅ Informations enregistrées. Bascule vers la nouvelle adresse…', 'default')
+            window.location.replace(target.toString())
+            return
+          }
+
+          if (result.handoffToken) {
+            const cleanupResponse = await fetch('/api/complete-domain-handoff', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ token: result.handoffToken }),
+            })
+            const cleanup = await cleanupResponse.json().catch(() => ({}))
+            if (cleanupResponse.ok && !cleanup.warnings?.length) {
+              onToast && onToast(
+                cleanup.removedDomains?.length
+                  ? '✅ Informations enregistrées · Ancien domaine supprimé.'
+                  : '✅ Informations et adresse enregistrées.',
+                'default',
+              )
+            } else {
+              onToast && onToast('✅ Informations enregistrées. Le nouveau domaine fonctionne, mais un ancien alias reste à vérifier dans Vercel.', 'error')
+            }
+          } else {
+            onToast && onToast('✅ Informations enregistrées · Nouvelle adresse : ' + result.url, 'default')
+          }
         } else if (result.code === 'VERCEL_RENAME_NOT_CONFIGURED') {
           onToast && onToast('✅ Nom enregistré. Configure le renommage Vercel dans CLIENT_TEMPLATE_SETUP.md pour changer aussi l’adresse.', 'default')
         } else {
           onToast && onToast('✅ Nom enregistré. Adresse Vercel non modifiée : ' + (result.error || 'vérifie la configuration Vercel.'), 'error')
         }
       } catch {
-        onToast && onToast('✅ Informations enregistrées. Le renommage de l’adresse Vercel n’a pas pu être vérifié.', 'error')
+        onToast && onToast('✅ Informations enregistrées. Le changement d’adresse Vercel n’a pas pu être vérifié.', 'error')
       }
     } catch (e) {
       onToast && onToast('❌ Erreur : ' + e.message, 'error')
+    } finally {
+      setShopSaving(false)
     }
-    setShopSaving(false)
   }
 
   async function saveTradeMargin() {
