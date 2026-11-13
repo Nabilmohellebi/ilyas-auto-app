@@ -621,7 +621,7 @@ export default function AdminPanel({ onLogout, onToast }) {
                         <small>{r.created_at ? new Date(r.created_at).toLocaleString('fr-FR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }) : 'Date inconnue'}</small>
                       </div>
                       <span className={'res-badge ' + (r.statut || 'nouvelle')}>{RES_STATUTS.find(s => s.key === r.statut)?.label || r.statut || 'Nouvelle'}</span>
-                      <button className="act-btn wa adm-recent-contact" onClick={() => openWA(r)}>WhatsApp</button>
+                      <button className="act-btn wa adm-recent-contact" onClick={() => openWA(r, shopName)}>WhatsApp</button>
                     </div>
                   ))}
                 </div>
@@ -719,7 +719,7 @@ export default function AdminPanel({ onLogout, onToast }) {
                   {r.message && <span>📝 {r.message}</span>}
                 </div>
                 <div className="rescard-actions">
-                  <button className="act-btn wa" onClick={() => openWA(r)}>💬 Contacter WhatsApp</button>
+                  <button className="act-btn wa" onClick={() => openWA(r, shopName)}>💬 Contacter WhatsApp</button>
                   {r.statut !== 'contactee' && <button className="act-btn" onClick={() => setResStatus(r.id, 'contactee')}>📞 Marquer contactée</button>}
                   {r.statut !== 'vendue' && <button className="act-btn" onClick={() => setResStatus(r.id, 'vendue')}>✅ Marquer vendue</button>}
                   {r.statut !== 'annulee' && <button className="act-btn" onClick={() => setResStatus(r.id, 'annulee')}>❌ Annuler</button>}
@@ -765,7 +765,7 @@ export default function AdminPanel({ onLogout, onToast }) {
                     {!details.version && r.message && <span>📝 {r.message}</span>}
                   </div>
                   <div className="rescard-actions">
-                    <button className="act-btn wa" onClick={() => openWA({ nom_client: r.nom_client, telephone: r.telephone, vehicule_nom: contactVehicleName, vehicule_prix: trade?.offer || r.prix_souhaite || 0 })}>💬 Contacter WhatsApp</button>
+                    <button className="act-btn wa" onClick={() => openWA({ nom_client: r.nom_client, telephone: r.telephone, vehicule_nom: contactVehicleName, vehicule_prix: trade?.offer || r.prix_souhaite || 0 }, shopName)}>💬 Contacter WhatsApp</button>
                     {r.statut !== 'contactee' && <button className="act-btn" onClick={() => setSellStatus(r.id, 'contactee')}>📞 Marquer contactée</button>}
                     {r.statut !== 'vendue' && <button className="act-btn" onClick={() => setSellStatus(r.id, 'vendue')}>✅ Marquer traitée</button>}
                     {r.statut !== 'annulee' && <button className="act-btn" onClick={() => setSellStatus(r.id, 'annulee')}>❌ Annuler</button>}
