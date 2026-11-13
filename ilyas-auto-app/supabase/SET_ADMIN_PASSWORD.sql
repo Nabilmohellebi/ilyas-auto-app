@@ -4,6 +4,15 @@
 -- Remplace le texte entre apostrophes par un mot de passe personnel de
 -- 16 caractères minimum. Ne l'envoie pas dans une conversation.
 --
+-- Prépare la table de credentials pour une nouvelle installation.
+-- Le hardening complet des politiques sera appliqué par la migration ensuite.
+create schema if not exists private;
+create table if not exists private.hbr_admin_credentials (
+  singleton boolean primary key default true check (singleton = true),
+  password_hash text not null,
+  updated_at timestamptz not null default now()
+);
+
 -- Le mot de passe est immédiatement transformé en hash bcrypt.
 -- Le mot de passe en clair n'est ni stocké dans la base, ni dans GitHub.
 
