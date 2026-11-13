@@ -3,6 +3,7 @@ import AdminLogin from './components/admin/AdminLogin'
 const AdminPanel = lazy(() => import('./components/admin/AdminPanel'))
 import PublicSite from './components/PublicSite'
 import { supabase } from './supabase'
+import { getSettings } from './utils/useSettings'
 
 export default function App() {
   const isAdminRoute =
@@ -13,6 +14,15 @@ export default function App() {
   const [adminSession, setAdminSession] = useState(false)
   const [loginError, setLoginError] = useState('')
   const [toasts, setToasts] = useState([])
+  const [shopName, setShopName] = useState('Nabil Auto')
+
+  useEffect(() => {
+    let mounted = true
+    getSettings()
+      .then(settings => { if (mounted) setShopName(settings.shop_name || 'Nabil Auto') })
+      .catch(() => {})
+    return () => { mounted = false }
+  }, [])
 
   useEffect(() => {
     let mounted = true
@@ -80,7 +90,7 @@ export default function App() {
       return <div className="adm-loading" role="status">Vérification de la session…</div>
     }
     if (!adminSession) {
-      return <AdminLogin onLogin={handleLogin} error={loginError} />
+      return <AdminLogin onLogin={handleLogin} error={loginError} shopName={shopName} />
     }
     return (
       <>
