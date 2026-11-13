@@ -40,6 +40,44 @@ function projectDomain(project, requestedDomain) {
   return exact ? requestedDomain : null
 }
 
+async function assignDomainToLatestProduction(projectId, domain, token, teamId) {
+  const params = new URLSearchParams({
+    projectId,
+    target: 'production',
+    limit: '1',
+  })
+  if (teamId) params.set('teamId', teamId)
+
+  const deployments = await vercelRequest(`/v6/deployments?${params.toString()}`, token)
+  const deployment = deployments.payload?.deployments?.[0]
+  const deploymentId = deployment?.uid || deployment?.id
+
+  if (!deployments.response.ok || !deploymentId) {
+    return { ok: false, error: 'Aucun déploiement de production prêt n’a été trouvé pour ce projet.' }
+  }
+
+  const aliasPath = `/v2/deployments/${encodeURIComponent(deploymentId)}/aliases${teamQuery(teamId)}`
+  const assigned = await vercelRequest(aliasPath, token, {
+    method: 'POST',
+    body: JSON.stringify({ alias: domain }),
+  })
+
+  if (assigned.response.ok && assigned.payload?.alias === domain) {
+    return { ok: true, deploymentId }
+  }
+
+  // L’alias peut déjà être affecté au bon déploiement. On vérifie avant de déclarer un échec.
+  const existing = await vercelRequest(`/v4/aliases/${encodeURIComponent(domain)}${teamQuery(teamId)}`, token)
+  const existingDeploymentId = existing.payload?.deploymentId || existing.payload?.deployment?.id
+  if (existing.response.ok && existingDeploymentId === deploymentId) {
+    return { ok: true, deploymentId }
+  }
+
+  return {
+    ok: false,
+    error: 'Le domaine est enregistré, mais Vercel n’a pas confirmé son association au dernier déploiement de production.',
+  }
+}
 export default async function handler(req, res) {
   res.setHeader('Cache-Control', 'no-store')
 
@@ -121,26 +159,22 @@ export default async function handler(req, res) {
 
     const currentName = current.payload?.name || ''
     const currentDomain = projectDomain(current.payload, desiredDomain)
-    if (currentName === desiredSlug && currentDomain === desiredDomain) {
-      return json(res, 200, { ok: true, unchanged: true, projectName: currentName, domain: desiredDomain, url: `https://${desiredDomain}` })
+
+    if (currentName !== desiredSlug) {
+      const rename = await vercelRequest(projectPath, vercelToken, {
+        method: 'PATCH',
+        body: JSON.stringify({ name: desiredSlug }),
+      })
+
+      if (!rename.response.ok) {
+        const message = rename.response.status === 409
+          ? 'Ce nom de projet est déjà utilisé dans ce compte Vercel. Essaie un nom légèrement différent.'
+          : 'Vercel a refusé le changement de nom du projet.'
+        return json(res, rename.response.status, { error: message })
+      }
     }
 
-    const rename = await vercelRequest(projectPath, vercelToken, {
-      method: 'PATCH',
-      body: JSON.stringify({ name: desiredSlug }),
-    })
-
-    if (!rename.response.ok) {
-      const message = rename.response.status === 409
-        ? 'Ce nom de projet est déjà utilisé dans ce compte Vercel. Essaie un nom légèrement différent.'
-        : 'Vercel a refusé le changement de nom du projet.'
-      return json(res, rename.response.status, { error: message })
-    }
-
-    // Renommer le projet suffit souvent à mettre à jour son domaine par défaut.
-    // Si l'alias exact n'est pas présent, on tente de l'ajouter sans supprimer l'ancien.
-    let refreshed = await vercelRequest(projectPath, vercelToken)
-    let activeDomain = projectDomain(refreshed.payload, desiredDomain)
+    let activeDomain = currentDomain
 
     if (activeDomain !== desiredDomain) {
       const addPath = `/v10/projects/${encodeURIComponent(projectId)}/domains${query}`
@@ -173,7 +207,7 @@ export default async function handler(req, res) {
         }
 
         if (!activeDomain) {
-          refreshed = await vercelRequest(projectPath, vercelToken)
+          const refreshed = await vercelRequest(projectPath, vercelToken)
           activeDomain = projectDomain(refreshed.payload, fallbackDomain)
         }
       }
@@ -182,14 +216,24 @@ export default async function handler(req, res) {
     if (!activeDomain) {
       return json(res, 502, {
         code: 'PROJECT_RENAMED_DOMAIN_PENDING',
-        projectName: rename.payload?.name || desiredSlug,
-        error: 'Le projet a été renommé, mais Vercel n’a pas encore confirmé son nouveau domaine. Vérifie l’onglet Domains du projet.',
+        error: 'Le projet a été renommé, mais Vercel n’a pas confirmé son nouveau domaine. Réessaie depuis les paramètres.',
+      })
+    }
+
+    // L’ajout d’un domaine au projet ne suffit pas toujours à l’attacher au déploiement
+    // déjà en production. On l’assigne explicitement au dernier déploiement de production.
+    const alias = await assignDomainToLatestProduction(projectId, activeDomain, vercelToken, teamId)
+    if (!alias.ok) {
+      return json(res, 502, {
+        code: 'PROJECT_RENAMED_ALIAS_PENDING',
+        domain: activeDomain,
+        error: alias.error,
       })
     }
 
     return json(res, 200, {
       ok: true,
-      projectName: activeDomain.replace(/\.vercel\.app$/, ''),
+      projectName: activeDomain.replace(/\\.vercel\\.app$/, ''),
       domain: activeDomain,
       url: `https://${activeDomain}`,
       previousDomainKept: true,
