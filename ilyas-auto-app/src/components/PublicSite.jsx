@@ -119,6 +119,25 @@ function PublicSiteInner() {
     return { rest: words.join(' '), last }
   }, [s.nom])
 
+  useEffect(() => {
+    const title = `${s.nom} — Véhicules neufs & d’occasion`
+    const description = `Découvrez le stock de ${s.nom} : véhicules neufs et d’occasion, achat, vente, reprise et échange.`
+    document.title = title
+    const setMeta = (selector, value) => {
+      const element = document.querySelector(selector)
+      if (element) element.setAttribute('content', value)
+    }
+    setMeta('meta[name="description"]', description)
+    setMeta('meta[property="og:site_name"]', s.nom)
+    setMeta('meta[property="og:title"]', title)
+    setMeta('meta[property="og:description"]', description)
+    setMeta('meta[name="twitter:title"]', title)
+    setMeta('meta[name="twitter:description"]', description)
+    setMeta('meta[property="og:url"]', window.location.origin + '/')
+    const canonical = document.querySelector('link[rel="canonical"]')
+    if (canonical) canonical.setAttribute('href', window.location.origin + '/')
+  }, [s.nom])
+
   const brands = useMemo(() => [...new Set(vehicles.map(v => v.marque))].sort(), [vehicles])
 
   const heroImages = useMemo(() => vehicles.filter(v => v.img).slice(0, 3).map(v => v.img), [vehicles])
@@ -464,6 +483,7 @@ function PublicSiteInner() {
       {openVehicle && (
         <Suspense fallback={<div className="spinner" role="status">Chargement de la fiche…</div>}>
           <VehicleDetail
+            shopName={s.nom}
             vehicle={openVehicle}
             onClose={closeVehicleDetail}
             onReserve={v => { setOpenVehicle(null); setReserveVehicle(v) }}
@@ -472,13 +492,13 @@ function PublicSiteInner() {
       )}
 
       {/* ── Modal réservation ── */}
-      {reserveVehicle && <Suspense fallback={<div className="spinner" role="status">Chargement…</div>}><ReservationModal vehicle={reserveVehicle} onClose={() => setReserveVehicle(null)} /></Suspense>}
+      {reserveVehicle && <Suspense fallback={<div className="spinner" role="status">Chargement…</div>}><ReservationModal vehicle={reserveVehicle} shopName={s.nom} whatsapp={s.whatsapp} onClose={() => setReserveVehicle(null)} /></Suspense>}
 
       {/* ── Suivi de réservation ── */}
       {trackingOpen && <Suspense fallback={<div className="spinner" role="status">Chargement…</div>}><TrackingPage onClose={() => setTrackingOpen(false)} /></Suspense>}
 
       {/* ── Vendre mon véhicule ── */}
-      {sellOpen && <Suspense fallback={<div className="spinner" role="status">Chargement…</div>}><SellVehicleModal onClose={() => setSellOpen(false)} vehicles={vehicles} tradeMarginPercent={settings.trade_margin_percent ?? 5} whatsapp={s.whatsapp} /></Suspense>}
+      {sellOpen && <Suspense fallback={<div className="spinner" role="status">Chargement…</div>}><SellVehicleModal onClose={() => setSellOpen(false)} vehicles={vehicles} tradeMarginPercent={settings.trade_margin_percent ?? 5} whatsapp={s.whatsapp} shopName={s.nom} /></Suspense>}
     </div>
   )
 }
