@@ -1,11 +1,14 @@
 -- ═══════════════════════════════════════════════════════════════
--- HBR AUTO — Schéma Supabase
--- Tables, accès publics limités et accès admin via Supabase Auth.
+-- HBR AUTO — Schéma de base Supabase.
+-- Crée les tables du site et leurs politiques de démarrage.
 --
--- IMPORTANT :
--- 1. Créer le compte propriétaire dans Supabase Auth.
--- 2. Définir auth.users.raw_app_meta_data.role = 'admin' pour ce compte.
--- 3. Ne jamais attribuer le rôle depuis raw_user_meta_data / user_metadata.
+-- IMPORTANT — Installation complète en mot de passe seul :
+-- 1. Exécuter ce fichier pour créer / mettre à jour les tables.
+-- 2. Choisir ton mot de passe dans supabase/SET_ADMIN_PASSWORD.sql
+--    (remplacer le texte d'exemple ; ne jamais envoyer ce mot de passe).
+-- 3. Exécuter ensuite supabase/migrations/20261113001800_harden_public_policies_admin_only.sql
+--    pour activer les sessions admin et les règles d'accès définitives.
+-- Ne pas utiliser ce fichier seul comme configuration finale de production.
 -- ═══════════════════════════════════════════════════════════════
 
 -- ── STOCK ───────────────────────────────────────────────────────
