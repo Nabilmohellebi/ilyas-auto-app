@@ -119,6 +119,30 @@ function PublicSiteInner() {
     return { rest: words.join(' '), last }
   }, [s.nom])
 
+  useEffect(() => {
+    const title = `${s.nom} — Véhicules neufs & d’occasion`
+    const description = `Découvrez le stock de ${s.nom} : véhicules neufs et d’occasion, achat, vente, reprise et échange.`
+    document.title = title
+    const setMeta = (selector, value) => {
+      const element = document.querySelector(selector)
+      if (element) element.setAttribute('content', value)
+    }
+    setMeta('meta[name="description"]', description)
+    setMeta('meta[property="og:site_name"]', s.nom)
+    setMeta('meta[property="og:title"]', title)
+    setMeta('meta[property="og:description"]', description)
+    setMeta('meta[name="twitter:title"]', title)
+    setMeta('meta[name="twitter:description"]', description)
+    setMeta('meta[property="og:url"]', window.location.origin + '/')
+    let canonical = document.querySelector('link[rel="canonical"]')
+    if (!canonical) {
+      canonical = document.createElement('link')
+      canonical.setAttribute('rel', 'canonical')
+      document.head.appendChild(canonical)
+    }
+    canonical.setAttribute('href', window.location.origin + '/')
+  }, [s.nom])
+
   const brands = useMemo(() => [...new Set(vehicles.map(v => v.marque))].sort(), [vehicles])
 
   const heroImages = useMemo(() => vehicles.filter(v => v.img).slice(0, 3).map(v => v.img), [vehicles])
@@ -387,10 +411,10 @@ function PublicSiteInner() {
         </div>
         <div className="showroom-grid">
           <div>
-            <div className="showroom-info-row">
+            {s.adresse && <div className="showroom-info-row">
               <span className="ic">📍</span>
               <div><h4>{t.showroom.adresse}</h4><p>{s.nom}<br />{s.adresse}</p></div>
-            </div>
+            </div>}
             <div className="showroom-info-row">
               <span className="ic">📞</span>
               <div><h4>{t.showroom.telephone}</h4>
@@ -399,10 +423,10 @@ function PublicSiteInner() {
                 ))}
               </div>
             </div>
-            <div className="showroom-info-row">
+            {s.horaires && <div className="showroom-info-row">
               <span className="ic">🕐</span>
               <div><h4>{t.showroom.horaires}</h4><p>{s.horaires}</p></div>
-            </div>
+            </div>}
             <a href={s.mapsUrl} target="_blank" rel="noreferrer" className="btn-hero-primary" style={{ marginTop: 10 }}>
               {t.showroom.itineraire}
             </a>
