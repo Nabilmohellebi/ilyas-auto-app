@@ -6,14 +6,14 @@
 
 const CONFIG = {
   // ── Infos showroom ──
-  nom:      'HBR Auto',
+  nom:      'Nabil Auto',
   slogan:   'Importation & Vente de Véhicules · Algérie 🇩🇿',
-  adresse:  'HBR Melaba, Azazga, Algérie',
+  adresse:  '',
 
   // ── Contact ──
-  telephone: '213550123456',   // Format international sans +
-  email:     'contact@hbrauto.com',
-  whatsapp:  '213550123456',
+  telephone: '',   // Format international sans +
+  email:     '',
+  whatsapp:  '',
 
   // ── Réseaux sociaux ──
   facebook:  '',
@@ -21,9 +21,9 @@ const CONFIG = {
   tiktok:    '',
 
   // ── Showroom ──
-  mapsUrl: 'https://maps.app.goo.gl/mrnBnx1ZRXTS4xoi6',
-  mapsEmbed: 'https://maps.google.com/maps?q=HBR+MELABA,+Azazga&z=16&output=embed',
-  horaires: 'Samedi – Jeudi : 09h00 – 19h00 · Vendredi : fermé',
+  mapsUrl: '',
+  mapsEmbed: '',
+  horaires: '',
 }
 
 export default CONFIG
