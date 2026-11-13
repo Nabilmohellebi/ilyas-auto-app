@@ -52,7 +52,7 @@ export async function notifyTelegramSellRequest(request, details = {}) {
   const target = details.targetVehicle
 
   const msg = `
-${isExchange ? '🔄 *Nouvelle demande d’échange*' : '💰 *Nouvelle proposition de vente*'} — ${CONFIG.nom}
+${isExchange ? '🔄 *Nouvelle demande d’échange*' : '💰 *Nouvelle proposition de vente*'} — ${shopName}
 ━━━━━━━━━━━━━━━━
 🆔 *${request.id}*
 🚘 *Véhicule :* ${request.marque} ${request.modele}

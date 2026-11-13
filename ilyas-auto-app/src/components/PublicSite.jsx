@@ -96,19 +96,24 @@ function PublicSiteInner() {
 
   const s = useMemo(() => ({
     nom:        settings.shop_name       || 'Nabil Auto',
-    telephone:  settings.shop_phone      ?? CONFIG.telephone,
-    whatsapp:   settings.shop_whatsapp   ?? CONFIG.whatsapp,
-    adresse:    settings.shop_address    ?? CONFIG.adresse,
-    horaires:   settings.shop_horaires   ?? CONFIG.horaires,
-    mapsUrl:    settings.shop_maps_url   ?? CONFIG.mapsUrl,
-    mapsEmbed:  settings.shop_maps_embed ?? CONFIG.mapsEmbed,
+    telephone:  settings.shop_phone      || CONFIG.telephone,
+    whatsapp:   settings.shop_whatsapp   || CONFIG.whatsapp,
+    adresse:    settings.shop_address    || CONFIG.adresse,
+    horaires:   settings.shop_horaires   || CONFIG.horaires,
+    mapsUrl:    settings.shop_maps_url   || CONFIG.mapsUrl,
+    mapsEmbed:  settings.shop_maps_embed || CONFIG.mapsEmbed,
     facebook:   CONFIG.facebook,
     instagram:  CONFIG.instagram,
     phones:     (() => {
       try {
         const parsed = JSON.parse(settings.shop_phones || '[]')
-        return Array.isArray(parsed) ? parsed : []
-      } catch { return [] }
+        const savedPhones = Array.isArray(parsed) ? parsed.filter(phone => phone?.number) : []
+        const fallbackPhone = settings.shop_phone || CONFIG.telephone
+        return savedPhones.length > 0 ? savedPhones : (fallbackPhone ? [{ label: '', number: fallbackPhone }] : [])
+      } catch {
+        const fallbackPhone = settings.shop_phone || CONFIG.telephone
+        return fallbackPhone ? [{ label: '', number: fallbackPhone }] : []
+      }
     })(),
   }), [settings])
 
@@ -237,7 +242,7 @@ function PublicSiteInner() {
             <a onClick={e => { e.preventDefault(); setVehicleCondition('occasion'); scrollTo('stock') }} href="#stock">{t.nav.occasion}</a>
             <a onClick={e => { e.preventDefault(); setSellOpen(true) }} href="#">{t.nav.venteEchange}</a>
             <button onClick={toggleLang} className="lang-toggle">{lang === 'fr' ? '🇩🇿 عربي' : '🇫🇷 Français'}</button>
-            {s.whatsapp && <a href={waLink('Bonjour ' + s.nom + ', je vous contacte depuis votre site web.', s.whatsapp)} target="_blank" rel="noreferrer" className="nav-wa-btn">💬 {t.nav.whatsapp}</a>}
+            <a href={waLink('Bonjour ' + s.nom + ', je vous contacte depuis votre site web.', s.whatsapp)} target="_blank" rel="noreferrer" className="nav-wa-btn">💬 {t.nav.whatsapp}</a>
           </div>
           <button className="nav-burger" type="button" aria-label={mobileOpen ? 'Fermer le menu' : 'Ouvrir le menu'} aria-expanded={mobileOpen} onClick={() => setMobileOpen(o => !o)}>☰</button>
         </div>
@@ -249,7 +254,7 @@ function PublicSiteInner() {
           <a onClick={e => { e.preventDefault(); setMobileOpen(false); setVehicleCondition('occasion'); scrollTo('stock') }} href="#stock">{t.nav.occasion}</a>
           <a onClick={e => { e.preventDefault(); setMobileOpen(false); setSellOpen(true) }} href="#">{t.nav.venteEchange}</a>
           <button onClick={toggleLang} className="lang-toggle" style={{ marginTop: 6, width: 'fit-content' }}>{lang === 'fr' ? '🇩🇿 عربي' : '🇫🇷 Français'}</button>
-          {s.whatsapp && <a href={waLink('Bonjour ' + s.nom + ', je vous contacte depuis votre site web.', s.whatsapp)} target="_blank" rel="noreferrer">💬 {t.nav.whatsapp}</a>}
+          <a href={waLink('Bonjour ' + s.nom + ', je vous contacte depuis votre site web.', s.whatsapp)} target="_blank" rel="noreferrer">💬 {t.nav.whatsapp}</a>
         </div>
       </nav>
 
@@ -411,29 +416,29 @@ function PublicSiteInner() {
         </div>
         <div className="showroom-grid">
           <div>
-            {s.adresse && <div className="showroom-info-row">
+            <div className="showroom-info-row">
               <span className="ic">📍</span>
               <div><h4>{t.showroom.adresse}</h4><p>{s.nom}<br />{s.adresse}</p></div>
-            </div>}
-            <div className="showroom-info-row">
+            </div>
+            {s.phones.length > 0 && <div className="showroom-info-row">
               <span className="ic">📞</span>
               <div><h4>{t.showroom.telephone}</h4>
                 {s.phones.map((p, i) => (
                   <p key={i}>{p.label && <strong style={{ color: 'rgba(255,255,255,.85)' }}>{p.label} : </strong>}<a href={`tel:+${p.number}`} style={{ color: 'inherit', textDecoration: 'none' }}>+{p.number}</a></p>
                 ))}
               </div>
-            </div>
-            {s.horaires && <div className="showroom-info-row">
+            </div>}
+            <div className="showroom-info-row">
               <span className="ic">🕐</span>
               <div><h4>{t.showroom.horaires}</h4><p>{s.horaires}</p></div>
-            </div>}
-            <a href={s.mapsUrl} target="_blank" rel="noreferrer" className="btn-hero-primary" style={{ marginTop: 10 }}>
+            </div>
+            {s.mapsUrl && <a href={s.mapsUrl} target="_blank" rel="noreferrer" className="btn-hero-primary" style={{ marginTop: 10 }}>
               {t.showroom.itineraire}
-            </a>
+            </a>}
           </div>
-          <div className="showroom-map">
+          {s.mapsEmbed && <div className="showroom-map">
             <iframe title="Showroom" src={s.mapsEmbed} loading="lazy" />
-          </div>
+          </div>}
         </div>
       </section>
 
@@ -445,7 +450,7 @@ function PublicSiteInner() {
             <div className="footer-sub">© {new Date().getFullYear()} {s.nom} — {t.footer.droits}</div>
           </div>
           <div className="footer-social">
-            {s.whatsapp && <a href={waLink('Bonjour ' + s.nom, s.whatsapp)} target="_blank" rel="noreferrer">💬</a>}
+            <a href={waLink('Bonjour ' + s.nom, s.whatsapp)} target="_blank" rel="noreferrer">💬</a>
             <button onClick={() => setTrackingOpen(true)} className="footer-track-btn">{t.footer.suivre}</button>
             {s.facebook && <a href={s.facebook} target="_blank" rel="noreferrer">📘</a>}
             {s.instagram && <a href={s.instagram} target="_blank" rel="noreferrer">📷</a>}
@@ -454,7 +459,7 @@ function PublicSiteInner() {
       </footer>
 
       {/* ── WhatsApp flottant ── */}
-      {s.whatsapp && <a className="wa-float" href={waLink('Bonjour ' + s.nom + ', je vous contacte depuis votre site web.', s.whatsapp)} target="_blank" rel="noreferrer">💬</a>}
+      <a className="wa-float" href={waLink('Bonjour ' + s.nom + ', je vous contacte depuis votre site web.', s.whatsapp)} target="_blank" rel="noreferrer">💬</a>
 
       {/* ── Barre flottante comparateur ── */}
       {compareList.length > 0 && (

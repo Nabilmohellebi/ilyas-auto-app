@@ -5,6 +5,12 @@ let cache = null
 let cacheTime = 0
 const CACHE_TTL = 2 * 60 * 1000 // 2 minutes
 
+const PUBLIC_SETTING_KEYS = [
+  'shop_name', 'shop_phone', 'shop_whatsapp', 'shop_email', 'shop_address',
+  'shop_horaires', 'shop_maps_url', 'shop_maps_embed', 'shop_phones',
+  'maintenance', 'trade_margin_percent',
+]
+
 const DEFAULTS = {
   shop_name:       'Nabil Auto',
   shop_phone:      '',
@@ -15,12 +21,11 @@ const DEFAULTS = {
   shop_maps_url:   '',
   shop_maps_embed: '',
   maintenance:     'false',
-  admin_password:  '', // si vide → on retombe sur VITE_ADMIN_PASSWORD
 }
 
 export async function getSettings() {
   if (cache && Date.now() - cacheTime < CACHE_TTL) return cache
-  const { data, error } = await supabase.from('settings').select('key, value')
+  const { data, error } = await supabase.from('settings').select('key, value').in('key', PUBLIC_SETTING_KEYS)
   if (error) { console.error('getSettings:', error); return DEFAULTS }
   if (!data || data.length === 0) return DEFAULTS
   const s = { ...DEFAULTS }

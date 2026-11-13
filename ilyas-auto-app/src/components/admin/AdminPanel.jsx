@@ -5,6 +5,7 @@ import { openWA, fmt } from '../../utils/notify'
 import { STATUTS, PLACEHOLDER_IMG, flagURI } from '../../data/vehicles-data'
 import VehicleForm from './VehicleForm'
 import CRMPanel from './CRMPanel'
+import FinancePanel from './FinancePanel'
 
 const RES_STATUTS = [
   { key: 'nouvelle',  label: '🆕 Nouvelle' },
@@ -55,7 +56,7 @@ function AdminSettings({ onLogout, onToast, onBrandNameChange }) {
       // Liste de numéros — si jamais configurée, on part du numéro principal
       try {
         const parsed = JSON.parse(s.shop_phones || '[]')
-        setPhones(Array.isArray(parsed) ? parsed : (s.shop_phone ? [{ label: 'Ventes', number: s.shop_phone }] : []))
+        setPhones(Array.isArray(parsed) && parsed.length > 0 ? parsed : (s.shop_phone ? [{ label: 'Ventes', number: s.shop_phone }] : []))
       } catch {
         setPhones(s.shop_phone ? [{ label: 'Ventes', number: s.shop_phone }] : [])
       }
@@ -78,12 +79,73 @@ function AdminSettings({ onLogout, onToast, onBrandNameChange }) {
       await saveSetting('shop_maps_url', shop.mapsUrl)
       await saveSetting('shop_maps_embed', shop.mapsEmbed)
       await saveSetting('shop_phones', JSON.stringify(phones.filter(p => p.number.trim())))
-      onBrandNameChange?.(shop.name.trim() || 'Nabil Auto')
-      onToast && onToast('✅ Informations sauvegardées', 'default')
+
+      const brandName = shop.name.trim() || 'Nabil Auto'
+      onBrandNameChange?.(brandName)
+
+      try {
+        const adminSession = window.sessionStorage.getItem('hbr_admin_session')
+        const response = await fetch('/api/rename-project', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(adminSession ? { 'x-hbr-admin-session': adminSession } : {}),
+          },
+          body: JSON.stringify({ shopName: brandName }),
+        })
+        const result = await response.json().catch(() => ({}))
+
+        if (response.ok && result.url) {
+          const target = new URL(result.url)
+          target.pathname = window.location.pathname
+          target.search = window.location.search
+
+          // Conserve l'accès admin dans le fragment, sans exposer le jeton dans les requêtes HTTP.
+          const adminRoute = window.location.hash.split('&')[0] === '#admin' ? 'admin' : ''
+          const handoffPart = result.handoffToken
+            ? 'domainHandoff=' + encodeURIComponent(result.handoffToken)
+            : ''
+          target.hash = [adminRoute, handoffPart].filter(Boolean).join('&')
+
+          if (target.hostname.toLowerCase() !== window.location.hostname.toLowerCase()) {
+            onToast && onToast('✅ Informations enregistrées. Bascule vers la nouvelle adresse…', 'default')
+            window.location.replace(target.toString())
+            return
+          }
+
+          if (result.handoffToken) {
+            const cleanupResponse = await fetch('/api/complete-domain-handoff', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ token: result.handoffToken }),
+            })
+            const cleanup = await cleanupResponse.json().catch(() => ({}))
+            if (cleanupResponse.ok && !cleanup.warnings?.length) {
+              onToast && onToast(
+                cleanup.removedDomains?.length
+                  ? '✅ Informations enregistrées · Ancien domaine supprimé.'
+                  : '✅ Informations et adresse enregistrées.',
+                'default',
+              )
+            } else {
+              onToast && onToast('✅ Informations enregistrées. Le nouveau domaine fonctionne, mais un ancien alias reste à vérifier dans Vercel.', 'error')
+            }
+          } else {
+            onToast && onToast('✅ Informations enregistrées · Nouvelle adresse : ' + result.url, 'default')
+          }
+        } else if (result.code === 'VERCEL_RENAME_NOT_CONFIGURED') {
+          onToast && onToast('✅ Nom enregistré. Configure le renommage Vercel dans CLIENT_TEMPLATE_SETUP.md pour changer aussi l’adresse.', 'default')
+        } else {
+          onToast && onToast('✅ Nom enregistré. Adresse Vercel non modifiée : ' + (result.error || 'vérifie la configuration Vercel.'), 'error')
+        }
+      } catch {
+        onToast && onToast('✅ Informations enregistrées. Le changement d’adresse Vercel n’a pas pu être vérifié.', 'error')
+      }
     } catch (e) {
       onToast && onToast('❌ Erreur : ' + e.message, 'error')
+    } finally {
+      setShopSaving(false)
     }
-    setShopSaving(false)
   }
 
   async function saveTradeMargin() {
@@ -104,24 +166,23 @@ function AdminSettings({ onLogout, onToast, onBrandNameChange }) {
   }
 
   async function changePw() {
-    if (pwForm.new1.length < 6) { onToast && onToast('❌ Mot de passe trop court (min 6 caractères)', 'error'); return }
+    if (pwForm.new1.length < 12) { onToast && onToast('❌ Utilise au moins 12 caractères', 'error'); return }
     if (pwForm.new1 !== pwForm.new2) { onToast && onToast('❌ Les deux mots de passe ne correspondent pas', 'error'); return }
     setPwSaving(true)
     try {
-      const s = await getSettings()
-      const currentPw = s.admin_password || import.meta.env.VITE_ADMIN_PASSWORD || 'ilyas2026'
-      if (pwForm.current !== currentPw) {
-        onToast && onToast('❌ Mot de passe actuel incorrect', 'error')
-        setPwSaving(false)
-        return
-      }
-      await saveSetting('admin_password', pwForm.new1)
+      const { data, error } = await supabase.rpc('admin_change_password', {
+        p_current_password: pwForm.current,
+        p_new_password: pwForm.new1,
+      })
+      if (error) throw error
+      if (data !== true) throw new Error('Mot de passe actuel incorrect.')
       setPwForm({ current: '', new1: '', new2: '' })
-      onToast && onToast('✅ Mot de passe changé !', 'default')
+      onToast && onToast('✅ Mot de passe administrateur mis à jour', 'default')
     } catch (e) {
       onToast && onToast('❌ Erreur : ' + e.message, 'error')
+    } finally {
+      setPwSaving(false)
     }
-    setPwSaving(false)
   }
 
   return (
@@ -131,7 +192,13 @@ function AdminSettings({ onLogout, onToast, onBrandNameChange }) {
       <div className="pf-section" style={{ marginBottom: 14 }}>
         <h3>🏪 Informations du showroom</h3>
         <div className="pf-grid" style={{ marginBottom: 10 }}>
-          <div className="form-field"><label>Nom</label><input value={shop.name} onChange={e => setShop(s => ({ ...s, name: e.target.value }))} /></div>
+          <div className="form-field">
+            <label>Nom du garage</label>
+            <input value={shop.name} maxLength={100} onChange={e => setShop(s => ({ ...s, name: e.target.value }))} />
+            <small style={{ display: 'block', color: 'rgba(255,255,255,.42)', fontSize: 11, lineHeight: 1.5, marginTop: 6 }}>
+              Après l’enregistrement, le nom et l’adresse .vercel.app du garage sont synchronisés automatiquement avec Vercel.
+            </small>
+          </div>
           <div className="form-field"><label>Téléphone</label><input value={shop.phone} onChange={e => setShop(s => ({ ...s, phone: e.target.value }))} type="tel" /></div>
           <div className="form-field"><label>WhatsApp</label><input value={shop.whatsapp} onChange={e => setShop(s => ({ ...s, whatsapp: e.target.value }))} type="tel" /></div>
           <div className="form-field"><label>Email</label><input value={shop.email} onChange={e => setShop(s => ({ ...s, email: e.target.value }))} type="email" /></div>
@@ -499,6 +566,7 @@ export default function AdminPanel({ onLogout, onToast }) {
             ['vehicules-occasion', '🔄 Véhicules d’occasion'],
             ['reservations', '📩 Réservations'],
             ['crm', '👥 CRM clients'],
+            ['finances', '💰 Finances'],
             ['reprises', '🔄 Ventes & échanges'],
             ['temoignages', '⭐ Témoignages'],
             ['banniere', '📢 Bannière'],
@@ -743,6 +811,10 @@ export default function AdminPanel({ onLogout, onToast }) {
               )
             })}
           </div>
+        )}
+
+        {tab === 'finances' && (
+          <FinancePanel vehicles={vehicles} onToast={onToast} />
         )}
 
         {tab === 'crm' && (
