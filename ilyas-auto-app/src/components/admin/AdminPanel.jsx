@@ -31,7 +31,7 @@ function parseSellRequestDetails(request) {
 //  PARAMÈTRES
 // ═══════════════════════════════════════════════
 function AdminSettings({ onLogout, onToast, onBrandNameChange }) {
-  const [shop, setShop] = useState({ name: 'Nabil Auto', phone: '213550123456', whatsapp: '213550123456', address: 'HBR Melaba, Azazga, Algérie', email: '', horaires: '', mapsUrl: '', mapsEmbed: '' })
+  const [shop, setShop] = useState({ name: 'Nabil Auto', phone: '', whatsapp: '', address: '', email: '', horaires: '', mapsUrl: '', mapsEmbed: '' })
   const [phones, setPhones] = useState([])
   const [tradeMarginPercent, setTradeMarginPercent] = useState('5')
   const [tradeMarginSaving, setTradeMarginSaving] = useState(false)
@@ -45,9 +45,9 @@ function AdminSettings({ onLogout, onToast, onBrandNameChange }) {
       setTradeMarginPercent(String(s.trade_margin_percent ?? '5'))
       setShop({
         name: s.shop_name || 'Nabil Auto',
-        phone: s.shop_phone || '213550123456',
-        whatsapp: s.shop_whatsapp || s.shop_phone || '213550123456',
-        address: s.shop_address || 'HBR Melaba, Azazga, Algérie',
+        phone: s.shop_phone || '',
+        whatsapp: s.shop_whatsapp || s.shop_phone || '',
+        address: s.shop_address || '',
         email: s.shop_email || '',
         horaires: s.shop_horaires || 'Samedi – Jeudi : 09h00 – 19h00 · Vendredi : fermé',
         mapsUrl: s.shop_maps_url || '',
@@ -56,9 +56,9 @@ function AdminSettings({ onLogout, onToast, onBrandNameChange }) {
       // Liste de numéros — si jamais configurée, on part du numéro principal
       try {
         const parsed = JSON.parse(s.shop_phones || '[]')
-        setPhones(Array.isArray(parsed) && parsed.length > 0 ? parsed : [{ label: 'Ventes', number: s.shop_phone || '213550123456' }])
+        setPhones(Array.isArray(parsed) && parsed.length > 0 ? parsed : (s.shop_phone ? [{ label: 'Ventes', number: s.shop_phone }] : []))
       } catch {
-        setPhones([{ label: 'Ventes', number: s.shop_phone || '213550123456' }])
+        setPhones(s.shop_phone ? [{ label: 'Ventes', number: s.shop_phone }] : [])
       }
     })
   }, [])
