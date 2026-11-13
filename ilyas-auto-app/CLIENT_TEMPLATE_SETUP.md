@@ -59,9 +59,11 @@ Après avoir ajouté ou modifié les variables, redéploie le projet pour que le
 
 La fonction serveur vérifie d'abord la session administrateur dans Supabase, puis demande à Vercel de renommer le projet et d'associer un domaine de production au format `nom-du-garage.vercel.app`.
 
-Les caractères accentués sont normalisés et les espaces deviennent des tirets. Les sous-domaines `.vercel.app` sont globaux : si le nom est déjà pris, la fonction essaie une variante avec un petit suffixe lié au projet. Elle ne supprime pas volontairement l'ancien domaine. Vérifie l'adresse renvoyée par le message de confirmation avant de la communiquer au client.
+Lorsque Vercel confirme le nouveau domaine, le navigateur remplace automatiquement l'adresse dans l'onglet avec une navigation complète. Un transfert chiffré et temporaire permet de conserver la session administrateur pendant ce changement. À l'arrivée sur le nouveau domaine, le serveur retire les anciens alias `.vercel.app` qui étaient rattachés à ce projet, puis les détache du projet Vercel. Les domaines personnalisés qui ne se terminent pas par `.vercel.app` ne sont jamais supprimés par cette procédure.
 
-Le nom commercial est toujours enregistré dans Supabase même si le jeton Vercel n'est pas encore configuré. Dans ce cas, seul le changement d'adresse automatique reste désactivé.
+Les caractères accentués sont normalisés et les espaces deviennent des tirets. Les sous-domaines `.vercel.app` sont globaux : si le nom est déjà pris, la fonction essaie une variante avec un petit suffixe lié au projet. Si Vercel refuse la suppression d'un ancien alias, le nouveau domaine reste actif et l'administration affiche un avertissement ; l'alias restant peut alors être retiré depuis Vercel.
+
+Le nom commercial est toujours enregistré dans Supabase même si le jeton Vercel n'est pas encore configuré. Dans ce cas, seul le changement d'adresse automatique et le nettoyage des anciens alias restent désactivés.
 
 ## 5. Ce que chaque garage possède
 
