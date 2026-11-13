@@ -95,7 +95,7 @@ function PublicSiteInner() {
   }, [loading, vehicles])
 
   const s = useMemo(() => ({
-    nom:        settings.shop_name       || CONFIG.nom,
+    nom:        settings.shop_name       || 'Nabil Auto',
     telephone:  settings.shop_phone      || CONFIG.telephone,
     whatsapp:   settings.shop_whatsapp   || CONFIG.whatsapp,
     adresse:    settings.shop_address    || CONFIG.adresse,
@@ -114,7 +114,7 @@ function PublicSiteInner() {
 
   // ── Logo dynamique — dernier mot du nom mis en avant (accent) ──
   const logoParts = useMemo(() => {
-    const words = (s.nom || 'HBR Auto').trim().split(' ')
+    const words = (s.nom || 'Nabil Auto').trim().split(' ')
     const last = words.pop()
     return { rest: words.join(' '), last }
   }, [s.nom])
