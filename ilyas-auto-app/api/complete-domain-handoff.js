@@ -114,6 +114,11 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(204).end()
   if (req.method !== 'POST') return json(res, 405, { error: 'Méthode non autorisée.' })
 
+  // Domain cleanup is only allowed on the live production host, never on Preview deployments.
+  if (process.env.VERCEL_ENV !== 'production') {
+    return json(res, 403, { code: 'PRODUCTION_ONLY', error: 'Le nettoyage des anciens domaines est désactivé dans les aperçus Vercel.' })
+  }
+
   const requestHost = String(req.headers.host || '').split(':')[0].toLowerCase()
   const origin = req.headers.origin
   if (origin) {
