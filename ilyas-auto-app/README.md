@@ -1,36 +1,26 @@
-# HBR AUTO — Site complet
+# Modèle de site automobile — Nabil Auto
 
-Site de vente de véhicules : panel admin + vitrine publique bilingue FR/AR.
-Architecture React + Vite + Supabase + Vercel, thème rouge/noir sport.
+Application React + Vite + Supabase conçue pour être copiée et personnalisée pour chaque garage automobile.
 
-## 1. Supabase
+## Démarrage d'une nouvelle installation
 
-1. Crée un projet sur [supabase.com](https://supabase.com)
-2. **SQL Editor** → colle le contenu de `supabase/schema.sql` → **Run**
-3. Récupère `Project URL` et `anon public key` dans **Settings → API**
+Lis le guide complet **[CLIENT_TEMPLATE_SETUP.md](./CLIENT_TEMPLATE_SETUP.md)** avant le premier déploiement. Il décrit la création d'une base Supabase indépendante, la configuration du projet Vercel, le mot de passe administrateur et le changement automatique du nom de projet et du domaine `.vercel.app`.
 
-## 2. Variables d'environnement (Vercel → Settings → Environment Variables)
-
-- `VITE_SUPABASE_URL`
-- `VITE_SUPABASE_ANON_KEY`
-- `VITE_ADMIN_PASSWORD`
-- `VITE_WA_NUMBER`
-- `TELEGRAM_BOT_TOKEN` / `TELEGRAM_CHAT_ID` (optionnel)
-
-## 3. Déploiement
-
-Pousse **tout le contenu de ce dossier** (pas le dossier lui-même, son contenu) à la racine
-de ton repo GitHub, connecte le repo à Vercel, Framework preset = Vite, ajoute les variables
-d'environnement ci-dessus, Deploy.
-
-## 4. Accès admin
-
-`https://tonsite.vercel.app/#admin` — mot de passe par défaut celui de `VITE_ADMIN_PASSWORD`
-(modifiable ensuite dans Admin → Paramètres).
-
-## 5. En local
+## Développement local
 
 ```bash
 npm install
 npm run dev
+npm run build
 ```
+
+## Architecture
+
+- Vitrine publique bilingue français / arabe.
+- Gestion indépendante du stock neuf et occasion.
+- Réservation, achat, vente, reprise et échange.
+- CRM, suivi des demandes et registre financier privé.
+- Supabase pour les données et les photos.
+- Fonctions serveur Vercel pour Telegram et le renommage du projet.
+
+**Important :** chaque garage doit avoir son propre projet Supabase et son propre projet Vercel. Ne partage pas une base de données entre plusieurs garages. Les jetons Vercel et Telegram doivent rester dans les variables d'environnement serveur, jamais dans le code client.
