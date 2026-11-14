@@ -2161,3 +2161,156 @@ input, select, textarea { font-family: var(--fb); outline: none; }
 @media (prefers-reduced-motion: reduce) {
   .app[data-theme] .hero-bg-slide { transition: none !important; }
 }
+
+
+/* Reusable image cropper for every showroom media upload. */
+.image-cropper-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+  background: rgba(7, 9, 14, .82);
+  backdrop-filter: blur(12px);
+}
+.image-cropper-dialog {
+  width: min(760px, 100%);
+  max-height: min(94vh, 900px);
+  overflow: auto;
+  background: #171920;
+  border: 1px solid rgba(215,177,95,.32);
+  border-radius: 22px;
+  box-shadow: 0 28px 90px rgba(0,0,0,.55);
+  color: #f7f7f8;
+  padding: 22px;
+}
+.image-cropper-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+.image-cropper-eyebrow {
+  color: #d7b15f;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: .16em;
+}
+.image-cropper-header h2 {
+  margin: 5px 0 4px;
+  color: #fff;
+  font-size: clamp(19px, 3vw, 25px);
+  font-weight: 900;
+  letter-spacing: -.035em;
+}
+.image-cropper-header p {
+  margin: 0;
+  color: rgba(255,255,255,.58);
+  font-size: 12px;
+  line-height: 1.5;
+}
+.image-cropper-close {
+  width: 34px;
+  height: 34px;
+  border: 1px solid rgba(255,255,255,.16);
+  border-radius: 50%;
+  color: #fff;
+  background: rgba(255,255,255,.07);
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+  flex: 0 0 auto;
+}
+.image-cropper-stage-wrap {
+  display: flex;
+  justify-content: center;
+  overflow: hidden;
+  background-color: #090b10;
+  background-image: linear-gradient(45deg,#141821 25%,transparent 25%),linear-gradient(-45deg,#141821 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#141821 75%),linear-gradient(-45deg,transparent 75%,#141821 75%);
+  background-size: 20px 20px;
+  background-position: 0 0,0 10px,10px -10px,-10px 0;
+  border: 1px solid rgba(255,255,255,.11);
+  border-radius: 15px;
+}
+.image-cropper-canvas {
+  display: block;
+  width: min(100%, 700px);
+  height: auto;
+  max-height: 54vh;
+  object-fit: contain;
+  cursor: grab;
+  touch-action: none;
+}
+.image-cropper-canvas:active { cursor: grabbing; }
+.image-cropper-loading {
+  min-height: 220px;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  color: rgba(255,255,255,.6);
+  font-size: 13px;
+}
+.image-cropper-controls { padding: 18px 2px 8px; }
+.image-cropper-zoom-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 9px;
+  color: rgba(255,255,255,.78);
+  font-size: 12px;
+}
+.image-cropper-zoom-label strong {
+  color: #e8c77e;
+  font-variant-numeric: tabular-nums;
+}
+.image-cropper-controls input[type="range"] {
+  display: block;
+  width: 100%;
+  accent-color: #c79b4d;
+}
+.image-cropper-hint {
+  margin-top: 8px;
+  color: rgba(255,255,255,.42);
+  font-size: 10.5px;
+  line-height: 1.45;
+}
+.image-cropper-error {
+  margin: 8px 0;
+  color: #ff9da5;
+  font-size: 12px;
+}
+.image-cropper-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 9px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(255,255,255,.09);
+}
+.image-cropper-footer button {
+  min-height: 42px;
+  padding: 0 17px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 850;
+  cursor: pointer;
+}
+.image-cropper-footer button:disabled { opacity: .55; cursor: wait; }
+.image-cropper-cancel {
+  color: rgba(255,255,255,.76);
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.13);
+}
+.image-cropper-confirm {
+  color: #17130d;
+  background: linear-gradient(135deg,#f1d99a,#c79b4d);
+  border: 1px solid rgba(255,255,255,.18);
+}
+@media (max-width: 600px) {
+  .image-cropper-backdrop { padding: 8px; align-items: flex-end; }
+  .image-cropper-dialog { padding: 16px; border-radius: 19px 19px 12px 12px; max-height: 94vh; }
+  .image-cropper-canvas { max-height: 48vh; }
+  .image-cropper-footer button { flex: 1; padding: 0 10px; }
+}
