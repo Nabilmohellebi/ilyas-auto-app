@@ -1002,7 +1002,7 @@
   -webkit-text-fill-color: #987033 !important;
 }
 .app[data-theme="ivory"] :where(
-  .nav-wa-btn,.btn-hero-primary,.veh-card-wa-bar,.wa-float,
+  .nav-wa-btn,.btn-hero-primary,.veh-card-wa-bar,.wa-float,.mobile-theme-toggle,
   .veh-price-strip,.veh-price-strip *,
   .veh-strip-tag,.veh-statut-badge,.veh-badge-tag,
   .vd-badge,.vd-disc,.vd-arrow,.vd-counter,.stamp-sold,
