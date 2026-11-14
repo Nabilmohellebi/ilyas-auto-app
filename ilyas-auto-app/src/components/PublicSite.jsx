@@ -53,6 +53,8 @@ function PublicSiteInner() {
     }
   })
   const [showFavorites, setShowFavorites] = useState(false)
+  const [shareFeedback, setShareFeedback] = useState('')
+  const [sharedFavoritesStatus, setSharedFavoritesStatus] = useState('')
   const [sellOpen, setSellOpen] = useState(false)
   const [vehicleCondition, setVehicleCondition] = useState('all')
   const [publicTheme, setPublicTheme] = useState(() => { try { return window.localStorage.getItem('hbr_public_theme') === 'dark' ? 'dark' : 'ivory' } catch { return 'ivory' } })
@@ -127,6 +129,35 @@ function PublicSiteInner() {
       return next.length === current.length ? current : next
     })
   }, [loading, stockError, vehicles])
+
+  // Importe une sélection de véhicules partagée dans l'URL, sans remplacer les favoris personnels.
+  useEffect(() => {
+    if (loading || stockError) return
+
+    const url = new URL(window.location.href)
+    const rawSelection = url.searchParams.get('favoris')
+    if (!rawSelection) return
+
+    const requestedIds = [...new Set(rawSelection.split(',').map(id => id.trim()).filter(Boolean))]
+    const availableIds = new Set(vehicles.map(vehicle => String(vehicle.id)))
+    const validIds = requestedIds.filter(id => availableIds.has(id))
+
+    if (validIds.length > 0) {
+      setFavoriteIds(current => [...new Set([...current, ...validIds])])
+      setShowFavorites(true)
+      setSharedFavoritesStatus(
+        validIds.length === requestedIds.length
+          ? t.catalogue.selectionImportee(validIds.length)
+          : t.catalogue.selectionPartielle(validIds.length, requestedIds.length)
+      )
+    } else {
+      setSharedFavoritesStatus(t.catalogue.selectionIndisponible)
+    }
+
+    // Retire le paramètre après import : les favoris sont désormais enregistrés localement.
+    url.searchParams.delete('favoris')
+    window.history.replaceState(window.history.state, '', url.pathname + url.search + url.hash)
+  }, [loading, stockError, vehicles, t])
 
   // Ouvre directement la fiche lorsqu'un visiteur arrive avec un lien partagé.
   useEffect(() => {
@@ -232,6 +263,44 @@ function PublicSiteInner() {
   function toggleFavorite(v) {
     const id = String(v.id)
     setFavoriteIds(prev => prev.includes(id) ? prev.filter(savedId => savedId !== id) : [...prev, id])
+  }
+
+  async function shareFavorites() {
+    const selected = vehicles.filter(vehicle => favoriteIds.includes(String(vehicle.id)))
+    if (selected.length === 0) return
+
+    const url = new URL(window.location.pathname, window.location.origin)
+    url.searchParams.set('favoris', selected.map(vehicle => String(vehicle.id)).join(','))
+    const shareData = {
+      title: `${s.nom} — ${t.catalogue.favoris}`,
+      text: t.catalogue.messagePartage(selected.length),
+      url: url.href,
+    }
+
+    setShareFeedback('')
+    try {
+      if (typeof navigator.share === 'function') {
+        try {
+          await navigator.share(shareData)
+          setShareFeedback(t.catalogue.partageTermine)
+          return
+        } catch (error) {
+          if (error?.name === 'AbortError') return
+        }
+      }
+
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(url.href)
+        setShareFeedback(t.catalogue.lienCopie)
+        return
+      }
+
+      const copied = window.prompt(t.catalogue.copierLien, url.href)
+      if (copied !== null) setShareFeedback(t.catalogue.lienPret)
+    } catch (error) {
+      console.warn('HBR AUTO share favorites:', error)
+      setShareFeedback(t.catalogue.partageErreur)
+    }
   }
 
   const recentVehicles = useMemo(
@@ -455,7 +524,22 @@ function PublicSiteInner() {
                 {t.catalogue.favoris}
                 <span className="catalogue-favorites-count">{favoriteVehiclesCount}</span>
               </button>
+              <button
+                type="button"
+                className="catalogue-share-btn"
+                onClick={shareFavorites}
+                disabled={favoriteVehiclesCount === 0}
+                title={t.catalogue.partagerFavoris}
+              >
+                <span aria-hidden="true">↗</span>
+                {t.catalogue.partagerFavoris}
+              </button>
             </div>
+            {(shareFeedback || sharedFavoritesStatus) && (
+              <p className="catalogue-share-feedback" role="status" aria-live="polite">
+                {shareFeedback || sharedFavoritesStatus}
+              </p>
+            )}
             {hasActiveCatalogueFilters && (
               <button type="button" className="catalogue-reset-btn" onClick={resetCatalogueFilters}>
                 {t.catalogue.reinitialiser}
