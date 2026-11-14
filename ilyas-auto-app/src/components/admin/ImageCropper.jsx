@@ -1,5 +1,81 @@
 import { useEffect, useRef, useState } from 'react'
 
+
+function removeBorderConnectedWhiteBackground(canvas) {
+  const context = canvas.getContext('2d', { willReadFrequently: true })
+  if (!context) throw new Error('Le navigateur ne peut pas traiter cette image.')
+
+  const image = context.getImageData(0, 0, canvas.width, canvas.height)
+  const { data, width, height } = image
+  const total = width * height
+  const visited = new Uint8Array(total)
+  const queue = new Int32Array(total)
+  let tail = 0
+
+  // Ne cible que les pixels presque blancs reliés au bord de l’image.
+  // Les zones blanches enfermées dans le logo restent donc intactes.
+  const isBackgroundPixel = pixel => {
+    const offset = pixel * 4
+    if (data[offset + 3] === 0) return false
+    const red = data[offset]
+    const green = data[offset + 1]
+    const blue = data[offset + 2]
+    const darkest = Math.min(red, green, blue)
+    const brightest = Math.max(red, green, blue)
+    return darkest >= 220 && brightest - darkest <= 34
+  }
+
+  const addPixel = pixel => {
+    if (pixel < 0 || pixel >= total || visited[pixel] || !isBackgroundPixel(pixel)) return
+    visited[pixel] = 1
+    queue[tail++] = pixel
+  }
+
+  for (let x = 0; x < width; x += 1) {
+    addPixel(x)
+    addPixel((height - 1) * width + x)
+  }
+  for (let y = 0; y < height; y += 1) {
+    addPixel(y * width)
+    addPixel(y * width + width - 1)
+  }
+
+  // Parcours itératif à quatre voisins : évite de supprimer les blancs isolés.
+  for (let head = 0; head < tail; head += 1) {
+    const pixel = queue[head]
+    const x = pixel % width
+    if (x > 0) addPixel(pixel - 1)
+    if (x < width - 1) addPixel(pixel + 1)
+    if (pixel >= width) addPixel(pixel - width)
+    if (pixel + width < total) addPixel(pixel + width)
+  }
+
+  // Rend le blanc transparent et adoucit les contours anti-crénelés.
+  for (let index = 0; index < tail; index += 1) {
+    const offset = queue[index] * 4
+    const red = data[offset]
+    const green = data[offset + 1]
+    const blue = data[offset + 2]
+    const alpha = Math.max(0, 255 - Math.min(red, green, blue))
+
+    if (alpha <= 3) {
+      data[offset] = 0
+      data[offset + 1] = 0
+      data[offset + 2] = 0
+      data[offset + 3] = 0
+      continue
+    }
+
+    const matte = 255 - alpha
+    data[offset] = Math.max(0, Math.min(255, Math.round((red - matte) * 255 / alpha)))
+    data[offset + 1] = Math.max(0, Math.min(255, Math.round((green - matte) * 255 / alpha)))
+    data[offset + 2] = Math.max(0, Math.min(255, Math.round((blue - matte) * 255 / alpha)))
+    data[offset + 3] = Math.round(data[offset + 3] * alpha / 255)
+  }
+
+  context.putImageData(image, 0, 0)
+}
+
 function clampOffset(offset, drawWidth, drawHeight, width, height) {
   return {
     x: Math.max(width - drawWidth, Math.min(0, offset.x)),
@@ -12,6 +88,7 @@ export default function ImageCropper({
   aspectRatio = 1,
   title = 'Ajuster la photo',
   outputFormat = 'image/jpeg',
+  allowWhiteBackgroundRemoval = false,
   onCancel,
   onConfirm,
 }) {
@@ -23,6 +100,7 @@ export default function ImageCropper({
   const [offset, setOffset] = useState({ x: 0, y: 0 })
   const [working, setWorking] = useState(false)
   const [error, setError] = useState('')
+  const [removeWhiteBackground, setRemoveWhiteBackground] = useState(Boolean(allowWhiteBackgroundRemoval))
 
   useEffect(() => {
     if (!file) return undefined
@@ -33,6 +111,7 @@ export default function ImageCropper({
     setError('')
     setZoom(1)
     setOffset({ x: 0, y: 0 })
+    setRemoveWhiteBackground(Boolean(allowWhiteBackgroundRemoval))
     image.onload = () => {
       if (!active) return
       imageRef.current = image
@@ -47,9 +126,9 @@ export default function ImageCropper({
       URL.revokeObjectURL(objectUrl)
       imageRef.current = null
     }
-  }, [file])
+  }, [file, allowWhiteBackgroundRemoval])
 
-  function drawCrop(canvas, targetWidth, targetHeight, currentZoom, currentOffset) {
+  function drawCrop(canvas, targetWidth, targetHeight, currentZoom, currentOffset, transparentWhiteBackground) {
     const image = imageRef.current
     if (!image || !canvas) return null
     const context = canvas.getContext('2d')
@@ -65,6 +144,9 @@ export default function ImageCropper({
     context.imageSmoothingEnabled = true
     context.imageSmoothingQuality = 'high'
     context.drawImage(image, x, y, drawWidth, drawHeight)
+    if (transparentWhiteBackground) {
+      try { removeBorderConnectedWhiteBackground(canvas) } catch (processingError) { console.warn('Aperçu de transparence indisponible :', processingError) }
+    }
     return { drawWidth, drawHeight }
   }
 
@@ -73,8 +155,8 @@ export default function ImageCropper({
     if (!ready || !canvas || !imageRef.current) return
     canvas.width = 960
     canvas.height = Math.round(960 / aspectRatio)
-    drawCrop(canvas, canvas.width, canvas.height, zoom, offset)
-  }, [ready, zoom, offset, aspectRatio])
+    drawCrop(canvas, canvas.width, canvas.height, zoom, offset, removeWhiteBackground)
+  }, [ready, zoom, offset, aspectRatio, removeWhiteBackground])
 
   function handlePointerDown(event) {
     if (!ready) return
@@ -146,6 +228,15 @@ export default function ImageCropper({
     ctx.imageSmoothingEnabled = true
     ctx.imageSmoothingQuality = 'high'
     ctx.drawImage(image, x, y, drawWidth, drawHeight)
+    if (removeWhiteBackground) {
+      try {
+        removeBorderConnectedWhiteBackground(output)
+      } catch (processingError) {
+        setError(processingError?.message || 'Impossible de rendre le fond transparent.')
+        setWorking(false)
+        return
+      }
+    }
     output.toBlob(blob => {
       if (!blob) {
         setError('Impossible de préparer cette image. Essaie un autre fichier.')
@@ -208,6 +299,20 @@ export default function ImageCropper({
             onChange={event => handleZoom(event.target.value)}
             disabled={!ready || working}
           />
+          {allowWhiteBackgroundRemoval && (
+            <label className="image-cropper-background-toggle">
+              <input
+                type="checkbox"
+                checked={removeWhiteBackground}
+                onChange={event => setRemoveWhiteBackground(event.target.checked)}
+                disabled={!ready || working}
+              />
+              <span>
+                <strong>Supprimer le fond blanc automatiquement</strong>
+                <small>Le fond relié aux bords devient transparent pour laisser apparaître le thème clair ou sombre du showroom. Les zones blanches isolées du logo sont conservées autant que possible.</small>
+              </span>
+            </label>
+          )}
           <div className="image-cropper-hint">Astuce : tu peux aussi déplacer l’image directement avec la souris ou le doigt.</div>
         </div>
 
