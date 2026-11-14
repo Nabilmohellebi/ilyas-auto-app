@@ -572,6 +572,7 @@ function AdminSettings({ onLogout, onToast, onBrandNameChange }) {
           title={cropQueue[0].title}
           aspectRatio={cropQueue[0].aspectRatio}
           outputFormat={cropQueue[0].outputFormat}
+          allowWhiteBackgroundRemoval={cropQueue[0].kind === 'logo'}
           onCancel={cancelCropQueue}
           onConfirm={confirmCropUpload}
         />
