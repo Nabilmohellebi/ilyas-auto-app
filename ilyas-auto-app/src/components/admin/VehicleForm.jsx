@@ -128,7 +128,7 @@ export default function VehicleForm({ vehicle, onClose, onSave }) {
       if (url && task.target === 'main') {
         setForm(current => ({ ...current, images: [...current.images, { url }], img: current.img || url }))
       } else if (url && task.target === 'gallery') {
-        setForm(current => ({ ...current, images_gallery: [...current.images_gallery, { url } }))
+        setForm(current => ({ ...current, images_gallery: [...current.images_gallery, { url }] }))
       }
     } finally {
       setCropQueue(current => current.slice(1))
