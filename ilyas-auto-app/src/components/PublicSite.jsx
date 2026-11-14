@@ -42,6 +42,17 @@ function PublicSiteInner() {
   const [settings, setSettings] = useState({})
   const [compareList, setCompareList] = useState([])
   const [compareOpen, setCompareOpen] = useState(false)
+  const [favoriteIds, setFavoriteIds] = useState(() => {
+    try {
+      const saved = JSON.parse(window.localStorage.getItem('hbr_favorite_vehicles') || '[]')
+      return Array.isArray(saved)
+        ? [...new Set(saved.filter(id => typeof id === 'string' || typeof id === 'number').map(String))]
+        : []
+    } catch {
+      return []
+    }
+  })
+  const [showFavorites, setShowFavorites] = useState(false)
   const [sellOpen, setSellOpen] = useState(false)
   const [vehicleCondition, setVehicleCondition] = useState('all')
   const [publicTheme, setPublicTheme] = useState(() => { try { return window.localStorage.getItem('hbr_public_theme') === 'dark' ? 'dark' : 'ivory' } catch { return 'ivory' } })
@@ -98,6 +109,24 @@ function PublicSiteInner() {
 
     return () => { active = false }
   }, [stockReloadKey])
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem('hbr_favorite_vehicles', JSON.stringify(favoriteIds))
+    } catch (error) {
+      console.warn('HBR AUTO favorites storage:', error)
+    }
+  }, [favoriteIds])
+
+  // Retire les favoris des véhicules qui ne sont plus présents dans le stock public.
+  useEffect(() => {
+    if (loading || stockError) return
+    const availableIds = new Set(vehicles.map(vehicle => String(vehicle.id)))
+    setFavoriteIds(current => {
+      const next = current.filter(id => availableIds.has(id))
+      return next.length === current.length ? current : next
+    })
+  }, [loading, stockError, vehicles])
 
   // Ouvre directement la fiche lorsqu'un visiteur arrive avec un lien partagé.
   useEffect(() => {
@@ -200,6 +229,11 @@ function PublicSiteInner() {
     })
   }
 
+  function toggleFavorite(v) {
+    const id = String(v.id)
+    setFavoriteIds(prev => prev.includes(id) ? prev.filter(savedId => savedId !== id) : [...prev, id])
+  }
+
   const recentVehicles = useMemo(
     () => [...vehicles].sort((a, b) => new Date(b.created_at) - new Date(a.created_at)),
     [vehicles]
@@ -210,7 +244,9 @@ function PublicSiteInner() {
   const usedVehicleCount = vehicles.filter(v => getVehicleCondition(v) === 'occasion').length
 
   const searchTerm = normalizeSearchText(search)
+  const favoriteVehiclesCount = vehicles.filter(v => favoriteIds.includes(String(v.id))).length
   const filtered = vehicles.filter(v => {
+    if (showFavorites && !favoriteIds.includes(String(v.id))) return false
     const condition = getVehicleCondition(v)
     if (vehicleCondition !== 'all' && condition !== vehicleCondition) return false
     if (brand !== 'all' && v.marque !== brand) return false
@@ -235,7 +271,7 @@ function PublicSiteInner() {
 
   const hasActiveCatalogueFilters = Boolean(
     search.trim() || vehicleCondition !== 'all' || brand !== 'all' ||
-    origin !== 'all' || bodyType !== 'all' || budget !== 'all' || sort !== 'default'
+    origin !== 'all' || bodyType !== 'all' || budget !== 'all' || sort !== 'default' || showFavorites
   )
 
   function togglePublicTheme() {
@@ -252,6 +288,7 @@ function PublicSiteInner() {
     setBodyType('all')
     setBudget('all')
     setSort('default')
+    setShowFavorites(false)
   }
 
   function scrollTo(id) {
@@ -405,7 +442,20 @@ function PublicSiteInner() {
 
         {!loading && !stockError && vehicles.length > 0 && (
           <div className="catalogue-results-bar" aria-live="polite">
-            <span className="catalogue-results-count">{t.catalogue.resultats(sorted.length)}</span>
+            <div className="catalogue-results-left">
+              <span className="catalogue-results-count">{t.catalogue.resultats(sorted.length)}</span>
+              <button
+                type="button"
+                className={`catalogue-favorites-toggle ${showFavorites ? 'active' : ''}`}
+                aria-pressed={showFavorites}
+                onClick={() => setShowFavorites(value => !value)}
+                title={t.catalogue.favoris}
+              >
+                <span aria-hidden="true">{showFavorites ? '♥' : '♡'}</span>
+                {t.catalogue.favoris}
+                <span className="catalogue-favorites-count">{favoriteVehiclesCount}</span>
+              </button>
+            </div>
             {hasActiveCatalogueFilters && (
               <button type="button" className="catalogue-reset-btn" onClick={resetCatalogueFilters}>
                 {t.catalogue.reinitialiser}
@@ -425,7 +475,7 @@ function PublicSiteInner() {
         ) : sorted.length === 0 ? (
           <div className="empty">
             <div style={{ fontSize: 44 }}>🚗</div>
-            <p>{vehicles.length === 0 ? t.catalogue.aucunVehiculeLigne : t.catalogue.aucunCorrespond}</p>
+            <p>{vehicles.length === 0 ? t.catalogue.aucunVehiculeLigne : showFavorites ? t.catalogue.aucunFavori : t.catalogue.aucunCorrespond}</p>
           </div>
         ) : (
           <div className="veh-grid">
@@ -434,6 +484,16 @@ function PublicSiteInner() {
               const disabled = v.statut === 'vendu'
               return (
                 <div key={v.id} className="veh-card" style={{ opacity: disabled ? .55 : 1 }}>
+                  <button
+                    type="button"
+                    className={`veh-favorite-btn ${favoriteIds.includes(String(v.id)) ? 'active' : ''}`}
+                    aria-pressed={favoriteIds.includes(String(v.id))}
+                    aria-label={favoriteIds.includes(String(v.id)) ? t.catalogue.retirerFavori : t.catalogue.ajouterFavori}
+                    title={favoriteIds.includes(String(v.id)) ? t.catalogue.retirerFavori : t.catalogue.ajouterFavori}
+                    onClick={() => toggleFavorite(v)}
+                  >
+                    {favoriteIds.includes(String(v.id)) ? '♥' : '♡'}
+                  </button>
                   <div
                     className="veh-card-img"
                     role="button"
