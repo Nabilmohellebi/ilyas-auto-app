@@ -877,7 +877,7 @@
   border-color: #ddd1c0 !important;
 }
 .app[data-theme="ivory"] .nav {
-  background: rgba(248, 244, 236, .96) !important;
+  background: rgba(244, 236, 223, .97) !important;
   border-bottom: 1px solid #ddd1c0 !important;
 }
 .app[data-theme="ivory"] .nav-mobile {
@@ -987,7 +987,7 @@
   color: #514638 !important;
 }
 .app[data-theme="ivory"] .vd-bottom {
-  background: rgba(248, 244, 236, .97) !important;
+  background: rgba(238, 231, 219, .98) !important;
   border-top-color: #d7c9b6 !important;
 }
 .app[data-theme="ivory"] .vd-title,
