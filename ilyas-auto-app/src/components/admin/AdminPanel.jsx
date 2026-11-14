@@ -40,7 +40,7 @@ function AdminSettings({ onLogout, onToast, onBrandNameChange }) {
   const [pwForm, setPwForm] = useState({ current: '', new1: '', new2: '' })
   const [pwSaving, setPwSaving] = useState(false)
   const [showPw, setShowPw] = useState(false)
-  const [siteTheme, setSiteTheme] = useState('light')
+  const [siteTheme, setSiteTheme] = useState('ivory')
   const [themeSaving, setThemeSaving] = useState(false)
   const [brandIdentity, setBrandIdentity] = useState(DEFAULT_BRAND_IDENTITY)
   const [brandSaving, setBrandSaving] = useState(false)
@@ -57,7 +57,7 @@ function AdminSettings({ onLogout, onToast, onBrandNameChange }) {
   useEffect(() => {
     getSettings().then(s => {
       setTradeMarginPercent(String(s.trade_margin_percent ?? '5'))
-      setSiteTheme(['light', 'ivory', 'dark'].includes(s.site_theme) ? s.site_theme : 'light')
+      setSiteTheme(s.site_theme === 'dark' ? 'dark' : 'ivory')
       const savedBrand = parseBrandIdentity(s.brand_identity)
       setBrandIdentity(savedBrand)
       initialLogoPath.current = savedBrand.logoPath
@@ -92,7 +92,7 @@ function AdminSettings({ onLogout, onToast, onBrandNameChange }) {
       onToast && onToast('✅ Thème du site enregistré', 'default')
     } catch (e) {
       onToast && onToast('❌ Impossible d’enregistrer le thème : ' + e.message, 'error')
-      setSiteTheme('light')
+      setSiteTheme('ivory')
     } finally {
       setThemeSaving(false)
     }
@@ -371,12 +371,11 @@ function AdminSettings({ onLogout, onToast, onBrandNameChange }) {
       <div className="pf-section" style={{ marginBottom: 14 }}>
         <h3>🎨 Apparence du site</h3>
         <p style={{ fontSize: 12, color: 'rgba(255,255,255,.55)', lineHeight: 1.6, marginBottom: 14 }}>
-          Choisis le thème visible par les visiteurs. Le changement est enregistré immédiatement.
+          Choisis le thème par défaut des visiteurs. Ils peuvent ensuite basculer entre ivoire et sombre depuis le bouton en haut du site.
         </p>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: 10 }}>
           {[
-            { key: 'light', label: 'Blanc', detail: 'Clair et épuré', bg: '#ffffff', fg: '#25252a', border: '#dedee2' },
-            { key: 'ivory', label: 'Ivoire', detail: 'Chaud et élégant', bg: '#f5f0e7', fg: '#463d32', border: '#dfd2bd' },
+            { key: 'ivory', label: 'Ivoire', detail: 'Clair, doux et élégant', bg: '#f5f0e7', fg: '#463d32', border: '#dfd2bd' },
             { key: 'dark', label: 'Noir premium', detail: 'Sombre et moderne', bg: '#171719', fg: '#ffffff', border: '#44444a' },
           ].map(theme => (
             <button key={theme.key} type="button" onClick={() => saveSiteTheme(theme.key)}
