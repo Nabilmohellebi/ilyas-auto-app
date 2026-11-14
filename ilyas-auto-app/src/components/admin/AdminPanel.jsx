@@ -369,8 +369,7 @@ function AdminSettings({ onLogout, onToast, onBrandNameChange }) {
       <div className="pf-section brand-identity-settings" style={{ marginBottom: 14 }}>
         <h3>✨ Identité visuelle du showroom</h3>
         <p className="brand-settings-help">
-          Personnalise le nom à gauche du site : aperçu en direct, finition métallique et typographie.
-          Le choix du style ne modifie pas ton adresse web.
+          Importe ton propre logo : il remplacera le nom texte dans la barre supérieure du site. Le fichier peut être changé à tout moment.
         </p>
         <div className="brand-editor-preview brand-logo-editor-preview">
           {brandIdentity.logoUrl
@@ -453,7 +452,7 @@ function AdminSettings({ onLogout, onToast, onBrandNameChange }) {
             <label>Nom du showroom (logo à gauche)</label>
             <input value={shop.name} maxLength={100} onChange={e => setShop(s => ({ ...s, name: e.target.value }))} />
             <small style={{ display: 'block', color: 'rgba(255,255,255,.42)', fontSize: 11, lineHeight: 1.5, marginTop: 6 }}>
-              Ce nom apparaît dans le logo à gauche, le titre du site et l’adresse .vercel.app. Son changement peut donc aussi renommer l’adresse Vercel.
+              Ce nom apparaît dans le titre du site et dans le texte de remplacement tant qu’aucun logo personnalisé n’est importé. Son changement peut aussi renommer l’adresse Vercel.
             </small>
           </div>
           <div className="form-field"><label>Téléphone</label><input value={shop.phone} onChange={e => setShop(s => ({ ...s, phone: e.target.value }))} type="tel" /></div>
