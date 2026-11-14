@@ -15,6 +15,8 @@ import EditorialSelection from './EditorialSelection'
 import TestimonialsSection from './TestimonialsSection'
 const SellVehicleModal = lazy(() => import('./SellVehicleModal'))
 import CONFIG from '../config'
+import WhatsAppIcon from './WhatsAppIcon'
+import WhatsAppFloatingButton from './WhatsAppFloatingButton'
 
 function statutColor(key) {
   return key === 'disponible' ? '#22c55e' : key === 'reserve' ? '#f59e0b' : '#6b7280'
@@ -415,7 +417,7 @@ function PublicSiteInner() {
             <a onClick={e => { e.preventDefault(); setSellOpen(true) }} href="#">{t.nav.venteEchange}</a>
             <button type="button" onClick={togglePublicTheme} className="theme-toggle" aria-pressed={publicTheme === "dark"} aria-label={publicTheme === 'dark' ? 'Activer le thème ivoire' : 'Activer le mode sombre'} title={publicTheme === 'dark' ? 'Thème ivoire' : 'Mode sombre'}><span aria-hidden="true">{publicTheme === 'dark' ? '☀️' : '🌙'}</span><span className="theme-toggle-label">{publicTheme === 'dark' ? 'Ivoire' : 'Sombre'}</span></button>
             <button onClick={toggleLang} className="lang-toggle">{lang === 'fr' ? '🇩🇿 عربي' : '🇫🇷 Français'}</button>
-            <a href={waLink('Bonjour ' + s.nom + ', je vous contacte depuis votre site web.', s.whatsapp)} target="_blank" rel="noreferrer" className="nav-wa-btn">💬 {t.nav.whatsapp}</a>
+            <a href={waLink('Bonjour ' + s.nom + ', je vous contacte depuis votre site web.', s.whatsapp)} target="_blank" rel="noreferrer" className="nav-wa-btn"><WhatsAppIcon size={19} /> {t.nav.whatsapp}</a>
           </div>
           <button className="nav-burger" type="button" aria-label={mobileOpen ? 'Fermer le menu' : 'Ouvrir le menu'} aria-expanded={mobileOpen} onClick={() => setMobileOpen(o => !o)}>☰</button>
         </div>
@@ -427,7 +429,7 @@ function PublicSiteInner() {
           <a onClick={e => { e.preventDefault(); setMobileOpen(false); setVehicleCondition('occasion'); scrollTo('stock') }} href="#stock">{t.nav.occasion}</a>
           <a onClick={e => { e.preventDefault(); setMobileOpen(false); setSellOpen(true) }} href="#">{t.nav.venteEchange}</a>
           <button onClick={toggleLang} className="lang-toggle" style={{ marginTop: 6, width: 'fit-content' }}>{lang === 'fr' ? '🇩🇿 عربي' : '🇫🇷 Français'}</button>
-          <a href={waLink('Bonjour ' + s.nom + ', je vous contacte depuis votre site web.', s.whatsapp)} target="_blank" rel="noreferrer">💬 {t.nav.whatsapp}</a>
+          <a className="nav-mobile-wa-btn" href={waLink('Bonjour ' + s.nom + ', je vous contacte depuis votre site web.', s.whatsapp)} target="_blank" rel="noreferrer"><WhatsAppIcon size={19} /> {t.nav.whatsapp}</a>
         </div>
       </nav>
 
@@ -606,8 +608,8 @@ function PublicSiteInner() {
                   <a className="veh-card-wa-bar"
                     href={waLink(`Bonjour, je suis intéressé(e) par la ${v.marque} ${v.modele} affichée sur votre site.`, s.whatsapp)}
                     target="_blank" rel="noreferrer" onClick={e => e.stopPropagation()}>
-                    <span aria-hidden="true">☏</span>
-                    Discuter sur WhatsApp
+                    <WhatsAppIcon size={20} />
+                    <span className="veh-card-wa-label">Discuter sur WhatsApp</span>
                   </a>
                   <div className="veh-card-body">
                     <div className="veh-card-top" style={{ cursor: 'pointer' }} onClick={() => openVehicleDetail(v)}>
@@ -683,7 +685,7 @@ function PublicSiteInner() {
             <div className="footer-sub">© {new Date().getFullYear()} {s.nom} — {t.footer.droits}</div>
           </div>
           <div className="footer-social">
-            <a href={waLink('Bonjour ' + s.nom, s.whatsapp)} target="_blank" rel="noreferrer">💬</a>
+            <a className="footer-whatsapp-link" href={waLink('Bonjour ' + s.nom, s.whatsapp)} target="_blank" rel="noreferrer" aria-label={t.nav.whatsapp}><WhatsAppIcon size={21} /></a>
             <button onClick={() => setTrackingOpen(true)} className="footer-track-btn">{t.footer.suivre}</button>
             {s.facebook && <a href={s.facebook} target="_blank" rel="noreferrer">📘</a>}
             {s.instagram && <a href={s.instagram} target="_blank" rel="noreferrer">📷</a>}
@@ -692,7 +694,10 @@ function PublicSiteInner() {
       </footer>
 
       {/* ── WhatsApp flottant ── */}
-      <a className="wa-float" href={waLink('Bonjour ' + s.nom + ', je vous contacte depuis votre site web.', s.whatsapp)} target="_blank" rel="noreferrer">💬</a>
+      <WhatsAppFloatingButton
+        href={waLink('Bonjour ' + s.nom + ', je vous contacte depuis votre site web.', s.whatsapp)}
+        lang={lang}
+      />
 
       {/* ── Barre flottante comparateur ── */}
       {compareList.length > 0 && (

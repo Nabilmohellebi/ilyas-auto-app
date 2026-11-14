@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { supabase } from '../supabase'
 import { genId, notifyTelegramSellRequest, waLink } from '../utils/notify'
+import WhatsAppIcon from './WhatsAppIcon'
 
 const DETAILS_PREFIX = 'HBR_REQUEST_V2:'
 
@@ -245,8 +246,8 @@ export default function SellVehicleModal({ onClose, vehicles = [], tradeMarginPe
                 </div>
               </div>
             )}
-            <a href={waLink(buildWhatsAppText(), whatsapp)} target="_blank" rel="noreferrer" className="btn-hero-primary" style={{ width: '100%', justifyContent: 'center', marginBottom: 10 }}>
-              💬 Confirmer sur WhatsApp
+            <a href={waLink(buildWhatsAppText(), whatsapp)} target="_blank" rel="noreferrer" className="btn-hero-primary whatsapp-action-btn" style={{ width: '100%', justifyContent: 'center', marginBottom: 10 }}>
+              <WhatsAppIcon size={19} /> Confirmer sur WhatsApp
             </a>
             <button onClick={onClose} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,.4)', fontSize: 12.5, textDecoration: 'underline', cursor: 'pointer' }}>Fermer</button>
           </div>
