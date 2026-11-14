@@ -1948,3 +1948,32 @@ input, select, textarea { font-family: var(--fb); outline: none; }
   color: #987033 !important;
   -webkit-text-fill-color: #987033 !important;
 }
+
+/* Premium vehicle category tabs — gold marks the active filter, never alert red. */
+.app[data-theme] .vehicle-category-tabs button {
+  background: var(--theme-surface-raised) !important;
+  border: 1px solid var(--theme-border) !important;
+  color: var(--theme-text) !important;
+  -webkit-text-fill-color: var(--theme-text) !important;
+  box-shadow: none !important;
+  transition: background .2s ease, border-color .2s ease, color .2s ease, transform .2s ease, box-shadow .2s ease;
+}
+.app[data-theme] .vehicle-category-tabs button:hover:not(.active) {
+  border-color: rgba(215, 177, 95, .55) !important;
+  background: color-mix(in srgb, var(--theme-surface-raised) 88%, #d7b15f 12%) !important;
+}
+.app[data-theme] .vehicle-category-tabs button.active,
+.app[data-theme] .vehicle-category-tabs button.active:hover {
+  background: linear-gradient(135deg, #E8C77E 0%, #D7B15F 56%, #BD9146 100%) !important;
+  border-color: #D7B15F !important;
+  color: #171719 !important;
+  -webkit-text-fill-color: #171719 !important;
+  box-shadow: 0 5px 16px rgba(189, 145, 70, .22), inset 0 1px 0 rgba(255,255,255,.42) !important;
+}
+.app[data-theme] .vehicle-category-tabs button:focus-visible {
+  outline: 2px solid #D7B15F !important;
+  outline-offset: 3px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .app[data-theme] .vehicle-category-tabs button { transition: none; }
+}
