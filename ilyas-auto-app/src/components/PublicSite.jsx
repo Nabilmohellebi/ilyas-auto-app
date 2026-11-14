@@ -120,7 +120,7 @@ function PublicSiteInner() {
 
   // Découpe le nom du showroom pour le pied de page (évite une référence globale inexistante).
   const logoParts = useMemo(() => {
-    const parts = String(s.nom || 'Nabil Auto').trim().split(/\\s+/).filter(Boolean)
+    const parts = String(s.nom || 'Nabil Auto').trim().split(' ').filter(Boolean)
     const last = parts.pop() || 'Auto'
     return { rest: parts.join(' '), last }
   }, [s.nom])
