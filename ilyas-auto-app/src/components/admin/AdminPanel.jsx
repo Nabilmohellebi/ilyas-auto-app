@@ -44,7 +44,7 @@ function AdminSettings({ onLogout, onToast, onBrandNameChange }) {
   const [brandIdentity, setBrandIdentity] = useState(DEFAULT_BRAND_IDENTITY)
   const [brandSaving, setBrandSaving] = useState(false)
 
-  const previewWords = (shop.name || 'Nabil Auto').trim().split(/\\s+/).filter(Boolean)
+  const previewWords = (shop.name || 'Nabil Auto').trim().split(/\s+/).filter(Boolean)
   const previewAccent = previewWords.pop() || 'Auto'
   const previewMain = previewWords.join(' ')
 
@@ -90,7 +90,7 @@ function AdminSettings({ onLogout, onToast, onBrandNameChange }) {
   async function saveBrandIdentity() {
     setBrandSaving(true)
     try {
-      await saveSetting('brand_identity', JSON.stringify(parseBrandIdentity(JSON.stringify(brandIdentity))))
+      await saveSetting('brand_identity', JSON.stringify(parseBrandIdentity(brandIdentity)))
       onToast && onToast('✅ Style du logo enregistré', 'default')
     } catch (e) {
       onToast && onToast('❌ Impossible d’enregistrer le style : ' + e.message, 'error')
