@@ -1320,3 +1320,207 @@
   .app[data-theme] .catalogue-favorites-toggle { min-height: 42px; }
   .app[data-theme] .veh-favorite-btn { top: 10px; right: 10px; width: 38px; height: 38px; }
 }
+
+
+/* Comparateur — meilleure lisibilité, navigation clavier et adaptation RTL/mobile. */
+.app[data-theme] .cmp-box {
+  width: min(1040px, 100%);
+  max-height: min(90dvh, 900px);
+  border: 1px solid var(--theme-border, rgba(190,150,85,.3));
+  background: var(--theme-surface, #14191f);
+  color: var(--theme-text, #f4f2ed);
+  box-shadow: 0 28px 90px rgba(0,0,0,.42);
+}
+.app[data-theme] .cmp-hdr {
+  align-items: flex-start;
+  gap: 18px;
+  background: var(--theme-surface);
+  border-bottom-color: var(--theme-border);
+}
+.app[data-theme] .cmp-heading-copy { min-width: 0; }
+.app[data-theme] .cmp-hdr h2 {
+  color: var(--theme-text) !important;
+  font-size: clamp(17px,2.3vw,21px);
+  line-height: 1.35;
+}
+.app[data-theme] .cmp-heading-copy p {
+  margin-top: 5px;
+  color: var(--theme-muted) !important;
+  font-size: 11px;
+  line-height: 1.55;
+}
+.app[data-theme] .cmp-hdr .btn-close {
+  flex: 0 0 auto;
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  background: var(--theme-surface-raised);
+  border: 1px solid var(--theme-border);
+  color: var(--theme-text) !important;
+}
+.app[data-theme] .cmp-scroll {
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  padding: 12px 18px 16px;
+  background: var(--theme-surface);
+}
+.app[data-theme] .cmp-table {
+  min-width: max-content;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+.app[data-theme] .cmp-table caption {
+  padding: 0 0 10px;
+  color: var(--theme-muted);
+  font-size: 10px;
+  text-align: start;
+}
+.app[data-theme] .cmp-table th,
+.app[data-theme] .cmp-table td {
+  padding: 11px 13px;
+  background: var(--theme-surface-raised);
+  border-bottom: 1px solid var(--theme-border);
+  color: var(--theme-text) !important;
+  font-size: 12px;
+  text-align: center;
+  vertical-align: middle;
+}
+.app[data-theme] .cmp-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  min-width: 150px;
+  background: var(--theme-surface);
+  border-bottom: 1px solid var(--theme-border);
+}
+.app[data-theme] .cmp-table .cmp-label-col {
+  position: sticky;
+  inset-inline-start: 0;
+  z-index: 2;
+  min-width: 128px;
+  background: var(--theme-surface);
+  color: var(--theme-muted) !important;
+  text-align: start !important;
+  font-size: 11px !important;
+  font-weight: 850;
+}
+.app[data-theme] .cmp-table thead .cmp-label-col { z-index: 4; }
+.app[data-theme] .cmp-veh-card-wrap {
+  display: grid;
+  justify-items: center;
+  gap: 7px;
+}
+.app[data-theme] .cmp-veh-card {
+  width: 100%;
+  min-width: 130px;
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  border: 1px solid transparent;
+  border-radius: 11px;
+  background: transparent;
+  color: var(--theme-text) !important;
+  font: inherit;
+  cursor: pointer;
+}
+.app[data-theme] .cmp-veh-card:hover {
+  border-color: var(--theme-border);
+  background: var(--theme-surface-raised);
+}
+.app[data-theme] .cmp-veh-card img {
+  width: 124px;
+  height: 82px;
+  object-fit: cover;
+  border-radius: 8px;
+  background: var(--theme-border);
+}
+.app[data-theme] .cmp-veh-name {
+  color: var(--theme-text) !important;
+  font-size: 12px;
+  font-weight: 900;
+}
+.app[data-theme] .cmp-veh-model {
+  color: var(--theme-muted) !important;
+  font-size: 11px;
+  font-weight: 650;
+}
+.app[data-theme] .cmp-veh-open-hint {
+  color: var(--brand-accent, #bd9557) !important;
+  font-size: 10px;
+  font-weight: 800;
+}
+.app[data-theme] .cmp-highlights {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 5px;
+  max-width: 190px;
+}
+.app[data-theme] .cmp-highlight-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 7px;
+  border-radius: 999px;
+  background: rgba(190,150,85,.15);
+  color: var(--brand-accent, #bd9557) !important;
+  font-size: 9px;
+  font-weight: 850;
+  line-height: 1.25;
+  white-space: normal;
+}
+.app[data-theme] .cmp-price-cell {
+  color: var(--brand-accent, #bd9557) !important;
+  font-weight: 900;
+}
+.app[data-theme] .cmp-highlight-cell {
+  background: rgba(190,150,85,.13) !important;
+  color: var(--theme-text) !important;
+  font-weight: 900;
+}
+.app[data-theme] .cmp-highlight-check {
+  display: inline-grid;
+  width: 16px;
+  height: 16px;
+  margin-inline-start: 6px;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--brand-accent, #bd9557);
+  color: #17130d !important;
+  font-size: 10px;
+  vertical-align: middle;
+}
+.app[data-theme] .cmp-footnote {
+  margin: 0;
+  padding: 0 18px 14px;
+  color: var(--theme-muted) !important;
+  background: var(--theme-surface);
+  font-size: 10px;
+  line-height: 1.55;
+}
+.app[data-theme] .cmp-box :focus-visible,
+.app[data-theme] .cmp-scroll:focus-visible {
+  outline: 2px solid var(--brand-accent, #bd9557);
+  outline-offset: -2px;
+}
+.app[data-theme] .cmp-box :dir(rtl) .cmp-label-col { text-align: start !important; }
+@media (max-width: 600px) {
+  .app[data-theme] .cmp-ov { padding: 7px; align-items: flex-end; }
+  .app[data-theme] .cmp-box {
+    max-height: 93dvh;
+    border-radius: 18px 18px 10px 10px;
+  }
+  .app[data-theme] .cmp-hdr { padding: 14px 14px 12px; }
+  .app[data-theme] .cmp-scroll { padding: 8px 8px 12px; }
+  .app[data-theme] .cmp-table th,
+  .app[data-theme] .cmp-table td { padding: 9px 10px; font-size: 11px; }
+  .app[data-theme] .cmp-table thead th { min-width: 128px; }
+  .app[data-theme] .cmp-table .cmp-label-col { min-width: 102px; }
+  .app[data-theme] .cmp-veh-card img { width: 100px; height: 68px; }
+  .app[data-theme] .cmp-footnote { padding: 0 12px 12px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .app[data-theme] .cmp-veh-card { transition: none; }
+}

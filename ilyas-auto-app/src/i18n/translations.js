@@ -62,6 +62,19 @@ export const fr = {
     desc: 'Simulation illustrative au taux annuel indicatif de 7 %, hors assurance et frais. Ce calcul ne constitue pas une offre de crédit : les conditions sont à confirmer auprès d’un organisme de financement.',
     apport: 'Apport initial', duree: 'Durée du financement', montantFinance: 'Montant financé', mensualite: 'Mensualité estimée', mois: 'mois',
   },
+  compare: {
+    titre: 'Comparateur de véhicules',
+    description: count => `Comparez les caractéristiques de ${count} véhicules côte à côte.`,
+    prix: '💰 Prix', annee: '📅 Année', kilometrage: '🛣️ Kilométrage', boite: '⚙️ Boîte de vitesses',
+    carburant: '⛽ Carburant', carrosserie: '🚙 Carrosserie', provenance: '🌍 Provenance', statut: '📍 Disponibilité',
+    disponible: '✅ Disponible', reserve: '⏳ Réservé', vendu: '🚫 Vendu',
+    nonRenseigne: 'Non renseigné', zeroKm: 'Neuf / 0 km', inconnue: 'Non précisée',
+    moinsCher: 'Prix le plus bas', plusRecent: 'Année la plus récente', kilometrageBas: 'Kilométrage le plus faible',
+    caracteristique: 'Caractéristique', voirFiche: 'Voir la fiche', pointsForts: 'Points forts de ce véhicule',
+    pointFort: 'Meilleure valeur parmi les véhicules comparés', fermer: 'Fermer le comparateur',
+    zoneTableau: 'Tableau comparatif des véhicules', legende: 'Comparaison des prix, de l’année et des caractéristiques techniques.',
+    note: 'Les repères signalent uniquement le prix le plus bas, l’année la plus récente et le kilométrage le plus faible parmi les véhicules sélectionnés.',
+  },
 }
 
 export const ar = {
@@ -123,6 +136,19 @@ export const ar = {
     titre: '💰 محاكي التمويل',
     desc: 'محاكاة توضيحية بمعدل سنوي إرشادي 7٪، دون التأمين والرسوم. هذا الحساب ليس عرض تمويل، ويجب تأكيد الشروط لدى جهة التمويل.',
     apport: 'الدفعة الأولى', duree: 'مدة التمويل', montantFinance: 'المبلغ الممول', mensualite: 'القسط الشهري المقدر', mois: 'شهر',
+  },
+  compare: {
+    titre: 'مقارنة السيارات',
+    description: count => `قارن خصائص ${count} سيارات جنبًا إلى جنب.`,
+    prix: '💰 السعر', annee: '📅 السنة', kilometrage: '🛣️ المسافة المقطوعة', boite: '⚙️ ناقل الحركة',
+    carburant: '⛽ الوقود', carrosserie: '🚙 نوع الهيكل', provenance: '🌍 المنشأ', statut: '📍 الحالة',
+    disponible: '✅ متوفرة', reserve: '⏳ محجوزة', vendu: '🚫 مباعة',
+    nonRenseigne: 'غير محدد', zeroKm: 'جديدة / 0 كم', inconnue: 'غير محدد',
+    moinsCher: 'أقل سعر', plusRecent: 'أحدث سنة', kilometrageBas: 'أقل مسافة',
+    caracteristique: 'الخاصية', voirFiche: 'عرض التفاصيل', pointsForts: 'مميزات هذه السيارة',
+    pointFort: 'أفضل قيمة بين السيارات المقارنة', fermer: 'إغلاق المقارنة',
+    zoneTableau: 'جدول مقارنة السيارات', legende: 'مقارنة الأسعار والسنوات والمواصفات التقنية.',
+    note: 'تُظهر العلامات فقط أقل سعر وأحدث سنة وأقل مسافة بين السيارات المحددة.',
   },
 }
 
