@@ -35,7 +35,7 @@ function PublicSiteInner() {
   const [compareOpen, setCompareOpen] = useState(false)
   const [sellOpen, setSellOpen] = useState(false)
   const [vehicleCondition, setVehicleCondition] = useState('all')
-  const [publicTheme, setPublicTheme] = useState(() => { try { const saved = window.localStorage.getItem('hbr_public_theme'); return ['light', 'dark', 'ivory'].includes(saved) ? saved : 'light' } catch { return 'light' } })
+  const [publicTheme, setPublicTheme] = useState(() => { try { return window.localStorage.getItem('hbr_public_theme') === 'dark' ? 'dark' : 'ivory' } catch { return 'ivory' } })
 
   const [search, setSearch] = useState('')
   const [brand, setBrand] = useState('all')
@@ -71,7 +71,19 @@ function PublicSiteInner() {
     }
 
     loadStock()
-    getSettings().then(data => { if (!active) return; setSettings(data); try { if (!window.localStorage.getItem('hbr_public_theme') && ['light','dark','ivory'].includes(data.site_theme)) setPublicTheme(data.site_theme) } catch {} }).catch(error => {
+    getSettings().then(data => {
+      if (!active) return
+      setSettings(data)
+      try {
+        const savedTheme = window.localStorage.getItem('hbr_public_theme')
+        if (savedTheme === 'light') {
+          window.localStorage.setItem('hbr_public_theme', 'ivory')
+          setPublicTheme('ivory')
+        } else if (!savedTheme && ['light', 'dark', 'ivory'].includes(data.site_theme)) {
+          setPublicTheme(data.site_theme === 'dark' ? 'dark' : 'ivory')
+        }
+      } catch {}
+    }).catch(error => {
       console.warn('HBR AUTO settings:', error)
     })
 
@@ -211,7 +223,7 @@ function PublicSiteInner() {
   })
 
   function togglePublicTheme() {
-    const nextTheme = publicTheme === 'dark' ? 'light' : 'dark'
+    const nextTheme = publicTheme === 'dark' ? 'ivory' : 'dark'
     setPublicTheme(nextTheme)
     try { window.localStorage.setItem('hbr_public_theme', nextTheme) } catch {}
   }
@@ -261,7 +273,7 @@ function PublicSiteInner() {
               ? <img className="nav-custom-logo" src={showroomLogoUrl} alt={s.nom} />
               : <span className="nav-brand-fallback">{s.nom}</span>}
           </a>
-          <button type="button" onClick={togglePublicTheme} className="theme-toggle mobile-theme-toggle" aria-pressed={publicTheme === "dark"} aria-label={publicTheme === 'dark' ? 'Activer le mode clair' : 'Activer le mode sombre'} title={publicTheme === 'dark' ? 'Mode clair' : 'Mode sombre'}><span aria-hidden="true">{publicTheme === 'dark' ? '☀️' : '🌙'}</span><span className="theme-toggle-label">{publicTheme === 'dark' ? 'Clair' : 'Sombre'}</span></button>
+          <button type="button" onClick={togglePublicTheme} className="theme-toggle mobile-theme-toggle" aria-pressed={publicTheme === "dark"} aria-label={publicTheme === 'dark' ? 'Activer le thème ivoire' : 'Activer le mode sombre'} title={publicTheme === 'dark' ? 'Thème ivoire' : 'Mode sombre'}><span aria-hidden="true">{publicTheme === 'dark' ? '☀️' : '🌙'}</span><span className="theme-toggle-label">{publicTheme === 'dark' ? 'Ivoire' : 'Sombre'}</span></button>
           <div className="nav-links">
             <a onClick={() => scrollTo('accueil')} href="#accueil">{t.nav.accueil}</a>
             <a onClick={() => scrollTo('stock')} href="#stock">{t.nav.stock}</a>
@@ -269,7 +281,7 @@ function PublicSiteInner() {
             <a onClick={e => { e.preventDefault(); setTrackingOpen(true) }} href="#">{t.nav.suivi}</a>
             <a onClick={e => { e.preventDefault(); setVehicleCondition('occasion'); scrollTo('stock') }} href="#stock">{t.nav.occasion}</a>
             <a onClick={e => { e.preventDefault(); setSellOpen(true) }} href="#">{t.nav.venteEchange}</a>
-            <button type="button" onClick={togglePublicTheme} className="theme-toggle" aria-pressed={publicTheme === "dark"} aria-label={publicTheme === 'dark' ? 'Activer le mode clair' : 'Activer le mode sombre'} title={publicTheme === 'dark' ? 'Mode clair' : 'Mode sombre'}><span aria-hidden="true">{publicTheme === 'dark' ? '☀️' : '🌙'}</span><span className="theme-toggle-label">{publicTheme === 'dark' ? 'Clair' : 'Sombre'}</span></button>
+            <button type="button" onClick={togglePublicTheme} className="theme-toggle" aria-pressed={publicTheme === "dark"} aria-label={publicTheme === 'dark' ? 'Activer le thème ivoire' : 'Activer le mode sombre'} title={publicTheme === 'dark' ? 'Thème ivoire' : 'Mode sombre'}><span aria-hidden="true">{publicTheme === 'dark' ? '☀️' : '🌙'}</span><span className="theme-toggle-label">{publicTheme === 'dark' ? 'Ivoire' : 'Sombre'}</span></button>
             <button onClick={toggleLang} className="lang-toggle">{lang === 'fr' ? '🇩🇿 عربي' : '🇫🇷 Français'}</button>
             <a href={waLink('Bonjour ' + s.nom + ', je vous contacte depuis votre site web.', s.whatsapp)} target="_blank" rel="noreferrer" className="nav-wa-btn">💬 {t.nav.whatsapp}</a>
           </div>
