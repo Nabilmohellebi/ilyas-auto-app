@@ -225,7 +225,7 @@ function PublicSiteInner() {
   }
 
   return (
-    <div className="app" dir={rtl ? 'rtl' : 'ltr'}>
+    <div className="app" data-theme={settings.site_theme || 'light'} dir={rtl ? 'rtl' : 'ltr'}>
       {/* ── Bande nouveautés & promos ── */}
       {!loading && <VehicleGallery vehicles={recentVehicles} onVehicleClick={openVehicleDetail} newLabel={t.card.nouveau} />}
 
@@ -377,6 +377,12 @@ function PublicSiteInner() {
                       {disc > 0 && <span className="old">{fmt(v.prix_old)}</span>}
                     </div>
                   </div>
+                  <a className="veh-card-wa-bar"
+                    href={waLink(`Bonjour, je suis intéressé(e) par la ${v.marque} ${v.modele} affichée sur votre site.`, s.whatsapp)}
+                    target="_blank" rel="noreferrer" onClick={e => e.stopPropagation()}>
+                    <span aria-hidden="true">☏</span>
+                    Discuter sur WhatsApp
+                  </a>
                   <div className="veh-card-body">
                     <div className="veh-card-top" style={{ cursor: 'pointer' }} onClick={() => openVehicleDetail(v)}>
                       <div>

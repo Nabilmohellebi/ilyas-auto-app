@@ -8,7 +8,7 @@ const CACHE_TTL = 2 * 60 * 1000 // 2 minutes
 const PUBLIC_SETTING_KEYS = [
   'shop_name', 'shop_phone', 'shop_whatsapp', 'shop_email', 'shop_address',
   'shop_horaires', 'shop_maps_url', 'shop_maps_embed', 'shop_phones',
-  'maintenance', 'trade_margin_percent',
+  'maintenance', 'trade_margin_percent', 'site_theme',
 ]
 
 const DEFAULTS = {
@@ -21,6 +21,7 @@ const DEFAULTS = {
   shop_maps_url:   '',
   shop_maps_embed: '',
   maintenance:     'false',
+  site_theme:      'light',
 }
 
 export async function getSettings() {

@@ -39,10 +39,13 @@ function AdminSettings({ onLogout, onToast, onBrandNameChange }) {
   const [pwForm, setPwForm] = useState({ current: '', new1: '', new2: '' })
   const [pwSaving, setPwSaving] = useState(false)
   const [showPw, setShowPw] = useState(false)
+  const [siteTheme, setSiteTheme] = useState('light')
+  const [themeSaving, setThemeSaving] = useState(false)
 
   useEffect(() => {
     getSettings().then(s => {
       setTradeMarginPercent(String(s.trade_margin_percent ?? '5'))
+      setSiteTheme(['light', 'ivory', 'dark'].includes(s.site_theme) ? s.site_theme : 'light')
       setShop({
         name: s.shop_name || 'Nabil Auto',
         phone: s.shop_phone || '',
@@ -62,6 +65,20 @@ function AdminSettings({ onLogout, onToast, onBrandNameChange }) {
       }
     })
   }, [])
+
+  async function saveSiteTheme(nextTheme) {
+    setSiteTheme(nextTheme)
+    setThemeSaving(true)
+    try {
+      await saveSetting('site_theme', nextTheme)
+      onToast && onToast('✅ Thème du site enregistré', 'default')
+    } catch (e) {
+      onToast && onToast('❌ Impossible d’enregistrer le thème : ' + e.message, 'error')
+      setSiteTheme('light')
+    } finally {
+      setThemeSaving(false)
+    }
+  }
 
   function addPhone() { setPhones(p => [...p, { label: '', number: '' }]) }
   function updatePhone(i, key, val) { setPhones(p => p.map((ph, idx) => idx === i ? { ...ph, [key]: val } : ph)) }
@@ -188,6 +205,31 @@ function AdminSettings({ onLogout, onToast, onBrandNameChange }) {
   return (
     <div>
       <h3 style={{ color: 'white', fontSize: 16, fontWeight: 800, marginBottom: 20 }}>⚙️ Paramètres</h3>
+
+      <div className="pf-section" style={{ marginBottom: 14 }}>
+        <h3>🎨 Apparence du site</h3>
+        <p style={{ fontSize: 12, color: 'rgba(255,255,255,.55)', lineHeight: 1.6, marginBottom: 14 }}>
+          Choisis le thème visible par les visiteurs. Le changement est enregistré immédiatement.
+        </p>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: 10 }}>
+          {[
+            { key: 'light', label: 'Blanc', detail: 'Clair et épuré', bg: '#ffffff', fg: '#25252a', border: '#dedee2' },
+            { key: 'ivory', label: 'Ivoire', detail: 'Chaud et élégant', bg: '#f5f0e7', fg: '#463d32', border: '#dfd2bd' },
+            { key: 'dark', label: 'Noir premium', detail: 'Sombre et moderne', bg: '#171719', fg: '#ffffff', border: '#44444a' },
+          ].map(theme => (
+            <button key={theme.key} type="button" onClick={() => saveSiteTheme(theme.key)}
+              disabled={themeSaving} aria-pressed={siteTheme === theme.key}
+              style={{ textAlign: 'left', padding: 12, borderRadius: 10, cursor: 'pointer',
+                background: theme.bg, color: theme.fg,
+                border: siteTheme === theme.key ? '3px solid #a10d2b' : '1px solid ' + theme.border,
+                opacity: themeSaving ? .7 : 1 }}>
+              <span style={{ display: 'block', fontWeight: 800, fontSize: 13 }}>{theme.label}</span>
+              <span style={{ display: 'block', fontSize: 11, opacity: .72, marginTop: 4 }}>{theme.detail}</span>
+              <span style={{ display: 'block', marginTop: 10, height: 5, borderRadius: 8, background: '#850019' }} />
+            </button>
+          ))}
+        </div>
+      </div>
 
       <div className="pf-section" style={{ marginBottom: 14 }}>
         <h3>🏪 Informations du showroom</h3>
