@@ -1450,3 +1450,95 @@ input, select, textarea { font-family: var(--fb); outline: none; }
   color: #ff6570 !important;
   -webkit-text-fill-color: #ff6570 !important;
 }
+
+
+/* ============================================================
+   UNIFIED PUBLIC THEME LAYER
+   One surface/text palette for light, ivory and dark modes.
+   This final layer overrides legacy hard-coded white surfaces.
+   ============================================================ */
+.app[data-theme="light"] {
+  --theme-bg:#ffffff; --theme-surface:#ffffff; --theme-surface-raised:#f7f7f8;
+  --theme-text:#242428; --theme-muted:#62626a; --theme-border:#e3e3e7; --theme-field:#ffffff;
+  color-scheme:light; background:var(--theme-bg)!important; color:var(--theme-text)!important;
+}
+.app[data-theme="ivory"] {
+  --theme-bg:#f5f0e7; --theme-surface:#f5f0e7; --theme-surface-raised:#eee7da;
+  --theme-text:#463d32; --theme-muted:#716655; --theme-border:#ddd2c1; --theme-field:#fffaf1;
+  color-scheme:light; background:var(--theme-bg)!important; color:var(--theme-text)!important;
+}
+.app[data-theme="dark"] {
+  --theme-bg:#111113; --theme-surface:#171719; --theme-surface-raised:#222226;
+  --theme-text:#f4f4f5; --theme-muted:#b7b7bd; --theme-border:#38383e; --theme-field:#222226;
+  color-scheme:dark; background:var(--theme-bg)!important; color:var(--theme-text)!important;
+}
+.app[data-theme] :where(
+  .nav,.nav-mobile,.trust-bar,.section,.editorial-selection,.testimonials-section,
+  .showroom-grid,.showroom-map,.footer-auto,.veh-card,.veh-card-body,
+  .veh-strip,.veh-strip-card,.announce-bar,.filters-bar,.vehicle-category-tabs,
+  .edito-card,.testi-card,.vd-ov,.vd-info,.vd-info-col,.vd-thumbs,
+  .vd-specs-grid div,.vd-equip-item,.vd-video-card,.vd-gallery-full-wrap,.vd-bottom,
+  .cmp-ov,.cmp-box,.cmp-table th,.cmp-table td,.cmp-float-bar,.cmp-float-chip,
+  .empty,.spinner
+) {
+  background-color:var(--theme-surface)!important;
+  border-color:var(--theme-border)!important;
+  color:var(--theme-text)!important;
+}
+.app[data-theme] :where(
+  .filters-bar input,.filters-bar select,.vd-print-btn,.vd-share-btn,
+  .veh-year-badge,.cmp-label-col,.cmp-veh-card
+) {
+  background-color:var(--theme-surface-raised)!important;
+  border-color:var(--theme-border)!important;
+  color:var(--theme-text)!important;
+}
+.app[data-theme] :where(input,select,textarea,option) {
+  background-color:var(--theme-field)!important;
+  border-color:var(--theme-border)!important;
+  color:var(--theme-text)!important;
+  caret-color:var(--theme-text)!important;
+}
+.app[data-theme] :where(input,textarea)::placeholder { color:var(--theme-muted)!important; opacity:1!important; }
+.app[data-theme] :where(
+  .section-head p,.trust-grid .lbl,.announce-item,.veh-card-top p,.veh-specs,
+  .showroom-info-row p,.footer-sub,.vd-description,.vd-old-price,.vd-bottom-price .lbl,
+  .cmp-label-col,.cmp-veh-model,.testi-quote,.testi-role
+) { color:var(--theme-muted)!important; }
+
+/* Ivory receives the same full text-contrast treatment as dark and light. */
+.app[data-theme="ivory"] * {
+  color:var(--theme-text)!important;
+  -webkit-text-fill-color:currentColor;
+  text-shadow:none!important;
+}
+.app[data-theme="ivory"] :where(
+  .section-head p,.trust-grid .lbl,.announce-item,.veh-card-top p,.veh-specs,
+  .showroom-info-row p,.footer-sub,.vd-description,.vd-old-price,.vd-bottom-price .lbl,
+  .cmp-label-col,.cmp-veh-model,.testi-quote,.testi-role
+) { color:var(--theme-muted)!important; -webkit-text-fill-color:currentColor!important; }
+
+/* Keep white lettering on deliberately colored controls and price strips. */
+.app[data-theme] :where(
+  .nav-wa-btn,.btn-hero-primary,.veh-card-wa-bar,.wa-float,.veh-price-strip,.veh-price-strip *,
+  .veh-strip-tag,.veh-statut-badge,.veh-badge-tag,.vd-badge,.vd-disc,.vd-arrow,
+  .vd-close-float,.vd-counter,.stamp-sold,.btn-save,.act-btn.primary,.login-box button
+) { color:#ffffff!important; -webkit-text-fill-color:#ffffff!important; }
+.app[data-theme="dark"] :where(
+  .veh-strip-info .price,.vd-price,.price-highlight,.accent-text,.showroom-info-row .ic
+) { color:#ff6570!important; -webkit-text-fill-color:#ff6570!important; }
+.app[data-theme="ivory"] :where(
+  .veh-strip-info .price,.vd-price,.price-highlight,.accent-text,.showroom-info-row .ic
+) { color:#850019!important; -webkit-text-fill-color:#850019!important; }
+.app[data-theme="dark"] .hero-auto { background-color:#111113!important; }
+.app[data-theme="dark"] .hero-auto-overlay { background:linear-gradient(90deg,rgba(8,8,10,.88),rgba(8,8,10,.3))!important; }
+.app[data-theme="dark"] .cmp-ov,.app[data-theme="dark"] .vd-lightbox { background-color:rgba(0,0,0,.88)!important; }
+.app[data-theme="ivory"] .hero-auto-overlay { background:linear-gradient(90deg,rgba(35,27,20,.72),rgba(35,27,20,.18))!important; }
+.app[data-theme="ivory"] .cmp-ov,.app[data-theme="ivory"] .vd-lightbox { background-color:rgba(35,29,22,.78)!important; }
+.app[data-theme] :where(
+  .veh-card,.edito-card,.testi-card,.showroom-info-row,.filters-bar input,.filters-bar select,
+  .theme-toggle,.cmp-box,.vd-info,.vd-specs-grid div
+) { border-color:var(--theme-border)!important; }
+.app[data-theme] :where(button,a,input,select,textarea):focus-visible {
+  outline:2px solid #e05260!important; outline-offset:3px!important;
+}
