@@ -1185,3 +1185,45 @@
   color: var(--theme-text) !important;
   -webkit-text-fill-color: var(--theme-text) !important;
 }
+
+
+/* Catalogue UX: visible result count and a clear, accessible reset action. */
+.app[data-theme] .catalogue-results-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  min-height: 42px;
+  margin: 12px 0 20px;
+}
+.app[data-theme] .catalogue-results-count {
+  color: var(--theme-muted) !important;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .025em;
+}
+.app[data-theme] .catalogue-reset-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 38px;
+  padding: 8px 14px;
+  border: 1px solid var(--theme-border);
+  border-radius: 999px;
+  background: var(--theme-surface-raised);
+  color: var(--theme-text) !important;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform .18s ease, border-color .18s ease, background .18s ease;
+}
+.app[data-theme] .catalogue-reset-btn:hover {
+  border-color: #bd9557;
+  transform: translateY(-1px);
+}
+.app[data-theme] .catalogue-reset-btn:active { transform: translateY(0); }
+@media (max-width: 520px) {
+  .app[data-theme] .catalogue-results-bar { margin: 10px 0 16px; }
+  .app[data-theme] .catalogue-reset-btn { min-height: 42px; padding-inline: 15px; }
+}
