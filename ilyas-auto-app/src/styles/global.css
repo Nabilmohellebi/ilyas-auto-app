@@ -1542,3 +1542,31 @@ input, select, textarea { font-family: var(--fb); outline: none; }
 .app[data-theme] :where(button,a,input,select,textarea):focus-visible {
   outline:2px solid #e05260!important; outline-offset:3px!important;
 }
+
+/* ============================================================
+   AVIS CLIENTS — CONTRASTE COHÉRENT DANS LES TROIS THÈMES
+   Les anciennes règles .testi-name et .testi-quote utilisaient
+   du blanc fixe, ce qui rendait les noms invisibles sur fond clair.
+   ============================================================ */
+.app[data-theme] .testimonials-section .testi-card {
+  background-color: var(--theme-surface) !important;
+  border-color: var(--theme-border) !important;
+  color: var(--theme-text) !important;
+}
+.app[data-theme] .testimonials-section .testi-name {
+  color: var(--theme-text) !important;
+  -webkit-text-fill-color: var(--theme-text) !important;
+}
+.app[data-theme] .testimonials-section .testi-quote,
+.app[data-theme] .testimonials-section .testi-role {
+  color: var(--theme-muted) !important;
+  -webkit-text-fill-color: var(--theme-muted) !important;
+}
+.app[data-theme] .testimonials-section .testi-stars {
+  color: #c18a00 !important;
+  -webkit-text-fill-color: #c18a00 !important;
+}
+.app[data-theme] .testimonials-section .testi-avatar {
+  color: #850019 !important;
+  -webkit-text-fill-color: #850019 !important;
+}

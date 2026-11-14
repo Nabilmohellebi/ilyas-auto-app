@@ -11,7 +11,7 @@ export default function TestimonialsSection({ supabase }) {
   if (items.length === 0) return null
 
   return (
-    <section className="section" style={{ paddingTop: 0 }}>
+    <section id="avis-clients" className="section testimonials-section" style={{ paddingTop: 0 }}>
       <div className="section-head">
         <h2>ILS NOUS FONT CONFIANCE</h2>
         <div className="bar" />
