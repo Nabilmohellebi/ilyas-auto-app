@@ -1461,8 +1461,8 @@ input, select, textarea { font-family: var(--fb); outline: none; }
   color-scheme:light; background:var(--theme-bg)!important; color:var(--theme-text)!important;
 }
 .app[data-theme="ivory"] {
-  --theme-bg:#f5f0e7; --theme-surface:#f5f0e7; --theme-surface-raised:#eee7da;
-  --theme-text:#463d32; --theme-muted:#716655; --theme-border:#ddd2c1; --theme-field:#fffaf1;
+  --theme-bg:#eee7db; --theme-surface:#f3ecdf; --theme-surface-raised:#e8dfd1;
+  --theme-text:#463d32; --theme-muted:#756958; --theme-border:#d9cbb7; --theme-field:#f5eddf;
   color-scheme:light; background:var(--theme-bg)!important; color:var(--theme-text)!important;
 }
 .app[data-theme="dark"] {
