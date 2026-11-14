@@ -1641,3 +1641,239 @@
     flex-basis: 38px;
   }
 }
+
+
+/* WhatsApp identity refresh — consistent brand treatment across the public site. */
+.app .whatsapp-icon {
+  display: inline-block;
+  flex: 0 0 auto;
+  vertical-align: middle;
+}
+.app .nav-wa-btn,
+.app .nav-mobile .nav-mobile-wa-btn,
+.app .veh-card-wa-bar,
+.app .whatsapp-action-btn {
+  background: linear-gradient(135deg, #25D366 0%, #1fbd63 48%, #128C7E 100%) !important;
+  color: #fff !important;
+  -webkit-text-fill-color: #fff !important;
+  border: 1px solid rgba(255,255,255,.2) !important;
+  box-shadow: 0 7px 22px rgba(18,140,126,.2);
+}
+.app .nav-wa-btn {
+  gap: 9px;
+  padding: 10px 17px;
+  border-radius: 999px;
+  transition: transform .2s ease, box-shadow .2s ease, filter .2s ease;
+}
+.app .nav-wa-btn:hover,
+.app .nav-mobile .nav-mobile-wa-btn:hover,
+.app .veh-card-wa-bar:hover,
+.app .whatsapp-action-btn:hover {
+  filter: brightness(1.06);
+  box-shadow: 0 9px 26px rgba(37,211,102,.28) !important;
+}
+.app .nav-mobile .nav-mobile-wa-btn {
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  gap: 9px;
+  margin-top: 5px;
+  padding: 10px 15px;
+  border-radius: 999px;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 800;
+}
+.app .veh-card-wa-bar {
+  display: flex !important;
+  min-height: 48px !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 9px !important;
+  padding: 11px 16px !important;
+  border-radius: 0 !important;
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+  font-size: 12px !important;
+  font-weight: 850 !important;
+}
+.app .veh-card-wa-bar .veh-card-wa-label {
+  font-size: 12px !important;
+  line-height: 1.35;
+}
+.app .veh-card-wa-bar .whatsapp-icon {
+  width: 21px;
+  height: 21px;
+}
+.app .footer-social .footer-whatsapp-link {
+  display: inline-grid;
+  width: 39px;
+  height: 39px;
+  place-items: center;
+  border: 1px solid rgba(37,211,102,.35);
+  border-radius: 50%;
+  background: rgba(37,211,102,.12);
+  color: #25D366;
+  transition: transform .2s ease, background .2s ease, box-shadow .2s ease;
+}
+.app .footer-social .footer-whatsapp-link:hover {
+  background: #25D366;
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 7px 18px rgba(37,211,102,.25);
+}
+.app .whatsapp-action-btn {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 9px;
+  border-radius: 10px !important;
+  font-weight: 850 !important;
+  text-decoration: none;
+  transition: filter .2s ease, box-shadow .2s ease;
+}
+.app .wa-float-shell {
+  position: fixed;
+  z-index: 60;
+  right: calc(22px + env(safe-area-inset-right, 0px));
+  bottom: calc(22px + env(safe-area-inset-bottom, 0px));
+  width: 64px;
+  height: 64px;
+  touch-action: none;
+}
+.app .wa-float {
+  position: relative;
+  display: flex;
+  width: 64px;
+  height: 64px;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+  border: 3px solid rgba(255,255,255,.96);
+  border-radius: 50%;
+  background: linear-gradient(145deg, #2be477 0%, #25D366 48%, #0e9f6e 100%);
+  color: #fff !important;
+  -webkit-text-fill-color: #fff !important;
+  text-decoration: none;
+  box-shadow: 0 9px 28px rgba(18,140,126,.42), 0 3px 8px rgba(0,0,0,.2);
+  cursor: pointer;
+  transition: transform .2s ease, box-shadow .2s ease;
+  touch-action: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.app .wa-float::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: -7px;
+  border: 2px solid rgba(37,211,102,.38);
+  border-radius: 50%;
+  animation: waFloatPulse 2.4s ease-out infinite;
+  pointer-events: none;
+}
+.app .wa-float .whatsapp-icon {
+  width: 32px;
+  height: 32px;
+  filter: drop-shadow(0 1px 1px rgba(0,0,0,.12));
+}
+.app .wa-float:hover {
+  transform: translateY(-3px) scale(1.04);
+  box-shadow: 0 12px 32px rgba(18,140,126,.5), 0 4px 10px rgba(0,0,0,.2);
+}
+.app .wa-float-shell.is-dragging .wa-float {
+  cursor: grabbing;
+  transform: scale(1.06);
+  transition: none;
+  box-shadow: 0 13px 36px rgba(18,140,126,.5), 0 5px 14px rgba(0,0,0,.25);
+}
+.app .wa-float-close {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  z-index: 2;
+  display: grid;
+  width: 23px;
+  height: 23px;
+  place-items: center;
+  padding: 0;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  background: #ef4444;
+  color: #fff;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 900;
+  line-height: 1;
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(.75);
+  transition: opacity .16s ease, transform .16s ease;
+}
+.app .wa-float-shell:hover .wa-float-close,
+.app .wa-float-shell:focus-within .wa-float-close {
+  opacity: 1;
+  pointer-events: auto;
+  transform: scale(1);
+}
+.app .wa-dismiss-zone {
+  position: fixed;
+  z-index: 59;
+  left: 50%;
+  bottom: calc(18px + env(safe-area-inset-bottom, 0px));
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 8px 14px 8px 8px;
+  border: 1px solid rgba(255,255,255,.2);
+  border-radius: 999px;
+  background: rgba(20,25,30,.94);
+  color: #fff;
+  box-shadow: 0 8px 30px rgba(0,0,0,.3);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translate(-50%, 14px) scale(.92);
+  transition: opacity .18s ease, transform .18s ease, visibility .18s ease;
+}
+.app .wa-dismiss-zone.visible {
+  opacity: 1;
+  visibility: visible;
+  transform: translate(-50%, 0) scale(1);
+}
+.app .wa-dismiss-zone-icon {
+  display: grid;
+  width: 31px;
+  height: 31px;
+  place-items: center;
+  border-radius: 50%;
+  background: #ef4444;
+  color: #fff;
+  font-size: 22px;
+  font-weight: 500;
+  line-height: 1;
+}
+.app .wa-dismiss-zone small {
+  color: #fff;
+  font-size: 10px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+@keyframes waFloatPulse {
+  0% { opacity: .55; transform: scale(.94); }
+  75%, 100% { opacity: 0; transform: scale(1.22); }
+}
+@media (max-width: 720px) {
+  .app .wa-float-shell {
+    right: calc(15px + env(safe-area-inset-right, 0px));
+    bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+    width: 60px;
+    height: 60px;
+  }
+  .app .wa-float { width: 60px; height: 60px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .app .wa-float::before { animation: none; }
+  .app .wa-float,
+  .app .wa-float-close,
+  .app .wa-dismiss-zone { transition: none; }
+}
