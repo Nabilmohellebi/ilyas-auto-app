@@ -856,7 +856,7 @@
    ============================================================ */
 .app[data-theme="ivory"] {
   color-scheme: light;
-  background: #f4efe6 !important;
+  background: #eee7db !important;
   color: #463d32 !important;
 }
 .app[data-theme="ivory"] :where(
@@ -872,38 +872,38 @@
   .showroom-grid,.footer-auto,.veh-strip,.veh-strip-card,.announce-bar,
   .cmp-float-bar,.cmp-modal
 ) {
-  background: #f4efe6 !important;
+  background: #eee7db !important;
   color: #463d32 !important;
-  border-color: #e4dacb !important;
+  border-color: #ddd1c0 !important;
 }
 .app[data-theme="ivory"] .nav {
-  background: rgba(248, 244, 236, .96) !important;
-  border-bottom: 1px solid #e4dacb !important;
+  background: rgba(244, 236, 223, .97) !important;
+  border-bottom: 1px solid #ddd1c0 !important;
 }
 .app[data-theme="ivory"] .nav-mobile {
-  background: #f8f4ec !important;
-  border-color: #e4dacb !important;
+  background: #f4ecdf !important;
+  border-color: #ddd1c0 !important;
 }
 .app[data-theme="ivory"] .trust-bar,
 .app[data-theme="ivory"] .announce-bar,
 .app[data-theme="ivory"] .veh-strip,
 .app[data-theme="ivory"] .veh-strip-card {
-  background: #eee7db !important;
+  background: #e8dfd1 !important;
 }
 .app[data-theme="ivory"] .section,
 .app[data-theme="ivory"] .editorial-selection,
 .app[data-theme="ivory"] .testimonials-section,
 .app[data-theme="ivory"] .showroom-grid,
 .app[data-theme="ivory"] .footer-auto {
-  background: #f4efe6 !important;
+  background: #eee7db !important;
 }
 .app[data-theme="ivory"] .veh-card {
-  background: linear-gradient(155deg, #fffdf8 0%, #f1eadf 100%) !important;
-  border: 1px solid #e2d8c8 !important;
+  background: linear-gradient(155deg, #f7f0e5 0%, #eee5d8 100%) !important;
+  border: 1px solid #d9cbb7 !important;
   box-shadow: 0 8px 24px rgba(73, 57, 35, .08) !important;
 }
 .app[data-theme="ivory"] .veh-card-body {
-  background: #fffaf2 !important;
+  background: #f4ecdf !important;
   color: #463d32 !important;
 }
 .app[data-theme="ivory"] .veh-card-top h3,
@@ -927,15 +927,15 @@
   -webkit-text-fill-color: currentColor !important;
 }
 .app[data-theme="ivory"] .filters-bar {
-  background: #eee7db !important;
-  border: 1px solid #ded2c0 !important;
+  background: #e8dfd1 !important;
+  border: 1px solid #d9cbb7 !important;
   box-shadow: 0 8px 22px rgba(73, 57, 35, .055) !important;
 }
 .app[data-theme="ivory"] :where(input,select,textarea,option) {
   color: #463d32 !important;
   -webkit-text-fill-color: #463d32 !important;
-  background-color: #fbf8f1 !important;
-  border-color: #ded4c5 !important;
+  background-color: #f5eddf !important;
+  border-color: #d7c9b6 !important;
   caret-color: #463d32 !important;
 }
 .app[data-theme="ivory"] :where(input,textarea)::placeholder {
@@ -945,8 +945,8 @@
 }
 .app[data-theme="ivory"] .filters-bar input,
 .app[data-theme="ivory"] .filters-bar select {
-  background: #fbf8f1 !important;
-  border-color: #ded4c5 !important;
+  background: #f5eddf !important;
+  border-color: #d7c9b6 !important;
 }
 .app[data-theme="ivory"] .hero-eyebrow {
   background: rgba(70, 61, 50, .45) !important;
@@ -964,17 +964,17 @@
   -webkit-text-fill-color: #e8c77e !important;
 }
 .app[data-theme="ivory"] .vd-ov {
-  background: #f1ece3 !important;
+  background: #ece3d5 !important;
   color: #463d32 !important;
 }
 .app[data-theme="ivory"] .vd-gallery,
 .app[data-theme="ivory"] .vd-thumbs {
-  background: #e9e2d6 !important;
-  border-color: #ded4c5 !important;
+  background: #e5dac9 !important;
+  border-color: #d7c9b6 !important;
 }
 .app[data-theme="ivory"] .vd-info {
-  background: linear-gradient(155deg, #fffaf2 0%, #f5eee3 100%) !important;
-  border-color: #e2d8c8 !important;
+  background: linear-gradient(155deg, #f4ecdf 0%, #eee4d4 100%) !important;
+  border-color: #d9cbb7 !important;
   color: #463d32 !important;
 }
 .app[data-theme="ivory"] .vd-section,
@@ -982,13 +982,13 @@
 .app[data-theme="ivory"] .cmp-table th,
 .app[data-theme="ivory"] .cmp-table td,
 .app[data-theme="ivory"] .cmp-float-chip {
-  background: #f6f0e6 !important;
-  border-color: #e1d7c8 !important;
+  background: #eee4d4 !important;
+  border-color: #d8cbb8 !important;
   color: #514638 !important;
 }
 .app[data-theme="ivory"] .vd-bottom {
-  background: rgba(248, 244, 236, .97) !important;
-  border-top-color: #ded4c5 !important;
+  background: rgba(238, 231, 219, .98) !important;
+  border-top-color: #d7c9b6 !important;
 }
 .app[data-theme="ivory"] .vd-title,
 .app[data-theme="ivory"] .vd-section h3 {
@@ -1017,14 +1017,14 @@
 }
 .app[data-theme="ivory"] .theme-toggle {
   color: #463d32 !important;
-  background: #eee7db !important;
-  border-color: #ded2c0 !important;
+  background: #e8dfd1 !important;
+  border-color: #d9cbb7 !important;
 }
 .app[data-theme="ivory"] .veh-strip-fade.left {
-  background: linear-gradient(90deg, #eee7db, transparent) !important;
+  background: linear-gradient(90deg, #e8dfd1, transparent) !important;
 }
 .app[data-theme="ivory"] .veh-strip-fade.right {
-  background: linear-gradient(270deg, #eee7db, transparent) !important;
+  background: linear-gradient(270deg, #e8dfd1, transparent) !important;
 }
 .app[data-theme="ivory"] svg,
 .app[data-theme="ivory"] svg * {
