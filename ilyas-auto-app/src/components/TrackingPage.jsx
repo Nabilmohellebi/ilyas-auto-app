@@ -37,7 +37,7 @@ export default function TrackingPage({ onClose }) {
 
   return (
     <div className="res-ov" onClick={e => e.target === e.currentTarget && onClose()}>
-      <div className="res-box" style={{ maxWidth: 480 }}>
+      <div className="res-box track-modal" style={{ maxWidth: 480 }}>
         <button className="btn-close" onClick={onClose}>✕</button>
         <h2 style={{ fontFamily: 'var(--ff)', fontSize: 20, fontWeight: 900, color: 'white', marginBottom: 4 }}>{t.tracking.titre}</h2>
         <p style={{ fontSize: 12.5, color: 'rgba(255,255,255,.5)', marginBottom: 16 }}>{t.tracking.desc}</p>
@@ -57,7 +57,7 @@ export default function TrackingPage({ onClose }) {
             </div>
 
             {cancelled ? (
-              <div style={{ background: 'rgba(255,255,255,.05)', border: '1px solid rgba(255,255,255,.1)', borderRadius: 10, padding: 14, textAlign: 'center', color: 'rgba(255,255,255,.5)', fontSize: 13 }}>
+              <div className="track-cancelled" style={{ background: 'rgba(255,255,255,.05)', border: '1px solid rgba(255,255,255,.1)', borderRadius: 10, padding: 14, textAlign: 'center', color: 'rgba(255,255,255,.5)', fontSize: 13 }}>
                 {t.tracking.annulee}
               </div>
             ) : (

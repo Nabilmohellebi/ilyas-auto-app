@@ -1102,3 +1102,86 @@
   color: #8d642b !important;
   -webkit-text-fill-color: #8d642b !important;
 }
+
+
+/* Suivi de commande — thème sombre et ivoire, sans texte pâle sur fond blanc. */
+.app[data-theme] .track-modal {
+  color: var(--theme-text) !important;
+  background: var(--theme-surface) !important;
+  border-color: var(--theme-border) !important;
+  box-shadow: 0 24px 80px rgba(0,0,0,.38) !important;
+}
+.app[data-theme] .track-modal h2 {
+  color: var(--theme-text) !important;
+  -webkit-text-fill-color: var(--theme-text) !important;
+}
+.app[data-theme] .track-modal > p,
+.app[data-theme] .track-modal .track-summary .lbl,
+.app[data-theme] .track-modal .track-desc {
+  color: var(--theme-muted) !important;
+  -webkit-text-fill-color: var(--theme-muted) !important;
+}
+.app[data-theme] .track-modal .track-input {
+  background: var(--theme-field) !important;
+  border-color: var(--theme-border) !important;
+  color: var(--theme-text) !important;
+  -webkit-text-fill-color: var(--theme-text) !important;
+}
+.app[data-theme] .track-modal .track-summary {
+  background: var(--theme-surface-raised) !important;
+  border-color: var(--theme-border) !important;
+}
+.app[data-theme] .track-modal .track-summary strong {
+  color: var(--theme-text) !important;
+  -webkit-text-fill-color: var(--theme-text) !important;
+}
+.app[data-theme] .track-modal .track-summary > div:nth-child(2) strong {
+  color: var(--brand-accent, #bd9557) !important;
+  -webkit-text-fill-color: var(--brand-accent, #bd9557) !important;
+}
+.app[data-theme] .track-modal .track-line {
+  background: var(--theme-border) !important;
+}
+.app[data-theme] .track-modal .track-line.done {
+  background: var(--brand-accent, #bd9557) !important;
+}
+.app[data-theme] .track-modal .track-icon {
+  background: var(--theme-surface-raised) !important;
+  border-color: var(--theme-border) !important;
+}
+.app[data-theme] .track-modal .track-icon.done {
+  background: rgba(190,150,85,.16) !important;
+  border-color: var(--brand-accent, #bd9557) !important;
+}
+.app[data-theme] .track-modal .track-label {
+  color: var(--theme-muted) !important;
+  -webkit-text-fill-color: var(--theme-muted) !important;
+}
+.app[data-theme] .track-modal .track-label.done {
+  color: var(--theme-text) !important;
+  -webkit-text-fill-color: var(--theme-text) !important;
+}
+.app[data-theme] .track-modal .track-current-tag {
+  color: #9a202b !important;
+  -webkit-text-fill-color: #9a202b !important;
+  background: rgba(190,45,60,.12) !important;
+  border-color: rgba(190,45,60,.28) !important;
+}
+.app[data-theme="dark"] .track-modal .track-current-tag {
+  color: #ff9aa3 !important;
+  -webkit-text-fill-color: #ff9aa3 !important;
+  background: rgba(255,101,112,.14) !important;
+  border-color: rgba(255,101,112,.32) !important;
+}
+.app[data-theme] .track-modal .track-cancelled {
+  background: var(--theme-surface-raised) !important;
+  border-color: var(--theme-border) !important;
+  color: var(--theme-muted) !important;
+  -webkit-text-fill-color: var(--theme-muted) !important;
+}
+.app[data-theme] .track-modal .btn-close {
+  background: var(--theme-surface-raised) !important;
+  border-color: var(--theme-border) !important;
+  color: var(--theme-text) !important;
+  -webkit-text-fill-color: var(--theme-text) !important;
+}
