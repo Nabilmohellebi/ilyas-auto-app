@@ -1572,3 +1572,72 @@
   .app[data-theme] .catalogue-share-btn { min-height: 42px; }
   .app[data-theme] .catalogue-share-feedback { margin: -5px 0 12px; }
 }
+
+
+/* Favorite and vehicle origin now share a dedicated top row instead of overlapping. */
+.app[data-theme] .veh-card-top-overlay {
+  position: absolute;
+  z-index: 5;
+  top: 12px;
+  left: 12px;
+  right: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  pointer-events: none;
+}
+.app[data-theme] .veh-card-top-overlay .veh-statut-badge {
+  position: static;
+  flex: 0 1 auto;
+  max-width: 42%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.app[data-theme] .veh-card-overlay-actions {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 8px;
+  pointer-events: none;
+}
+.app[data-theme] .veh-card-top-overlay .veh-flag-badge {
+  position: static;
+  flex: 0 1 auto;
+  max-width: clamp(88px, 28vw, 150px);
+  min-width: 0;
+  overflow: hidden;
+  padding: 5px 9px;
+  white-space: nowrap;
+}
+.app[data-theme] .veh-card-top-overlay .veh-flag-badge img {
+  flex: 0 0 14px;
+}
+.app[data-theme] .veh-card-top-overlay .veh-flag-badge span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.app[data-theme] .veh-card-top-overlay .veh-favorite-btn {
+  position: relative;
+  top: auto;
+  right: auto;
+  flex: 0 0 40px;
+  pointer-events: auto;
+}
+@media (max-width: 520px) {
+  .app[data-theme] .veh-card-top-overlay {
+    top: 10px;
+    left: 10px;
+    right: 10px;
+  }
+  .app[data-theme] .veh-card-top-overlay .veh-flag-badge {
+    max-width: clamp(82px, 30vw, 132px);
+  }
+  .app[data-theme] .veh-card-top-overlay .veh-favorite-btn {
+    width: 38px;
+    height: 38px;
+    flex-basis: 38px;
+  }
+}
