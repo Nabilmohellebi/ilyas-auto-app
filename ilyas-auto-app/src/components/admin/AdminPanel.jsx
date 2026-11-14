@@ -1,6 +1,6 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { supabase } from '../../supabase'
-import { saveSetting, getSettings, parseBrandIdentity, DEFAULT_BRAND_IDENTITY } from '../../utils/useSettings'
+import { saveSetting, getSettings, parseBrandIdentity, parseShowroomHeroImages, DEFAULT_BRAND_IDENTITY } from '../../utils/useSettings'
 import { openWA, fmt } from '../../utils/notify'
 import { STATUTS, PLACEHOLDER_IMG, flagURI } from '../../data/vehicles-data'
 import VehicleForm from './VehicleForm'
@@ -43,16 +43,25 @@ function AdminSettings({ onLogout, onToast, onBrandNameChange }) {
   const [themeSaving, setThemeSaving] = useState(false)
   const [brandIdentity, setBrandIdentity] = useState(DEFAULT_BRAND_IDENTITY)
   const [brandSaving, setBrandSaving] = useState(false)
-
-  const previewWords = (shop.name || 'Nabil Auto').trim().split(/\s+/).filter(Boolean)
-  const previewAccent = previewWords.pop() || 'Auto'
-  const previewMain = previewWords.join(' ')
+  const [logoUploading, setLogoUploading] = useState(false)
+  const [heroImages, setHeroImages] = useState([])
+  const [heroUploading, setHeroUploading] = useState(false)
+  const [heroSaving, setHeroSaving] = useState(false)
+  const logoInputRef = useRef(null)
+  const heroInputRef = useRef(null)
+  const initialLogoPath = useRef('')
+  const initialHeroPaths = useRef([])
 
   useEffect(() => {
     getSettings().then(s => {
       setTradeMarginPercent(String(s.trade_margin_percent ?? '5'))
       setSiteTheme(['light', 'ivory', 'dark'].includes(s.site_theme) ? s.site_theme : 'light')
-      setBrandIdentity(parseBrandIdentity(s.brand_identity))
+      const savedBrand = parseBrandIdentity(s.brand_identity)
+      setBrandIdentity(savedBrand)
+      initialLogoPath.current = savedBrand.logoPath
+      const savedHeroImages = parseShowroomHeroImages(s.hero_images)
+      setHeroImages(savedHeroImages)
+      initialHeroPaths.current = savedHeroImages.map(image => image.path).filter(Boolean)
       setShop({
         name: s.shop_name || 'Nabil Auto',
         phone: s.shop_phone || '',
@@ -87,15 +96,122 @@ function AdminSettings({ onLogout, onToast, onBrandNameChange }) {
     }
   }
 
+  function makeMediaPath(folder, file) {
+    const extensionByType = {
+      'image/jpeg': 'jpg',
+      'image/png': 'png',
+      'image/webp': 'webp',
+      'image/svg+xml': 'svg',
+      'image/avif': 'avif',
+    }
+    const extension = extensionByType[file.type]
+    if (!extension) throw new Error('Format non accepté. Utilise JPG, PNG, WEBP, SVG ou AVIF.')
+    const id = window.crypto?.randomUUID?.() || (Date.now() + '-' + Math.random().toString(36).slice(2))
+    return `${folder}/${id}.${extension}`
+  }
+
+  async function uploadShowroomImage(file, folder) {
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/svg+xml', 'image/avif']
+    if (!allowedTypes.includes(file.type)) throw new Error('Format non accepté. Utilise JPG, PNG, WEBP, SVG ou AVIF.')
+    if (file.size > 8 * 1024 * 1024) throw new Error('Chaque image doit faire 8 Mo maximum.')
+    const path = makeMediaPath(folder, file)
+    const { data, error } = await supabase.storage
+      .from('showroom-media')
+      .upload(path, file, {
+        cacheControl: '31536000',
+        contentType: file.type,
+        upsert: false,
+      })
+    if (error) throw error
+    const { data: publicData } = supabase.storage.from('showroom-media').getPublicUrl(data.path)
+    return { url: publicData.publicUrl, path: data.path }
+  }
+
+  async function handleLogoUpload(event) {
+    const file = event.target.files?.[0]
+    event.target.value = ''
+    if (!file) return
+    setLogoUploading(true)
+    try {
+      const image = await uploadShowroomImage(file, 'logo')
+      setBrandIdentity(current => ({ ...current, ...image }))
+      onToast && onToast('✅ Logo importé. Clique sur « Enregistrer le logo » pour le publier.', 'default')
+    } catch (e) {
+      onToast && onToast('❌ Impossible d’importer le logo : ' + e.message, 'error')
+    } finally {
+      setLogoUploading(false)
+    }
+  }
+
+  async function handleHeroUpload(event) {
+    const files = Array.from(event.target.files || [])
+    event.target.value = ''
+    if (!files.length) return
+    if (heroImages.length + files.length > 6) {
+      onToast && onToast('❌ Tu peux afficher 6 photos de couverture maximum.', 'error')
+      return
+    }
+    setHeroUploading(true)
+    try {
+      const uploaded = []
+      for (const file of files) uploaded.push(await uploadShowroomImage(file, 'hero'))
+      setHeroImages(current => [...current, ...uploaded])
+      onToast && onToast(`✅ ${uploaded.length} photo(s) importée(s). Clique sur « Enregistrer les photos » pour publier.`, 'default')
+    } catch (e) {
+      onToast && onToast('❌ Import des photos interrompu : ' + e.message, 'error')
+    } finally {
+      setHeroUploading(false)
+    }
+  }
+
   async function saveBrandIdentity() {
     setBrandSaving(true)
     try {
-      await saveSetting('brand_identity', JSON.stringify(parseBrandIdentity(brandIdentity)))
-      onToast && onToast('✅ Style du logo enregistré', 'default')
+      const nextBrand = parseBrandIdentity(brandIdentity)
+      await saveSetting('brand_identity', JSON.stringify(nextBrand))
+      const oldPath = initialLogoPath.current
+      if (oldPath && oldPath !== nextBrand.logoPath) {
+        const { error: removeError } = await supabase.storage.from('showroom-media').remove([oldPath])
+        if (removeError) console.warn('Ancien logo conservé dans le stockage :', removeError)
+      }
+      initialLogoPath.current = nextBrand.logoPath
+      setBrandIdentity(nextBrand)
+      onToast && onToast(nextBrand.logoUrl ? '✅ Ton logo est maintenant publié sur le site.' : '✅ Logo personnalisé retiré.', 'default')
     } catch (e) {
-      onToast && onToast('❌ Impossible d’enregistrer le style : ' + e.message, 'error')
+      onToast && onToast('❌ Impossible d’enregistrer le logo : ' + e.message, 'error')
     } finally {
       setBrandSaving(false)
+    }
+  }
+
+  function moveHeroImage(index, direction) {
+    setHeroImages(current => {
+      const next = [...current]
+      const target = index + direction
+      if (target < 0 || target >= next.length) return current
+      ;[next[index], next[target]] = [next[target], next[index]]
+      return next
+    })
+  }
+
+  async function saveHeroImages() {
+    setHeroSaving(true)
+    try {
+      const nextImages = parseShowroomHeroImages(heroImages)
+      await saveSetting('hero_images', JSON.stringify(nextImages))
+      const keepPaths = new Set(nextImages.map(image => image.path).filter(Boolean))
+      const obsoletePaths = initialHeroPaths.current.filter(path => !keepPaths.has(path))
+      if (obsoletePaths.length) {
+        const { error: removeError } = await supabase.storage.from('showroom-media').remove(obsoletePaths)
+        if (removeError) console.warn('Certaines anciennes photos sont restées dans le stockage :', removeError)
+      }
+      initialHeroPaths.current = nextImages.map(image => image.path).filter(Boolean)
+      setHeroImages(nextImages)
+      onToast && onToast('✅ Photos de couverture enregistrées.', 'default')
+    } catch (e) {
+      onToast && onToast('❌ Impossible d’enregistrer les photos : ' + e.message, 'error')
+    } finally {
+      setHeroSaving(false)
     }
   }
 
@@ -253,68 +369,80 @@ function AdminSettings({ onLogout, onToast, onBrandNameChange }) {
       <div className="pf-section brand-identity-settings" style={{ marginBottom: 14 }}>
         <h3>✨ Identité visuelle du showroom</h3>
         <p className="brand-settings-help">
-          Personnalise le nom à gauche du site : aperçu en direct, finition métallique et typographie.
-          Le choix du style ne modifie pas ton adresse web.
+          Importe ton propre logo : il remplacera le nom texte dans la barre supérieure du site. Le fichier peut être changé à tout moment.
         </p>
-        <div className={`brand-editor-preview nav-brand-font--${brandIdentity.fontStyle}`} style={{ '--brand-accent': brandIdentity.accentColor }}>
-          <span className="nav-brand-mark" aria-hidden="true"><span>✦</span></span>
-          <span className="nav-brand-copy">
-            <span className="nav-brand-name">
-              {previewMain && <span className="nav-brand-main">{previewMain} </span>}
-              <span className="nav-brand-accent">{previewAccent}</span>
-            </span>
-            <span className="nav-brand-caption">SHOWROOM AUTOMOBILE</span>
-          </span>
+        <div className="brand-editor-preview brand-logo-editor-preview">
+          {brandIdentity.logoUrl
+            ? <img className="brand-logo-preview-image" src={brandIdentity.logoUrl} alt="Aperçu du logo importé" />
+            : <span className="brand-preview-fallback">{shop.name || 'Nom du showroom'}</span>}
         </div>
-        <div className="brand-identity-controls">
-          <div className="form-field">
-            <label>Typographie du logo</label>
-            <select
-              value={brandIdentity.fontStyle}
-              onChange={e => setBrandIdentity(s => ({ ...s, fontStyle: e.target.value }))}
-            >
-              <option value="sport">Sportive et puissante</option>
-              <option value="elegant">Élégante et premium</option>
-              <option value="modern">Moderne et épurée</option>
-            </select>
-          </div>
-          <div className="form-field">
-            <label>Couleur du dernier mot</label>
-            <div className="brand-color-presets">
-              {[
-                { label: 'Or', color: '#d7b15f' },
-                { label: 'Argent', color: '#aeb8c4' },
-                { label: 'Rouge', color: '#d43b4c' },
-                { label: 'Bleu', color: '#78a9d6' },
-              ].map(option => (
-                <button
-                  type="button"
-                  key={option.label}
-                  className={`brand-color-preset ${brandIdentity.accentColor.toLowerCase() === option.color ? 'active' : ''}`}
-                  onClick={() => setBrandIdentity(s => ({ ...s, accentColor: option.color }))}
-                  title={option.label}
-                  aria-label={`Choisir la finition ${option.label.toLowerCase()}`}
-                >
-                  <span style={{ background: option.color }} />
-                  {option.label}
-                </button>
-              ))}
-            </div>
-            <div className="brand-custom-color">
-              <span>Couleur personnalisée</span>
-              <input
-                aria-label="Couleur personnalisée du logo"
-                type="color"
-                value={brandIdentity.accentColor}
-                onChange={e => setBrandIdentity(s => ({ ...s, accentColor: e.target.value }))}
-              />
-              <code>{brandIdentity.accentColor.toUpperCase()}</code>
-            </div>
-          </div>
+        <input
+          ref={logoInputRef}
+          type="file"
+          accept="image/png,image/jpeg,image/webp,image/svg+xml,image/avif"
+          style={{ display: 'none' }}
+          onChange={handleLogoUpload}
+        />
+        <div className="brand-logo-actions">
+          <button type="button" className="act-btn" onClick={() => logoInputRef.current?.click()} disabled={logoUploading}>
+            {logoUploading ? '⏳ Import en cours…' : brandIdentity.logoUrl ? '📁 Remplacer mon logo' : '📁 Importer mon logo'}
+          </button>
+          {brandIdentity.logoUrl && (
+            <button type="button" className="act-btn brand-logo-remove" onClick={() => setBrandIdentity(current => ({ ...current, logoUrl: '', logoPath: '' }))}>
+              ✕ Retirer
+            </button>
+          )}
         </div>
-        <button className="btn-save" onClick={saveBrandIdentity} disabled={brandSaving}>
-          {brandSaving ? '⏳...' : '💾 Enregistrer le style du logo'}
+        <p className="brand-settings-help">
+          Formats acceptés : PNG, JPG, WEBP, SVG ou AVIF (8 Mo maximum). Ton image remplacera le logo texte dans l’en-tête du site.
+        </p>
+        <button className="btn-save" onClick={saveBrandIdentity} disabled={brandSaving || logoUploading}>
+          {brandSaving ? '⏳...' : '💾 Enregistrer le logo'}
         </button>
+      </div>
+
+      <div className="pf-section showroom-hero-settings" style={{ marginBottom: 14 }}>
+        <h3>📸 Photo de couverture du site</h3>
+        <p className="brand-settings-help">
+          Gère les grandes photos affichées tout en haut de la page d’accueil. Ajoute jusqu’à 6 photos : elles défileront automatiquement. Si tu n’en ajoutes aucune, le site continuera d’utiliser les photos des véhicules.
+        </p>
+        <input
+          ref={heroInputRef}
+          type="file"
+          accept="image/png,image/jpeg,image/webp,image/avif"
+          multiple
+          style={{ display: 'none' }}
+          onChange={handleHeroUpload}
+        />
+        {heroImages.length > 0 ? (
+          <div className="showroom-hero-admin-grid">
+            {heroImages.map((image, index) => (
+              <div className="showroom-hero-admin-card" key={image.path || image.url}>
+                <img src={image.url} alt={`Photo de couverture ${index + 1}`} />
+                <div className="showroom-hero-admin-card-footer">
+                  <span>Photo {index + 1}</span>
+                  <div>
+                    <button type="button" onClick={() => moveHeroImage(index, -1)} disabled={index === 0} aria-label="Déplacer la photo vers la gauche">←</button>
+                    <button type="button" onClick={() => moveHeroImage(index, 1)} disabled={index === heroImages.length - 1} aria-label="Déplacer la photo vers la droite">→</button>
+                    <button type="button" className="remove" onClick={() => setHeroImages(current => current.filter((_, i) => i !== index))} aria-label="Retirer cette photo">✕</button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="showroom-hero-empty">Aucune photo personnalisée. Les photos des véhicules du stock sont utilisées pour le moment.</div>
+        )}
+        <div className="showroom-hero-actions">
+          <button type="button" className="act-btn" onClick={() => heroInputRef.current?.click()} disabled={heroUploading || heroImages.length >= 6}>
+            {heroUploading ? '⏳ Import en cours…' : '+ Ajouter des photos'}
+          </button>
+          <span>{heroImages.length}/6 photos</span>
+          <button className="btn-save" onClick={saveHeroImages} disabled={heroSaving || heroUploading}>
+            {heroSaving ? '⏳...' : '💾 Enregistrer les photos'}
+          </button>
+        </div>
+        <p className="brand-settings-help">JPG, PNG, WEBP ou AVIF · 8 Mo maximum par image. Les photos sont affichées dans l’ordre choisi ci-dessus.</p>
       </div>
 
       <div className="pf-section" style={{ marginBottom: 14 }}>
@@ -324,7 +452,7 @@ function AdminSettings({ onLogout, onToast, onBrandNameChange }) {
             <label>Nom du showroom (logo à gauche)</label>
             <input value={shop.name} maxLength={100} onChange={e => setShop(s => ({ ...s, name: e.target.value }))} />
             <small style={{ display: 'block', color: 'rgba(255,255,255,.42)', fontSize: 11, lineHeight: 1.5, marginTop: 6 }}>
-              Ce nom apparaît dans le logo à gauche, le titre du site et l’adresse .vercel.app. Son changement peut donc aussi renommer l’adresse Vercel.
+              Ce nom apparaît dans le titre du site et dans le texte de remplacement tant qu’aucun logo personnalisé n’est importé. Son changement peut aussi renommer l’adresse Vercel.
             </small>
           </div>
           <div className="form-field"><label>Téléphone</label><input value={shop.phone} onChange={e => setShop(s => ({ ...s, phone: e.target.value }))} type="tel" /></div>

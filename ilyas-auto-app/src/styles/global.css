@@ -1977,3 +1977,128 @@ input, select, textarea { font-family: var(--fb); outline: none; }
 @media (prefers-reduced-motion: reduce) {
   .app[data-theme] .vehicle-category-tabs button { transition: none; }
 }
+
+
+/* Administrator-provided showroom logo (replaces the generated wordmark). */
+.app .nav-brand {
+  max-width: min(42vw, 250px);
+  overflow: hidden;
+}
+.app .nav-custom-logo {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: min(220px, 38vw);
+  max-height: 54px;
+  object-fit: contain;
+  object-position: left center;
+}
+.app .nav-brand-fallback {
+  display: block;
+  max-width: 100%;
+  overflow: hidden;
+  color: var(--theme-text, #25252b);
+  font-family: var(--ff, system-ui, sans-serif);
+  font-size: 21px;
+  font-weight: 900;
+  letter-spacing: -.045em;
+  line-height: 1.1;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.app[data-theme="dark"] .nav-brand-fallback { color: #f4f4f5; }
+.app[data-theme="ivory"] .nav-brand-fallback { color: #463d32; }
+.brand-logo-editor-preview {
+  min-height: 102px;
+  justify-content: center;
+  background: linear-gradient(135deg, #202127, #111216);
+}
+.brand-logo-preview-image {
+  display: block;
+  max-width: min(100%, 300px);
+  max-height: 76px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}
+.brand-preview-fallback {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  color: #f4f4f5;
+  font-size: 25px;
+  font-weight: 900;
+  letter-spacing: -.04em;
+}
+.brand-logo-actions,
+.showroom-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 9px;
+  margin: 12px 0 5px;
+}
+.brand-logo-remove { color: #ffb3b8 !important; border-color: rgba(230,57,70,.3) !important; }
+.showroom-hero-admin-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 12px;
+  margin: 14px 0;
+}
+.showroom-hero-admin-card {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 10px;
+  background: rgba(255,255,255,.035);
+}
+.showroom-hero-admin-card > img {
+  display: block;
+  width: 100%;
+  height: 112px;
+  object-fit: cover;
+  background: #111216;
+}
+.showroom-hero-admin-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px;
+  color: rgba(244,242,237,.82);
+  font-size: 11px;
+  font-weight: 700;
+}
+.showroom-hero-admin-card-footer > div { display: flex; gap: 4px; }
+.showroom-hero-admin-card-footer button {
+  width: 27px;
+  height: 27px;
+  border: 1px solid rgba(255,255,255,.14);
+  border-radius: 6px;
+  background: rgba(255,255,255,.06);
+  color: #f4f2ed;
+  cursor: pointer;
+}
+.showroom-hero-admin-card-footer button:disabled { opacity: .35; cursor: not-allowed; }
+.showroom-hero-admin-card-footer button.remove {
+  color: #ffb3b8;
+  border-color: rgba(230,57,70,.3);
+}
+.showroom-hero-actions > span {
+  color: rgba(244,242,237,.5);
+  font-size: 11px;
+  font-weight: 700;
+}
+.showroom-hero-empty {
+  padding: 18px;
+  border: 1px dashed rgba(255,255,255,.2);
+  border-radius: 10px;
+  color: rgba(244,242,237,.56);
+  font-size: 12px;
+  line-height: 1.6;
+}
+@media (max-width: 720px) {
+  .app .nav-brand { max-width: min(48vw, 190px); }
+  .app .nav-custom-logo { max-width: min(150px, 39vw); max-height: 44px; }
+  .app .nav-brand-fallback { font-size: 18px; }
+  .showroom-hero-admin-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+}

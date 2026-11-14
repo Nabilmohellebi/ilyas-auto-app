@@ -2,7 +2,7 @@ import { lazy, Suspense, useState, useEffect, useMemo } from 'react'
 import { supabase } from '../supabase'
 import { fmt, waLink } from '../utils/notify'
 import { ORIGINS, flagURI, PLACEHOLDER_IMG, BODY_TYPES } from '../data/vehicles-data'
-import { getSettings, parseBrandIdentity } from '../utils/useSettings'
+import { getSettings, parseBrandIdentity, parseShowroomHeroImages } from '../utils/useSettings'
 import { statutLabel } from '../i18n/translations'
 import { LangProvider, useLang } from '../i18n/LangContext'
 const ReservationModal = lazy(() => import('./ReservationModal'))
@@ -120,12 +120,8 @@ function PublicSiteInner() {
 
   const brandIdentity = useMemo(() => parseBrandIdentity(settings.brand_identity), [settings.brand_identity])
 
-  // ── Logo dynamique — dernier mot du nom mis en avant (accent) ──
-  const logoParts = useMemo(() => {
-    const words = (s.nom || 'Nabil Auto').trim().split(' ')
-    const last = words.pop()
-    return { rest: words.join(' '), last }
-  }, [s.nom])
+  // Logo fourni par l'administrateur ; à défaut, le nom reste en texte simple.
+  const showroomLogoUrl = brandIdentity.logoUrl
 
   useEffect(() => {
     const title = `${s.nom} — Véhicules neufs & d’occasion`
@@ -153,13 +149,20 @@ function PublicSiteInner() {
 
   const brands = useMemo(() => [...new Set(vehicles.map(v => v.marque))].sort(), [vehicles])
 
-  const heroImages = useMemo(() => vehicles.filter(v => v.img).slice(0, 3).map(v => v.img), [vehicles])
+  const customHeroImages = useMemo(() => parseShowroomHeroImages(settings.hero_images), [settings.hero_images])
+  const heroImages = useMemo(
+    () => customHeroImages.length
+      ? customHeroImages.map(image => image.url)
+      : vehicles.filter(v => v.img).slice(0, 3).map(v => v.img),
+    [customHeroImages, vehicles]
+  )
 
   useEffect(() => {
+    setHeroIdx(0)
     if (heroImages.length < 2) return
     const id = setInterval(() => setHeroIdx(i => (i + 1) % heroImages.length), 5000)
     return () => clearInterval(id)
-  }, [heroImages.length])
+  }, [heroImages.length, settings.hero_images])
 
   function toggleCompare(v) {
     setCompareList(prev => {
@@ -244,18 +247,12 @@ function PublicSiteInner() {
         <div className="nav-inner">
           <a
             href="#accueil"
-            className={`nav-logo nav-brand nav-brand-font--${brandIdentity.fontStyle}`}
-            style={{ '--brand-accent': brandIdentity.accentColor }}
+            className="nav-logo nav-brand"
             aria-label={s.nom}
           >
-            <span className="nav-brand-mark" aria-hidden="true"><span>✦</span></span>
-            <span className="nav-brand-copy">
-              <span className="nav-brand-name">
-                {logoParts.rest && <span className="nav-brand-main">{logoParts.rest} </span>}
-                <span className="nav-brand-accent">{logoParts.last}</span>
-              </span>
-              <span className="nav-brand-caption">{lang === 'ar' ? 'معرض السيارات' : 'SHOWROOM AUTOMOBILE'}</span>
-            </span>
+            {showroomLogoUrl
+              ? <img className="nav-custom-logo" src={showroomLogoUrl} alt={s.nom} />
+              : <span className="nav-brand-fallback">{s.nom}</span>}
           </a>
           <button type="button" onClick={togglePublicTheme} className="theme-toggle mobile-theme-toggle" aria-pressed={publicTheme === "dark"} aria-label={publicTheme === 'dark' ? 'Activer le mode clair' : 'Activer le mode sombre'} title={publicTheme === 'dark' ? 'Mode clair' : 'Mode sombre'}><span aria-hidden="true">{publicTheme === 'dark' ? '☀️' : '🌙'}</span><span className="theme-toggle-label">{publicTheme === 'dark' ? 'Clair' : 'Sombre'}</span></button>
           <div className="nav-links">
