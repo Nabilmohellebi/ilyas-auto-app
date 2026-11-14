@@ -1,6 +1,20 @@
 import { useRef, useState } from 'react'
 import WhatsAppIcon from './WhatsAppIcon'
 
+const DISMISS_ZONE_HEIGHT = 126
+const DISMISS_ZONE_HALF_WIDTH = 118
+
+function isWhatsAppUrl(value) {
+  try {
+    const url = new URL(value)
+    return url.protocol === 'https:'
+      && url.hostname === 'wa.me'
+      && /^\\d{8,15}$/.test(url.pathname.replace(/^\\//, ''))
+  } catch {
+    return false
+  }
+}
+
 export default function WhatsAppFloatingButton({ href, lang = 'fr' }) {
   const [dismissed, setDismissed] = useState(false)
   const [dragging, setDragging] = useState(false)
@@ -9,8 +23,7 @@ export default function WhatsAppFloatingButton({ href, lang = 'fr' }) {
   const suppressClick = useRef(false)
 
   function handlePointerDown(event) {
-    if (event.pointerType !== 'touch') return
-
+    if (event.pointerType !== 'touch' && event.pointerType !== 'pen') return
     const rect = event.currentTarget.getBoundingClientRect()
     drag.current = {
       pointerId: event.pointerId,
@@ -19,7 +32,6 @@ export default function WhatsAppFloatingButton({ href, lang = 'fr' }) {
       rect,
       moved: false,
     }
-
     try {
       event.currentTarget.setPointerCapture(event.pointerId)
     } catch {}
@@ -31,15 +43,16 @@ export default function WhatsAppFloatingButton({ href, lang = 'fr' }) {
 
     const deltaX = event.clientX - current.startX
     const deltaY = event.clientY - current.startY
-    if (!current.moved && Math.hypot(deltaX, deltaY) < 9) return
+    if (!current.moved && Math.hypot(deltaX, deltaY) < 10) return
 
     current.moved = true
+    suppressClick.current = true
     setDragging(true)
 
     const width = current.rect.width
     const height = current.rect.height
-    const left = Math.max(10, Math.min(window.innerWidth - width - 10, current.rect.left + deltaX))
-    const top = Math.max(10, Math.min(window.innerHeight - height - 10, current.rect.top + deltaY))
+    const left = Math.max(8, Math.min(window.innerWidth - width - 8, current.rect.left + deltaX))
+    const top = Math.max(8, Math.min(window.innerHeight - height - 8, current.rect.top + deltaY))
     setPosition({ left, top })
   }
 
@@ -47,23 +60,22 @@ export default function WhatsAppFloatingButton({ href, lang = 'fr' }) {
     const current = drag.current
     if (!current || current.pointerId !== event.pointerId) return
     drag.current = null
-
     if (!current.moved) return
 
-    suppressClick.current = true
     setDragging(false)
+    const nearBottom = event.clientY >= window.innerHeight - DISMISS_ZONE_HEIGHT
+    const nearCenter = Math.abs(event.clientX - window.innerWidth / 2) <= DISMISS_ZONE_HALF_WIDTH
+    if (nearBottom && nearCenter) {
+      setDismissed(true)
+      return
+    }
 
-    const droppedOnDismiss = event.clientY >= window.innerHeight - 112
-      && Math.abs(event.clientX - window.innerWidth / 2) <= 92
-
-    if (droppedOnDismiss) setDismissed(true)
-  }
-
-  function handleClick(event) {
-    if (!suppressClick.current) return
-    event.preventDefault()
-    event.stopPropagation()
-    suppressClick.current = false
+    // Keep the bubble at its new position when released outside the red dismiss target.
+    const width = current.rect.width
+    const height = current.rect.height
+    const left = Math.max(8, Math.min(window.innerWidth - width - 8, event.clientX - width / 2))
+    const top = Math.max(8, Math.min(window.innerHeight - height - 8, event.clientY - height / 2))
+    setPosition({ left, top })
   }
 
   function cancelDrag(event) {
@@ -71,12 +83,24 @@ export default function WhatsAppFloatingButton({ href, lang = 'fr' }) {
     if (!current || current.pointerId !== event.pointerId) return
     drag.current = null
     if (current.moved) {
-      suppressClick.current = true
       setDragging(false)
+      suppressClick.current = true
     }
   }
 
-  if (dismissed || !href || href === '#') return null
+  function handleClick(event) {
+    if (suppressClick.current) {
+      event.preventDefault()
+      event.stopPropagation()
+      suppressClick.current = false
+      return
+    }
+    event.preventDefault()
+    if (!isWhatsAppUrl(href)) return
+    window.open(href, '_blank', 'noopener,noreferrer')
+  }
+
+  if (dismissed || !isWhatsAppUrl(href)) return null
 
   return (
     <>
@@ -84,14 +108,11 @@ export default function WhatsAppFloatingButton({ href, lang = 'fr' }) {
         className={`wa-float-shell ${dragging ? 'is-dragging' : ''}`}
         style={position ? { left: position.left, top: position.top, right: 'auto', bottom: 'auto' } : undefined}
       >
-        <a
+        <button
+          type="button"
           className="wa-float"
-          href={href}
-          target="_blank"
-          rel="noreferrer"
           aria-label={lang === 'ar' ? 'تواصل معنا عبر واتساب' : 'Nous contacter sur WhatsApp'}
           title="WhatsApp"
-          draggable="false"
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
           onPointerUp={finishDrag}
@@ -99,15 +120,6 @@ export default function WhatsAppFloatingButton({ href, lang = 'fr' }) {
           onClick={handleClick}
         >
           <WhatsAppIcon size={31} />
-        </a>
-        <button
-          type="button"
-          className="wa-float-close"
-          onClick={() => setDismissed(true)}
-          aria-label={lang === 'ar' ? 'إخفاء زر واتساب' : 'Masquer le bouton WhatsApp'}
-          title={lang === 'ar' ? 'إخفاء' : 'Masquer'}
-        >
-          ×
         </button>
       </div>
       <div className={`wa-dismiss-zone ${dragging ? 'visible' : ''}`} aria-hidden={!dragging}>
