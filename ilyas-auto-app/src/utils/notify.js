@@ -83,9 +83,18 @@ export function openWA(reservation, shopName = CONFIG.nom) {
   window.open(`https://wa.me/${normalized}?text=${buildWAMessage(reservation, shopName)}`, '_blank')
 }
 
-// Lien WA générique (bouton flottant, footer, etc.) — phone optionnel, sinon celui de config.js
+// Lien WhatsApp public. Retourne null si aucun numéro valide n'est configuré :
+// ne jamais utiliser "#" comme destination de secours, car cela rouvre le site.
+export function normalizeWhatsAppPhone(phone) {
+  let digits = String(phone || CONFIG.whatsapp || '').replace(/\D/g, '')
+  if (digits.startsWith('00')) digits = digits.slice(2)
+  // Format algérien national (0XXXXXXXXX) -> format international 213XXXXXXXXX.
+  if (digits.length === 10 && digits.startsWith('0')) digits = '213' + digits.slice(1)
+  return /^\d{8,15}$/.test(digits) ? digits : ''
+}
+
 export function waLink(text, phone) {
-  const p = phone || CONFIG.whatsapp
-  if (!p) return '#'
-  return `https://wa.me/${p}?text=${encodeURIComponent(text)}`
+  const normalized = normalizeWhatsAppPhone(phone)
+  if (!normalized) return null
+  return `https://wa.me/${normalized}?text=${encodeURIComponent(text)}`
 }

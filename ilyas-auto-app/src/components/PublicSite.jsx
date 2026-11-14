@@ -181,7 +181,7 @@ function PublicSiteInner() {
   const s = useMemo(() => ({
     nom:        settings.shop_name       || 'Nabil Auto',
     telephone:  settings.shop_phone      || CONFIG.telephone,
-    whatsapp:   settings.shop_whatsapp   || CONFIG.whatsapp,
+    whatsapp:   settings.shop_whatsapp   || settings.shop_phone || CONFIG.whatsapp,
     adresse:    settings.shop_address    || CONFIG.adresse,
     horaires:   settings.shop_horaires   || CONFIG.horaires,
     mapsUrl:    settings.shop_maps_url   || CONFIG.mapsUrl,
@@ -200,6 +200,8 @@ function PublicSiteInner() {
       }
     })(),
   }), [settings])
+
+  const hasWhatsApp = Boolean(waLink('', s.whatsapp))
 
   // Découpe le nom du showroom pour le pied de page (évite une référence globale inexistante).
   const logoParts = useMemo(() => {
@@ -417,7 +419,7 @@ function PublicSiteInner() {
             <a onClick={e => { e.preventDefault(); setSellOpen(true) }} href="#">{t.nav.venteEchange}</a>
             <button type="button" onClick={togglePublicTheme} className="theme-toggle" aria-pressed={publicTheme === "dark"} aria-label={publicTheme === 'dark' ? 'Activer le thème ivoire' : 'Activer le mode sombre'} title={publicTheme === 'dark' ? 'Thème ivoire' : 'Mode sombre'}><span aria-hidden="true">{publicTheme === 'dark' ? '☀️' : '🌙'}</span><span className="theme-toggle-label">{publicTheme === 'dark' ? 'Ivoire' : 'Sombre'}</span></button>
             <button onClick={toggleLang} className="lang-toggle">{lang === 'fr' ? '🇩🇿 عربي' : '🇫🇷 Français'}</button>
-            <a href={waLink('Bonjour ' + s.nom + ', je vous contacte depuis votre site web.', s.whatsapp)} target="_blank" rel="noreferrer" className="nav-wa-btn"><WhatsAppIcon size={19} /> {t.nav.whatsapp}</a>
+            {hasWhatsApp && <a href={waLink('Bonjour ' + s.nom + ', je vous contacte depuis votre site web.', s.whatsapp)} target="_blank" rel="noreferrer" className="nav-wa-btn"><WhatsAppIcon size={19} /> {t.nav.whatsapp}</a>}
           </div>
           <button className="nav-burger" type="button" aria-label={mobileOpen ? 'Fermer le menu' : 'Ouvrir le menu'} aria-expanded={mobileOpen} onClick={() => setMobileOpen(o => !o)}>☰</button>
         </div>
@@ -429,7 +431,7 @@ function PublicSiteInner() {
           <a onClick={e => { e.preventDefault(); setMobileOpen(false); setVehicleCondition('occasion'); scrollTo('stock') }} href="#stock">{t.nav.occasion}</a>
           <a onClick={e => { e.preventDefault(); setMobileOpen(false); setSellOpen(true) }} href="#">{t.nav.venteEchange}</a>
           <button onClick={toggleLang} className="lang-toggle" style={{ marginTop: 6, width: 'fit-content' }}>{lang === 'fr' ? '🇩🇿 عربي' : '🇫🇷 Français'}</button>
-          <a className="nav-mobile-wa-btn" href={waLink('Bonjour ' + s.nom + ', je vous contacte depuis votre site web.', s.whatsapp)} target="_blank" rel="noreferrer"><WhatsAppIcon size={19} /> {t.nav.whatsapp}</a>
+          {hasWhatsApp && <a className="nav-mobile-wa-btn" href={waLink('Bonjour ' + s.nom + ', je vous contacte depuis votre site web.', s.whatsapp)} target="_blank" rel="noreferrer"><WhatsAppIcon size={19} /> {t.nav.whatsapp}</a>}
         </div>
       </nav>
 
@@ -605,12 +607,12 @@ function PublicSiteInner() {
                       {disc > 0 && <span className="old">{fmt(v.prix_old)}</span>}
                     </div>
                   </div>
-                  <a className="veh-card-wa-bar"
+                  {hasWhatsApp && <a className="veh-card-wa-bar"
                     href={waLink(`Bonjour, je suis intéressé(e) par la ${v.marque} ${v.modele} affichée sur votre site.`, s.whatsapp)}
                     target="_blank" rel="noreferrer" onClick={e => e.stopPropagation()}>
                     <WhatsAppIcon size={20} />
                     <span className="veh-card-wa-label">Discuter sur WhatsApp</span>
-                  </a>
+                  </a>}
                   <div className="veh-card-body">
                     <div className="veh-card-top" style={{ cursor: 'pointer' }} onClick={() => openVehicleDetail(v)}>
                       <div>
@@ -685,7 +687,7 @@ function PublicSiteInner() {
             <div className="footer-sub">© {new Date().getFullYear()} {s.nom} — {t.footer.droits}</div>
           </div>
           <div className="footer-social">
-            <a className="footer-whatsapp-link" href={waLink('Bonjour ' + s.nom, s.whatsapp)} target="_blank" rel="noreferrer" aria-label={t.nav.whatsapp}><WhatsAppIcon size={21} /></a>
+            {hasWhatsApp && <a className="footer-whatsapp-link" href={waLink('Bonjour ' + s.nom, s.whatsapp)} target="_blank" rel="noreferrer" aria-label={t.nav.whatsapp}><WhatsAppIcon size={21} /></a>}
             <button onClick={() => setTrackingOpen(true)} className="footer-track-btn">{t.footer.suivre}</button>
             {s.facebook && <a href={s.facebook} target="_blank" rel="noreferrer">📘</a>}
             {s.instagram && <a href={s.instagram} target="_blank" rel="noreferrer">📷</a>}
