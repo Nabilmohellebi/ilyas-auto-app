@@ -1363,3 +1363,67 @@ input, select, textarea { font-family: var(--fb); outline: none; }
 @media(prefers-reduced-motion:reduce){
   .app,.app *{transition:none!important}
 }
+
+
+/* FINAL SYSTEMATIC DARK-THEME TEXT CONTRAST
+   Some older components still carry hard-coded dark foreground colors.
+   Force readable foregrounds throughout the public site, then restore
+   intentional accent and muted text colors below. */
+.app[data-theme="dark"] {
+  color-scheme: dark;
+  color: #f4f4f5 !important;
+}
+.app[data-theme="dark"] * {
+  color: #f4f4f5 !important;
+  -webkit-text-fill-color: currentColor;
+  text-shadow: none;
+}
+.app[data-theme="dark"] :where(input,select,textarea,option) {
+  color: #f4f4f5 !important;
+  -webkit-text-fill-color: #f4f4f5 !important;
+  background-color: #222226 !important;
+  border-color: #44444a !important;
+  caret-color: #f4f4f5 !important;
+}
+.app[data-theme="dark"] :where(input,textarea)::placeholder {
+  color: #a1a1aa !important;
+  -webkit-text-fill-color: #a1a1aa !important;
+  opacity: 1 !important;
+}
+/* Secondary information remains softer, without becoming unreadable. */
+.app[data-theme="dark"] :where(
+  .hero-auto-content p,.section-head p,.trust-grid .lbl,.trust-bar .lbl,
+  .announce-item,.veh-card-top p,.veh-specs,.showroom-info-row p,
+  .footer-sub,.vd-description,.vd-old-price,.vd-bottom-price .lbl,
+  .cmp-label-col,.cmp-veh-model,.testi-quote,.testi-role,
+  .veh-year-badge,.filters-bar label
+) {
+  color: #b7b7bd !important;
+  -webkit-text-fill-color: currentColor !important;
+}
+/* Preserve deliberate brand/status colors and white text on colored surfaces. */
+.app[data-theme="dark"] :where(
+  .veh-strip-info .price,.vd-price,.veh-price-strip .price,
+  .veh-price-strip .old,.price-highlight,.accent-text
+) {
+  color: #ff6570 !important;
+  -webkit-text-fill-color: currentColor !important;
+}
+.app[data-theme="dark"] :where(
+  .nav-wa-btn,.btn-hero-primary,.veh-card-wa-bar,.wa-float,
+  .veh-price-strip,.veh-price-strip *,
+  .veh-strip-tag,.veh-statut-badge,.veh-badge-tag,
+  .vd-badge,.vd-disc,.vd-arrow,.vd-close-float,
+  .vd-counter,.stamp-sold,.btn-save,.act-btn.primary,.login-box button
+) {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
+.app[data-theme="dark"] :where(button:not(.nav-wa-btn):not(.btn-hero-primary):not(.veh-card-wa-bar):not(.wa-float):not(.btn-save):not(.act-btn.primary)) {
+  color: #f4f4f5 !important;
+  -webkit-text-fill-color: currentColor !important;
+}
+.app[data-theme="dark"] svg,
+.app[data-theme="dark"] svg * {
+  -webkit-text-fill-color: initial;
+}
