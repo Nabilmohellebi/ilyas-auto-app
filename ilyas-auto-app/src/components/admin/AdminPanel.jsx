@@ -134,7 +134,7 @@ function AdminSettings({ onLogout, onToast, onBrandNameChange }) {
     event.target.value = ''
     if (!file) return
     setLogoUploading(true)
-    setCropQueue([{ file, kind: 'logo', title: 'Recadrer mon logo', aspectRatio: 3.8, outputFormat: 'image/png' }])
+    setCropQueue([{ file, kind: 'logo', title: 'Ajuster mon logo (sans couper)', aspectRatio: 3.8, outputFormat: 'image/png', fitToImage: true }])
   }
 
   function handleHeroUpload(event) {
@@ -573,6 +573,7 @@ function AdminSettings({ onLogout, onToast, onBrandNameChange }) {
           aspectRatio={cropQueue[0].aspectRatio}
           outputFormat={cropQueue[0].outputFormat}
           allowWhiteBackgroundRemoval={cropQueue[0].kind === 'logo'}
+          fitToImage={Boolean(cropQueue[0].fitToImage)}
           onCancel={cancelCropQueue}
           onConfirm={confirmCropUpload}
         />
