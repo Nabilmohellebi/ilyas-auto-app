@@ -744,3 +744,126 @@ input, select, textarea { font-family: var(--fb); outline: none; }
 .testi-card, .edito-card { box-shadow: none; }
 .btn-hero-primary { letter-spacing: .04em; font-weight: 700; }
 .btn-veh-reserve { letter-spacing: .03em; }
+
+
+/* ═══════════════════════════════════════════════════════════════
+   PUBLIC SITE — WHITE SHOWROOM / LARGE VEHICLE PRESENTATION
+   Inspired by the clear, image-led vehicle listings in the reference.
+   Admin styles remain unchanged because all rules are scoped to .app.
+═══════════════════════════════════════════════════════════════ */
+.app {
+  --bk: #ffffff;
+  --bk2: #f7f7f8;
+  --card: #ffffff;
+  --card2: #f5f5f6;
+  --card3: #eeeeef;
+  --brd: #e7e7e9;
+  --brd2: #d8d8dc;
+  --g3: #242428;
+  --g4: #66666d;
+  --g5: #85858d;
+  --g6: #eeeeef;
+  --sh: 0 8px 28px rgba(20,20,25,.08);
+  --sh2: 0 2px 10px rgba(20,20,25,.06);
+  color: #242428;
+  background: #fff;
+}
+.app .nav {
+  background: rgba(255,255,255,.96);
+  border-bottom: 1px solid #ececef;
+  box-shadow: 0 3px 18px rgba(20,20,25,.05);
+}
+.app .nav-logo, .app .nav-links a { color: #202024; }
+.app .nav-links a:hover { color: var(--br2); }
+.app .nav-burger { color: #202024; }
+.app .nav-mobile { background: #fff; border-bottom: 1px solid #ececef; }
+.app .nav-mobile a { color: #29292e; }
+.app .lang-toggle { color: #333; border-color: #dedee2; }
+.app .hero-auto {
+  background-color: #f6f6f7;
+  color: #242428;
+}
+.app .hero-auto::before { opacity: .12; }
+.app .hero-auto-content h1, .app .hero-auto-content p { color: #242428; }
+.app .hero-auto-content p { color: #5d5d64; }
+.app .trust-bar, .app .section { background: #fff; color: #242428; }
+.app .trust-bar { border-top: 1px solid #eee; border-bottom: 1px solid #eee; }
+.app .trust-bar .num, .app .section-head h2 { color: #202024; }
+.app .trust-bar .lbl, .app .section-head p { color: #686870; }
+.app .section-head .bar { background: var(--br); }
+.app .filters-bar {
+  background: #f7f7f8;
+  border-color: #e8e8eb;
+  box-shadow: 0 4px 18px rgba(20,20,25,.035);
+}
+.app .filters-bar input, .app .filters-bar select {
+  background: #fff;
+  color: #25252a;
+  border-color: #dedee2;
+}
+.app .filters-bar input::placeholder { color: #888890; }
+.app .veh-grid {
+  grid-template-columns: minmax(0, 1fr);
+  max-width: 980px;
+  margin: 0 auto;
+  gap: 26px;
+}
+.app .veh-card {
+  background: #fff;
+  border: 1px solid #e8e8eb;
+  border-radius: 14px;
+  box-shadow: 0 5px 22px rgba(20,20,25,.055);
+}
+.app .veh-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(193,18,31,.24);
+  box-shadow: 0 12px 28px rgba(20,20,25,.09);
+}
+.app .veh-card-img {
+  aspect-ratio: 16 / 9;
+  background: #f1f1f2;
+}
+.app .veh-card-img img { object-fit: cover; object-position: center; }
+.app .veh-price-strip {
+  background: linear-gradient(to top, rgba(0,0,0,.78), transparent);
+  padding: 42px 22px 16px;
+}
+.app .veh-price-strip .price { font-size: clamp(23px, 3vw, 32px); color: #fff; }
+.app .veh-price-strip .old { color: rgba(255,255,255,.72); }
+.app .veh-card-body { padding: 20px 22px 18px; }
+.app .veh-card-top h3 { color: #202024; font-size: 20px; }
+.app .veh-card-top p { color: #66666d; font-size: 15px; }
+.app .veh-year-badge { background: #f5f5f6; color: #44444a; border-color: #e5e5e8; }
+.app .veh-specs { color: #5f5f66; font-size: 13px; }
+.app .btn-veh-reserve { background: #850019; border-color: #850019; color: #fff; }
+.app .btn-veh-reserve:hover { background: #a20c28; border-color: #a20c28; }
+.app .btn-veh-wa { background: #effaf2; }
+.app .veh-compare-check { color: #66666d; }
+.app .editorial-selection, .app .testimonials-section { color: #242428; }
+.app .showroom-info-row h4 { color: #242428; }
+.app .showroom-info-row p { color: #66666d; }
+.app .showroom-map { border-color: #e5e5e8; }
+.app .footer-auto { background: #f7f7f8; border-top: 1px solid #e7e7e9; }
+.app .footer-logo { color: #202024; }
+.app .footer-sub, .app .footer-social a, .app .footer-track-btn { color: #66666d; }
+.app .wa-float { box-shadow: 0 6px 20px rgba(37,211,102,.25); }
+.app .vd-ov { background: #fff; color: #242428; }
+.app .vd-info, .app .vd-info-col { color: #242428; }
+.app .vd-title { color: #202024; }
+.app .vd-specs-grid { color: #55555d; }
+.app .vd-gallery { background: #f3f3f4; }
+.app .vd-thumbs { background: #fff; }
+.app .empty, .app .spinner { color: #66666d; }
+.app .filters-bar label { color: #55555d; }
+.app .nav-wa-btn { color: #fff !important; }
+@media (min-width: 900px) {
+  .app .veh-card-img { aspect-ratio: 16 / 8.5; }
+}
+@media (max-width: 720px) {
+  .app .veh-grid { width: 100%; gap: 18px; }
+  .app .veh-card { border-radius: 12px; }
+  .app .veh-card-img { aspect-ratio: 16 / 10; }
+  .app .veh-card-body { padding: 16px; }
+  .app .veh-card-top h3 { font-size: 18px; }
+  .app .veh-price-strip { padding: 36px 16px 12px; }
+}
