@@ -356,7 +356,14 @@ function PublicSiteInner() {
               const disabled = v.statut === 'vendu'
               return (
                 <div key={v.id} className="veh-card" style={{ opacity: disabled ? .55 : 1 }}>
-                  <div className="veh-card-img" style={{ cursor: 'pointer' }} onClick={() => openVehicleDetail(v)}>
+                  <div
+                    className="veh-card-img"
+                    role="button"
+                    tabIndex={0}
+                    aria-label={`${v.marque} ${v.modele} — voir les photos et détails`}
+                    onClick={() => openVehicleDetail(v)}
+                    onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openVehicleDetail(v) } }}
+                  >
                     <div className="veh-statut-badge" style={{ background: statutColor(v.statut) }}>{statutLabel(v.statut, lang)}</div>
                     <div className="veh-flag-badge">
                       <img src={flagURI(v.provenance)} style={{ width: 14, height: 10, borderRadius: 2 }} alt="" />
@@ -386,12 +393,6 @@ function PublicSiteInner() {
                       <span>⚙️ {v.transmission}</span>
                       <span>⛽ {v.carburant}</span>
                       <span>📅 {v.annee}</span>
-                    </div>
-                    <div className="veh-actions">
-                      <button className="btn-veh-reserve" disabled={disabled} onClick={() => setReserveVehicle(v)}>
-                        {disabled ? t.card.vendu : getVehicleCondition(v) === 'occasion' ? t.card.acheterOccasion : t.card.reserver}
-                      </button>
-                      <button className="btn-veh-wa" title="WhatsApp" onClick={() => waDirect(v)}>💬</button>
                     </div>
                     <label className="veh-compare-check">
                       <input type="checkbox" checked={!!compareList.find(x => x.id === v.id)} onChange={() => toggleCompare(v)} />
