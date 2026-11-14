@@ -134,7 +134,8 @@ function AdminSettings({ onLogout, onToast, onBrandNameChange }) {
     setLogoUploading(true)
     try {
       const image = await uploadShowroomImage(file, 'logo')
-      setBrandIdentity(current => ({ ...current, ...image }))
+      // Map the generic upload result to the brand identity fields consumed by the site.
+      setBrandIdentity(current => ({ ...current, logoUrl: image.url, logoPath: image.path }))
       onToast && onToast('✅ Logo importé. Clique sur « Enregistrer le logo » pour le publier.', 'default')
     } catch (e) {
       onToast && onToast('❌ Impossible d’importer le logo : ' + e.message, 'error')
@@ -169,6 +170,12 @@ function AdminSettings({ onLogout, onToast, onBrandNameChange }) {
     try {
       const nextBrand = parseBrandIdentity(brandIdentity)
       await saveSetting('brand_identity', JSON.stringify(nextBrand))
+      // Read the setting back before showing success, so a stale/empty save is never reported as complete.
+      const persistedSettings = await getSettings()
+      const persistedBrand = parseBrandIdentity(persistedSettings.brand_identity)
+      if (persistedBrand.logoUrl !== nextBrand.logoUrl || persistedBrand.logoPath !== nextBrand.logoPath) {
+        throw new Error('Le logo n’a pas été confirmé dans les paramètres. Réessaie l’enregistrement.')
+      }
       const oldPath = initialLogoPath.current
       if (oldPath && oldPath !== nextBrand.logoPath) {
         const { error: removeError } = await supabase.storage.from('showroom-media').remove([oldPath])
