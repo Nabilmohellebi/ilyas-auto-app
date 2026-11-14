@@ -485,3 +485,18 @@
   .finance-list-heading .adm-search { max-width: none; width: 100%; box-sizing: border-box; }
   .finance-live-result { grid-template-columns: 1fr; }
 }
+
+
+/* Dark-theme vehicle prices: keep the live price distinct from white labels. */
+.app[data-theme="dark"] .veh-price-strip .price,
+.app[data-theme="dark"] .vd-bottom-price strong,
+.app[data-theme="dark"] .vd-price {
+  color: #E8C77E !important;
+  -webkit-text-fill-color: #E8C77E !important;
+  text-shadow: 0 1px 10px rgba(0, 0, 0, .28) !important;
+}
+.app[data-theme="dark"] .veh-price-strip .old,
+.app[data-theme="dark"] .vd-old-price {
+  color: #B7B7BD !important;
+  -webkit-text-fill-color: #B7B7BD !important;
+}
