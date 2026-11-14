@@ -89,6 +89,7 @@ function AdminSettings({ onLogout, onToast, onBrandNameChange }) {
     setThemeSaving(true)
     try {
       await saveSetting('site_theme', nextTheme)
+      try { window.localStorage.removeItem('hbr_public_theme') } catch {}
       onToast && onToast('✅ Thème du site enregistré', 'default')
     } catch (e) {
       onToast && onToast('❌ Impossible d’enregistrer le thème : ' + e.message, 'error')
