@@ -1326,7 +1326,7 @@ input, select, textarea { font-family: var(--fb); outline: none; }
   -webkit-text-fill-color: initial;
 }
 
-/* PUBLIC THEME SWITCH — accessible sun/moon control and expanding liquid wipe */
+/* PUBLIC THEME SWITCH — clean, even crossfade (no expanding overlay) */
 .app .theme-toggle{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:38px;padding:7px 12px;border:1px solid rgba(128,128,140,.28);border-radius:999px;background:rgba(128,128,140,.09);color:inherit;font:700 12px/1 inherit;cursor:pointer;transition:background .2s ease,border-color .2s ease,transform .2s ease}
 .app .theme-toggle:hover{background:rgba(230,57,70,.12);border-color:rgba(230,57,70,.45);transform:translateY(-1px)}
 .app .theme-toggle span:first-child{font-size:17px;line-height:1}
@@ -1334,15 +1334,19 @@ input, select, textarea { font-family: var(--fb); outline: none; }
 .app[data-theme="dark"] .theme-toggle{color:#f4f4f5!important;background:#25252b;border-color:#414149}
 .app[data-theme="light"] .theme-toggle,.app[data-theme="ivory"] .theme-toggle{color:#29292f!important;background:#f5f5f7;border-color:#dedee4}
 .app .mobile-theme-toggle{display:none}
-.app .theme-transition-wave{position:fixed;z-index:10000;width:38px;height:38px;border-radius:50%;pointer-events:none;transform:translate(-50%,-50%) scale(0);animation:themeLiquidReveal 2.6s cubic-bezier(.65,.05,.36,1) forwards;will-change:transform;box-shadow:0 0 0 2px rgba(255,255,255,.08)}
-.app .theme-transition-wave.dark{background:#111113}
-.app .theme-transition-wave.light{background:#fff}
-@keyframes themeLiquidReveal{
-  0%{transform:translate(-50%,-50%) scale(0);border-radius:50%;opacity:1}
-  22%{border-radius:44% 56% 53% 47%/48% 43% 57% 52%}
-  48%{border-radius:58% 42% 47% 53%/42% 57% 43% 58%}
-  72%{border-radius:46% 54% 58% 42%/56% 44% 56% 44%}
-  100%{transform:translate(-50%,-50%) scale(100);border-radius:50%;opacity:0}
+
+/* Crossfade both directions: the actual page surfaces and text interpolate together. */
+.app,
+.app :where(.nav,.nav-mobile,.trust-bar,.section,.editorial-selection,.testimonials-section,
+.showroom-grid,.footer-auto,.veh-card,.veh-card-body,.veh-strip,.veh-strip-card,
+.announce-bar,.hero-auto,.filters-bar,.filters-bar input,.filters-bar select,
+.vd-ov,.vd-info,.vd-info-col,.vd-thumbs,.cmp-float-bar,.cmp-modal) {
+  transition: background-color .42s ease, border-color .42s ease, box-shadow .42s ease;
+}
+.app :where(h1,h2,h3,h4,h5,h6,p,a,label,small,strong,em,span,li,button,
+.nav-logo,.nav-links a,.nav-mobile a,.section-head,.trust-bar,.veh-card-top,
+.veh-specs,.showroom-info-row,.footer-auto,.vd-info,.cmp-modal) {
+  transition: color .32s ease;
 }
 .app[data-theme="dark"] .nav,.app[data-theme="dark"] .nav-mobile{background:#171719!important;color:#f4f4f5!important}
 .app[data-theme="dark"] .nav-mobile{border-color:#34343a!important}
@@ -1356,4 +1360,6 @@ input, select, textarea { font-family: var(--fb); outline: none; }
   .app .mobile-theme-toggle .theme-toggle-label{font-size:12px;color:#fff!important}
   .app .nav-burger{flex-shrink:0}
 }
-@media(prefers-reduced-motion:reduce){.app .theme-transition-wave{animation-duration:.01ms}.app .theme-toggle{transition:none}}
+@media(prefers-reduced-motion:reduce){
+  .app,.app *{transition:none!important}
+}
