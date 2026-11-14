@@ -20,6 +20,15 @@ function statutColor(key) {
   return key === 'disponible' ? '#22c55e' : key === 'reserve' ? '#f59e0b' : '#6b7280'
 }
 
+function normalizeSearchText(value) {
+  return String(value ?? '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLocaleLowerCase()
+    .replace(/\s+/g, ' ')
+    .trim()
+}
+
 function PublicSiteInner() {
   const { lang, t, rtl, toggleLang } = useLang()
   const [vehicles, setVehicles] = useState([])
@@ -200,6 +209,7 @@ function PublicSiteInner() {
   const newVehicleCount = vehicles.filter(v => getVehicleCondition(v) === 'neuf').length
   const usedVehicleCount = vehicles.filter(v => getVehicleCondition(v) === 'occasion').length
 
+  const searchTerm = normalizeSearchText(search)
   const filtered = vehicles.filter(v => {
     const condition = getVehicleCondition(v)
     if (vehicleCondition !== 'all' && condition !== vehicleCondition) return false
@@ -209,7 +219,8 @@ function PublicSiteInner() {
     if (budget === 'low' && v.prix >= 4000000) return false
     if (budget === 'mid' && (v.prix < 4000000 || v.prix > 7000000)) return false
     if (budget === 'high' && v.prix <= 7000000) return false
-    if (search && !`${v.marque} ${v.modele}`.toLowerCase().includes(search.toLowerCase())) return false
+    const searchable = normalizeSearchText(`${v.marque} ${v.modele} ${v.carrosserie || ''} ${v.annee || ''}`)
+    if (searchTerm && !searchable.includes(searchTerm)) return false
     return true
   })
 
@@ -222,10 +233,25 @@ function PublicSiteInner() {
     return (a.display_order || 99) - (b.display_order || 99)
   })
 
+  const hasActiveCatalogueFilters = Boolean(
+    search.trim() || vehicleCondition !== 'all' || brand !== 'all' ||
+    origin !== 'all' || bodyType !== 'all' || budget !== 'all' || sort !== 'default'
+  )
+
   function togglePublicTheme() {
     const nextTheme = publicTheme === 'dark' ? 'ivory' : 'dark'
     setPublicTheme(nextTheme)
     try { window.localStorage.setItem('hbr_public_theme', nextTheme) } catch {}
+  }
+
+  function resetCatalogueFilters() {
+    setSearch('')
+    setVehicleCondition('all')
+    setBrand('all')
+    setOrigin('all')
+    setBodyType('all')
+    setBudget('all')
+    setSort('default')
   }
 
   function scrollTo(id) {
@@ -341,33 +367,33 @@ function PublicSiteInner() {
           <p>{t.catalogue.desc}</p>
         </div>
 
-        <div className="vehicle-category-tabs" role="group" aria-label="Catégorie des véhicules">
-          <button type="button" className={vehicleCondition === 'all' ? 'active' : ''} onClick={() => setVehicleCondition('all')}>{t.catalogue.toutesCategories} <span>{vehicles.length}</span></button>
-          <button type="button" className={vehicleCondition === 'neuf' ? 'active' : ''} onClick={() => setVehicleCondition('neuf')}>🚘 {t.catalogue.neufs} <span>{newVehicleCount}</span></button>
-          <button type="button" className={vehicleCondition === 'occasion' ? 'active' : ''} onClick={() => setVehicleCondition('occasion')}>🔄 {t.catalogue.occasions} <span>{usedVehicleCount}</span></button>
+        <div className="vehicle-category-tabs" role="group" aria-label={t.catalogue.categorieLabel}>
+          <button type="button" className={vehicleCondition === 'all' ? 'active' : ''} aria-pressed={vehicleCondition === 'all'} onClick={() => setVehicleCondition('all')}>{t.catalogue.toutesCategories} <span>{vehicles.length}</span></button>
+          <button type="button" className={vehicleCondition === 'neuf' ? 'active' : ''} aria-pressed={vehicleCondition === 'neuf'} onClick={() => setVehicleCondition('neuf')}>🚘 {t.catalogue.neufs} <span>{newVehicleCount}</span></button>
+          <button type="button" className={vehicleCondition === 'occasion' ? 'active' : ''} aria-pressed={vehicleCondition === 'occasion'} onClick={() => setVehicleCondition('occasion')}>🔄 {t.catalogue.occasions} <span>{usedVehicleCount}</span></button>
         </div>
 
         <div className="filters-bar">
-          <input placeholder={t.catalogue.rechercher} value={search} onChange={e => setSearch(e.target.value)} />
-          <select value={brand} onChange={e => setBrand(e.target.value)}>
+          <input aria-label={t.catalogue.rechercher} placeholder={t.catalogue.rechercher} value={search} onChange={e => setSearch(e.target.value)} />
+          <select aria-label={t.catalogue.toutesMarques} value={brand} onChange={e => setBrand(e.target.value)}>
             <option value="all">{t.catalogue.toutesMarques}</option>
             {brands.map(b => <option key={b} value={b}>{b}</option>)}
           </select>
-          <select value={origin} onChange={e => setOrigin(e.target.value)}>
+          <select aria-label={t.catalogue.toutesOrigines} value={origin} onChange={e => setOrigin(e.target.value)}>
             <option value="all">{t.catalogue.toutesOrigines}</option>
             {Object.entries(ORIGINS).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
           </select>
-          <select value={bodyType} onChange={e => setBodyType(e.target.value)}>
-            <option value="all">Toutes carrosseries</option>
+          <select aria-label={t.catalogue.carrosserie} value={bodyType} onChange={e => setBodyType(e.target.value)}>
+            <option value="all">{t.catalogue.carrosserie}</option>
             {BODY_TYPES.map(b => <option key={b} value={b}>{b}</option>)}
           </select>
-          <select value={budget} onChange={e => setBudget(e.target.value)}>
+          <select aria-label={t.catalogue.toutBudget} value={budget} onChange={e => setBudget(e.target.value)}>
             <option value="all">{t.catalogue.toutBudget}</option>
             <option value="low">{t.catalogue.budgetLow}</option>
             <option value="mid">{t.catalogue.budgetMid}</option>
             <option value="high">{t.catalogue.budgetHigh}</option>
           </select>
-          <select value={sort} onChange={e => setSort(e.target.value)}>
+          <select aria-label={t.catalogue.triDefaut} value={sort} onChange={e => setSort(e.target.value)}>
             <option value="default">{t.catalogue.triDefaut}</option>
             <option value="price_asc">{t.catalogue.prixCroissant}</option>
             <option value="price_desc">{t.catalogue.prixDecroissant}</option>
@@ -376,6 +402,17 @@ function PublicSiteInner() {
             <option value="km_asc">{t.catalogue.kmMoins}</option>
           </select>
         </div>
+
+        {!loading && !stockError && vehicles.length > 0 && (
+          <div className="catalogue-results-bar" aria-live="polite">
+            <span className="catalogue-results-count">{t.catalogue.resultats(sorted.length)}</span>
+            {hasActiveCatalogueFilters && (
+              <button type="button" className="catalogue-reset-btn" onClick={resetCatalogueFilters}>
+                {t.catalogue.reinitialiser}
+              </button>
+            )}
+          </div>
+        )}
 
         {loading ? (
           <div className="spinner" role="status" aria-live="polite">{t.catalogue.chargement}</div>
@@ -454,7 +491,7 @@ function PublicSiteInner() {
       </section>
 
       {/* ── Témoignages ── */}
-      <TestimonialsSection supabase={supabase} />
+      <TestimonialsSection supabase={supabase} lang={lang} />
 
       {/* ── Showroom ── */}
       <section id="showroom" className="section">
