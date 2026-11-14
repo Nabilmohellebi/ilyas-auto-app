@@ -1,32 +1,64 @@
 import { useEffect, useRef, useState } from 'react'
 
 
-function removeBorderConnectedWhiteBackground(canvas) {
+function removeBorderConnectedWhiteBackground(canvas, tolerance = 64) {
   const context = canvas.getContext('2d', { willReadFrequently: true })
   if (!context) throw new Error('Le navigateur ne peut pas traiter cette image.')
 
   const image = context.getImageData(0, 0, canvas.width, canvas.height)
   const { data, width, height } = image
   const total = width * height
+  if (!total) return
+
+  // Estime la teinte du fond à partir des pixels clairs présents sur les bords.
+  // Cela permet de traiter aussi les blancs cassés et les fonds légèrement gris.
+  const edgeSamples = [[], [], []]
+  const samplePixel = pixel => {
+    const i = pixel * 4
+    if (data[i + 3] < 180) return
+    const r = data[i]
+    const g = data[i + 1]
+    const b = data[i + 2]
+    if (Math.min(r, g, b) < 215 || Math.max(r, g, b) - Math.min(r, g, b) > 58) return
+    edgeSamples[0].push(r)
+    edgeSamples[1].push(g)
+    edgeSamples[2].push(b)
+  }
+
+  for (let x = 0; x < width; x += 1) {
+    samplePixel(x)
+    if (height > 1) samplePixel((height - 1) * width + x)
+  }
+  for (let y = 1; y < height - 1; y += 1) {
+    samplePixel(y * width)
+    if (width > 1) samplePixel(y * width + width - 1)
+  }
+
+  const median = values => {
+    if (!values.length) return 255
+    values.sort((a, b) => a - b)
+    return values[Math.floor(values.length / 2)]
+  }
+  const background = edgeSamples.map(median)
   const visited = new Uint8Array(total)
   const queue = new Int32Array(total)
   let tail = 0
+  const limit = Math.max(12, Math.min(112, Number(tolerance) || 64))
 
-  // Ne cible que les pixels presque blancs reliés au bord de l’image.
-  // Les zones blanches enfermées dans le logo restent donc intactes.
-  const isBackgroundPixel = pixel => {
-    const offset = pixel * 4
-    if (data[offset + 3] === 0) return false
-    const red = data[offset]
-    const green = data[offset + 1]
-    const blue = data[offset + 2]
-    const darkest = Math.min(red, green, blue)
-    const brightest = Math.max(red, green, blue)
-    return darkest >= 220 && brightest - darkest <= 34
+  // La zone supprimée doit être reliée au bord : les blancs enfermés dans
+  // les lettres ou les symboles du logo ne sont donc pas sélectionnés.
+  const isBackgroundOrSoftEdge = pixel => {
+    const i = pixel * 4
+    if (data[i + 3] === 0) return false
+    const distance = Math.max(
+      Math.abs(data[i] - background[0]),
+      Math.abs(data[i + 1] - background[1]),
+      Math.abs(data[i + 2] - background[2])
+    )
+    return distance <= limit
   }
-
   const addPixel = pixel => {
-    if (pixel < 0 || pixel >= total || visited[pixel] || !isBackgroundPixel(pixel)) return
+    if (pixel < 0 || pixel >= total || visited[pixel] || !isBackgroundOrSoftEdge(pixel)) return
     visited[pixel] = 1
     queue[tail++] = pixel
   }
@@ -39,8 +71,6 @@ function removeBorderConnectedWhiteBackground(canvas) {
     addPixel(y * width)
     addPixel(y * width + width - 1)
   }
-
-  // Parcours itératif à quatre voisins : évite de supprimer les blancs isolés.
   for (let head = 0; head < tail; head += 1) {
     const pixel = queue[head]
     const x = pixel % width
@@ -50,27 +80,33 @@ function removeBorderConnectedWhiteBackground(canvas) {
     if (pixel + width < total) addPixel(pixel + width)
   }
 
-  // Rend le blanc transparent et adoucit les contours anti-crénelés.
+  // Décontamination du liseré : retire la dominante blanche des pixels
+  // anti-crénelés et conserve une transparence progressive sur les contours.
   for (let index = 0; index < tail; index += 1) {
-    const offset = queue[index] * 4
-    const red = data[offset]
-    const green = data[offset + 1]
-    const blue = data[offset + 2]
-    const alpha = Math.max(0, 255 - Math.min(red, green, blue))
+    const i = queue[index] * 4
+    const oldAlpha = data[i + 3] / 255
+    const r = data[i]
+    const g = data[i + 1]
+    const b = data[i + 2]
+    const alpha = Math.max(
+      Math.abs(r - background[0]),
+      Math.abs(g - background[1]),
+      Math.abs(b - background[2])
+    ) / 255
 
-    if (alpha <= 3) {
-      data[offset] = 0
-      data[offset + 1] = 0
-      data[offset + 2] = 0
-      data[offset + 3] = 0
+    if (alpha < 0.055) {
+      data[i] = 0
+      data[i + 1] = 0
+      data[i + 2] = 0
+      data[i + 3] = 0
       continue
     }
 
-    const matte = 255 - alpha
-    data[offset] = Math.max(0, Math.min(255, Math.round((red - matte) * 255 / alpha)))
-    data[offset + 1] = Math.max(0, Math.min(255, Math.round((green - matte) * 255 / alpha)))
-    data[offset + 2] = Math.max(0, Math.min(255, Math.round((blue - matte) * 255 / alpha)))
-    data[offset + 3] = Math.round(data[offset + 3] * alpha / 255)
+    const inverse = 1 - alpha
+    data[i] = Math.max(0, Math.min(255, Math.round((r - background[0] * inverse) / alpha)))
+    data[i + 1] = Math.max(0, Math.min(255, Math.round((g - background[1] * inverse) / alpha)))
+    data[i + 2] = Math.max(0, Math.min(255, Math.round((b - background[2] * inverse) / alpha)))
+    data[i + 3] = Math.round(oldAlpha * alpha * 255)
   }
 
   context.putImageData(image, 0, 0)
@@ -89,6 +125,7 @@ export default function ImageCropper({
   title = 'Ajuster la photo',
   outputFormat = 'image/jpeg',
   allowWhiteBackgroundRemoval = false,
+  fitToImage = false,
   onCancel,
   onConfirm,
 }) {
@@ -101,6 +138,10 @@ export default function ImageCropper({
   const [working, setWorking] = useState(false)
   const [error, setError] = useState('')
   const [removeWhiteBackground, setRemoveWhiteBackground] = useState(Boolean(allowWhiteBackgroundRemoval))
+  const [edgeTolerance, setEdgeTolerance] = useState(64)
+  const frameAspectRatio = fitToImage && imageRef.current?.naturalWidth
+    ? imageRef.current.naturalWidth / imageRef.current.naturalHeight
+    : aspectRatio
 
   useEffect(() => {
     if (!file) return undefined
@@ -112,6 +153,7 @@ export default function ImageCropper({
     setZoom(1)
     setOffset({ x: 0, y: 0 })
     setRemoveWhiteBackground(Boolean(allowWhiteBackgroundRemoval))
+    setEdgeTolerance(64)
     image.onload = () => {
       if (!active) return
       imageRef.current = image
@@ -128,7 +170,7 @@ export default function ImageCropper({
     }
   }, [file, allowWhiteBackgroundRemoval])
 
-  function drawCrop(canvas, targetWidth, targetHeight, currentZoom, currentOffset, transparentWhiteBackground) {
+  function drawCrop(canvas, targetWidth, targetHeight, currentZoom, currentOffset, transparentWhiteBackground, currentTolerance) {
     const image = imageRef.current
     if (!image || !canvas) return null
     const context = canvas.getContext('2d')
@@ -145,7 +187,7 @@ export default function ImageCropper({
     context.imageSmoothingQuality = 'high'
     context.drawImage(image, x, y, drawWidth, drawHeight)
     if (transparentWhiteBackground) {
-      try { removeBorderConnectedWhiteBackground(canvas) } catch (processingError) { console.warn('Aperçu de transparence indisponible :', processingError) }
+      try { removeBorderConnectedWhiteBackground(canvas, currentTolerance) } catch (processingError) { console.warn('Aperçu de transparence indisponible :', processingError) }
     }
     return { drawWidth, drawHeight }
   }
@@ -154,9 +196,9 @@ export default function ImageCropper({
     const canvas = canvasRef.current
     if (!ready || !canvas || !imageRef.current) return
     canvas.width = 960
-    canvas.height = Math.round(960 / aspectRatio)
-    drawCrop(canvas, canvas.width, canvas.height, zoom, offset, removeWhiteBackground)
-  }, [ready, zoom, offset, aspectRatio, removeWhiteBackground])
+    canvas.height = Math.round(960 / frameAspectRatio)
+    drawCrop(canvas, canvas.width, canvas.height, zoom, offset, removeWhiteBackground, edgeTolerance)
+  }, [ready, zoom, offset, frameAspectRatio, removeWhiteBackground, edgeTolerance])
 
   function handlePointerDown(event) {
     if (!ready) return
@@ -209,7 +251,7 @@ export default function ImageCropper({
     setError('')
     const output = document.createElement('canvas')
     output.width = 1600
-    output.height = Math.round(output.width / aspectRatio)
+    output.height = Math.round(output.width / frameAspectRatio)
     const ctx = output.getContext('2d')
     const base = Math.max(output.width / image.naturalWidth, output.height / image.naturalHeight)
     const scale = base * zoom
@@ -230,7 +272,7 @@ export default function ImageCropper({
     ctx.drawImage(image, x, y, drawWidth, drawHeight)
     if (removeWhiteBackground) {
       try {
-        removeBorderConnectedWhiteBackground(output)
+        removeBorderConnectedWhiteBackground(output, edgeTolerance)
       } catch (processingError) {
         setError(processingError?.message || 'Impossible de rendre le fond transparent.')
         setWorking(false)
@@ -300,6 +342,7 @@ export default function ImageCropper({
             disabled={!ready || working}
           />
           {allowWhiteBackgroundRemoval && (
+            <div className="image-cropper-background-options">
             <label className="image-cropper-background-toggle">
               <input
                 type="checkbox"
@@ -312,6 +355,24 @@ export default function ImageCropper({
                 <small>Le fond relié aux bords devient transparent pour laisser apparaître le thème clair ou sombre du showroom. Les zones blanches isolées du logo sont conservées autant que possible.</small>
               </span>
             </label>
+            <div className="image-cropper-edge-control">
+              <div>
+                <label htmlFor="image-cropper-edge-tolerance">Affiner les contours</label>
+                <strong>{edgeTolerance}%</strong>
+              </div>
+              <input
+                id="image-cropper-edge-tolerance"
+                type="range"
+                min="20"
+                max="112"
+                step="2"
+                value={edgeTolerance}
+                onChange={event => setEdgeTolerance(Number(event.target.value))}
+                disabled={!ready || working || !removeWhiteBackground}
+              />
+              <small>Augmente si un liseré blanc reste visible. Diminue si le détourage enlève des détails clairs.</small>
+            </div>
+            </div>
           )}
           <div className="image-cropper-hint">Astuce : tu peux aussi déplacer l’image directement avec la souris ou le doigt.</div>
         </div>
