@@ -35,6 +35,8 @@ function PublicSiteInner() {
   const [compareOpen, setCompareOpen] = useState(false)
   const [sellOpen, setSellOpen] = useState(false)
   const [vehicleCondition, setVehicleCondition] = useState('all')
+  const [publicTheme, setPublicTheme] = useState(() => { try { return window.localStorage.getItem('hbr_public_theme') || 'light' } catch { return 'light' } })
+  const [themeWave, setThemeWave] = useState(null)
 
   const [search, setSearch] = useState('')
   const [brand, setBrand] = useState('all')
@@ -70,7 +72,7 @@ function PublicSiteInner() {
     }
 
     loadStock()
-    getSettings().then(data => { if (active) setSettings(data) }).catch(error => {
+    getSettings().then(data => { if (!active) return; setSettings(data); try { if (!window.localStorage.getItem('hbr_public_theme') && ['light','dark','ivory'].includes(data.site_theme)) setPublicTheme(data.site_theme) } catch {} }).catch(error => {
       console.warn('HBR AUTO settings:', error)
     })
 
@@ -197,6 +199,17 @@ function PublicSiteInner() {
     return (a.display_order || 99) - (b.display_order || 99)
   })
 
+  function togglePublicTheme(event) {
+    const nextTheme = publicTheme === 'dark' ? 'light' : 'dark'
+    const rect = event && event.currentTarget ? event.currentTarget.getBoundingClientRect() : null
+    const x = rect ? rect.left + rect.width / 2 : window.innerWidth - 36
+    const y = rect ? rect.top + rect.height / 2 : 28
+    setThemeWave({ x, y, theme: nextTheme, id: Date.now() })
+    setPublicTheme(nextTheme)
+    try { window.localStorage.setItem('hbr_public_theme', nextTheme) } catch {}
+    window.setTimeout(() => setThemeWave(null), 950)
+  }
+
   function scrollTo(id) {
     setMobileOpen(false)
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
@@ -225,7 +238,8 @@ function PublicSiteInner() {
   }
 
   return (
-    <div className="app" data-theme={settings.site_theme || 'light'} dir={rtl ? 'rtl' : 'ltr'}>
+    <div className="app" data-theme={publicTheme} dir={rtl ? 'rtl' : 'ltr'}>
+      {themeWave && <div key={themeWave.id} className={'theme-transition-wave ' + themeWave.theme} style={{ left: themeWave.x, top: themeWave.y }} aria-hidden="true" />}
       {/* ── Bande nouveautés & promos ── */}
       {!loading && <VehicleGallery vehicles={recentVehicles} onVehicleClick={openVehicleDetail} newLabel={t.card.nouveau} />}
 
@@ -241,6 +255,7 @@ function PublicSiteInner() {
             <a onClick={e => { e.preventDefault(); setTrackingOpen(true) }} href="#">{t.nav.suivi}</a>
             <a onClick={e => { e.preventDefault(); setVehicleCondition('occasion'); scrollTo('stock') }} href="#stock">{t.nav.occasion}</a>
             <a onClick={e => { e.preventDefault(); setSellOpen(true) }} href="#">{t.nav.venteEchange}</a>
+            <button type="button" onClick={togglePublicTheme} className="theme-toggle" aria-label={publicTheme === 'dark' ? 'Activer le mode clair' : 'Activer le mode sombre'} title={publicTheme === 'dark' ? 'Mode clair' : 'Mode sombre'}><span aria-hidden="true">{publicTheme === 'dark' ? '☀️' : '🌙'}</span><span className="theme-toggle-label">{publicTheme === 'dark' ? 'Clair' : 'Sombre'}</span></button>
             <button onClick={toggleLang} className="lang-toggle">{lang === 'fr' ? '🇩🇿 عربي' : '🇫🇷 Français'}</button>
             <a href={waLink('Bonjour ' + s.nom + ', je vous contacte depuis votre site web.', s.whatsapp)} target="_blank" rel="noreferrer" className="nav-wa-btn">💬 {t.nav.whatsapp}</a>
           </div>
@@ -253,6 +268,7 @@ function PublicSiteInner() {
           <a onClick={e => { e.preventDefault(); setMobileOpen(false); setTrackingOpen(true) }} href="#">{t.nav.suivi}</a>
           <a onClick={e => { e.preventDefault(); setMobileOpen(false); setVehicleCondition('occasion'); scrollTo('stock') }} href="#stock">{t.nav.occasion}</a>
           <a onClick={e => { e.preventDefault(); setMobileOpen(false); setSellOpen(true) }} href="#">{t.nav.venteEchange}</a>
+          <button type="button" onClick={togglePublicTheme} className="theme-toggle" aria-label={publicTheme === 'dark' ? 'Activer le mode clair' : 'Activer le mode sombre'}><span aria-hidden="true">{publicTheme === 'dark' ? '☀️' : '🌙'}</span><span className="theme-toggle-label">{publicTheme === 'dark' ? 'Clair' : 'Sombre'}</span></button>
           <button onClick={toggleLang} className="lang-toggle" style={{ marginTop: 6, width: 'fit-content' }}>{lang === 'fr' ? '🇩🇿 عربي' : '🇫🇷 Français'}</button>
           <a href={waLink('Bonjour ' + s.nom + ', je vous contacte depuis votre site web.', s.whatsapp)} target="_blank" rel="noreferrer">💬 {t.nav.whatsapp}</a>
         </div>
