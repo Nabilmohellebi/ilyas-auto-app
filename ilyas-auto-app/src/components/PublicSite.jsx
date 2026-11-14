@@ -207,7 +207,7 @@ function PublicSiteInner() {
     setThemeWave({ x, y, theme: nextTheme, id: Date.now() })
     setPublicTheme(nextTheme)
     try { window.localStorage.setItem('hbr_public_theme', nextTheme) } catch {}
-    window.setTimeout(() => setThemeWave(null), 950)
+    window.setTimeout(() => setThemeWave(null), 2800)
   }
 
   function scrollTo(id) {
@@ -248,6 +248,7 @@ function PublicSiteInner() {
       <nav className="nav">
         <div className="nav-inner">
           <a href="#accueil" className="nav-logo">{logoParts.rest && logoParts.rest + ' '}<em>{logoParts.last}</em></a>
+          <button type="button" onClick={togglePublicTheme} className="theme-toggle mobile-theme-toggle" aria-label={publicTheme === 'dark' ? 'Activer le mode clair' : 'Activer le mode sombre'} title={publicTheme === 'dark' ? 'Mode clair' : 'Mode sombre'}><span aria-hidden="true">{publicTheme === 'dark' ? '☀️' : '🌙'}</span><span className="theme-toggle-label">{publicTheme === 'dark' ? 'Clair' : 'Sombre'}</span></button>
           <div className="nav-links">
             <a onClick={() => scrollTo('accueil')} href="#accueil">{t.nav.accueil}</a>
             <a onClick={() => scrollTo('stock')} href="#stock">{t.nav.stock}</a>
@@ -268,7 +269,6 @@ function PublicSiteInner() {
           <a onClick={e => { e.preventDefault(); setMobileOpen(false); setTrackingOpen(true) }} href="#">{t.nav.suivi}</a>
           <a onClick={e => { e.preventDefault(); setMobileOpen(false); setVehicleCondition('occasion'); scrollTo('stock') }} href="#stock">{t.nav.occasion}</a>
           <a onClick={e => { e.preventDefault(); setMobileOpen(false); setSellOpen(true) }} href="#">{t.nav.venteEchange}</a>
-          <button type="button" onClick={togglePublicTheme} className="theme-toggle" aria-label={publicTheme === 'dark' ? 'Activer le mode clair' : 'Activer le mode sombre'}><span aria-hidden="true">{publicTheme === 'dark' ? '☀️' : '🌙'}</span><span className="theme-toggle-label">{publicTheme === 'dark' ? 'Clair' : 'Sombre'}</span></button>
           <button onClick={toggleLang} className="lang-toggle" style={{ marginTop: 6, width: 'fit-content' }}>{lang === 'fr' ? '🇩🇿 عربي' : '🇫🇷 Français'}</button>
           <a href={waLink('Bonjour ' + s.nom + ', je vous contacte depuis votre site web.', s.whatsapp)} target="_blank" rel="noreferrer">💬 {t.nav.whatsapp}</a>
         </div>

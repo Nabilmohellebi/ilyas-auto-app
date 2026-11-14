@@ -1333,13 +1333,27 @@ input, select, textarea { font-family: var(--fb); outline: none; }
 .app .theme-toggle-label{font-size:11px;letter-spacing:.02em}
 .app[data-theme="dark"] .theme-toggle{color:#f4f4f5!important;background:#25252b;border-color:#414149}
 .app[data-theme="light"] .theme-toggle,.app[data-theme="ivory"] .theme-toggle{color:#29292f!important;background:#f5f5f7;border-color:#dedee4}
-.app .nav-mobile .theme-toggle{margin-top:6px;width:fit-content}
-.app .theme-transition-wave{position:fixed;z-index:10000;width:34px;height:34px;border-radius:50%;pointer-events:none;transform:translate(-50%,-50%) scale(0);animation:themeLiquidReveal .88s cubic-bezier(.16,1,.3,1) forwards;will-change:transform;box-shadow:0 0 0 2px rgba(255,255,255,.08)}
+.app .mobile-theme-toggle{display:none}
+.app .theme-transition-wave{position:fixed;z-index:10000;width:38px;height:38px;border-radius:50%;pointer-events:none;transform:translate(-50%,-50%) scale(0);animation:themeLiquidReveal 2.6s cubic-bezier(.65,.05,.36,1) forwards;will-change:transform;box-shadow:0 0 0 2px rgba(255,255,255,.08)}
 .app .theme-transition-wave.dark{background:#111113}
 .app .theme-transition-wave.light{background:#fff}
-@keyframes themeLiquidReveal{0%{transform:translate(-50%,-50%) scale(0);border-radius:50%}65%{border-radius:42% 58% 55% 45%/48% 42% 58% 52%}100%{transform:translate(-50%,-50%) scale(100);border-radius:50%;opacity:0}}
+@keyframes themeLiquidReveal{
+  0%{transform:translate(-50%,-50%) scale(0);border-radius:50%;opacity:1}
+  22%{border-radius:44% 56% 53% 47%/48% 43% 57% 52%}
+  48%{border-radius:58% 42% 47% 53%/42% 57% 43% 58%}
+  72%{border-radius:46% 54% 58% 42%/56% 44% 56% 44%}
+  100%{transform:translate(-50%,-50%) scale(100);border-radius:50%;opacity:0}
+}
 .app[data-theme="dark"] .nav,.app[data-theme="dark"] .nav-mobile{background:#171719!important;color:#f4f4f5!important}
 .app[data-theme="dark"] .nav-mobile{border-color:#34343a!important}
 .app[data-theme="dark"] .nav-mobile a,.app[data-theme="dark"] .nav-burger{color:#f4f4f5!important}
 .app[data-theme="dark"] .veh-strip-info .price{color:#ff6570!important}
+@media(max-width:720px){
+  .app .nav-inner{gap:10px}
+  .app .nav-logo{font-size:19px;min-width:0;white-space:nowrap}
+  .app .mobile-theme-toggle{display:inline-flex;flex-shrink:0;min-height:42px;padding:8px 13px;gap:7px;margin-left:auto;background:#850019!important;border:1px solid #a72a40!important;color:#fff!important;box-shadow:0 3px 12px rgba(133,0,25,.22)}
+  .app .mobile-theme-toggle span:first-child{font-size:19px}
+  .app .mobile-theme-toggle .theme-toggle-label{font-size:12px;color:#fff!important}
+  .app .nav-burger{flex-shrink:0}
+}
 @media(prefers-reduced-motion:reduce){.app .theme-transition-wave{animation-duration:.01ms}.app .theme-toggle{transition:none}}
