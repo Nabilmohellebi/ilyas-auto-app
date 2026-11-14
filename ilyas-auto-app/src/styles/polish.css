@@ -1030,3 +1030,75 @@
 .app[data-theme="ivory"] svg * {
   -webkit-text-fill-color: initial;
 }
+
+
+/* Vendre / Échanger — surfaces et contrastes cohérents avec le thème actif. */
+.app[data-theme] .trade-modal {
+  color: var(--theme-text) !important;
+  background: var(--theme-surface) !important;
+  border-color: var(--theme-border) !important;
+  box-shadow: 0 24px 80px rgba(0,0,0,.38) !important;
+}
+.app[data-theme] .trade-modal .trade-type-option,
+.app[data-theme] .trade-modal .trade-form-section,
+.app[data-theme] .trade-modal .trade-calculation {
+  background: var(--theme-surface-raised) !important;
+  border-color: var(--theme-border) !important;
+}
+.app[data-theme] .trade-modal .trade-type-option {
+  color: var(--theme-text) !important;
+}
+.app[data-theme] .trade-modal .trade-type-option.active {
+  background: rgba(190,150,85,.14) !important;
+  border-color: #bd9557 !important;
+}
+.app[data-theme] .trade-modal :where(h2,p,div,strong,span,small,label) {
+  color: var(--theme-text) !important;
+  -webkit-text-fill-color: currentColor !important;
+}
+.app[data-theme] .trade-modal .form-field label,
+.app[data-theme] .trade-modal .trade-type-option small,
+.app[data-theme] .trade-modal .trade-calculation-row,
+.app[data-theme] .trade-modal .trade-balance small,
+.app[data-theme] .trade-modal .trade-disclaimer,
+.app[data-theme] .trade-modal .trade-muted {
+  color: var(--theme-muted) !important;
+  -webkit-text-fill-color: currentColor !important;
+}
+.app[data-theme] .trade-modal :where(input,select,textarea,option) {
+  background: var(--theme-field) !important;
+  border-color: var(--theme-border) !important;
+  color: var(--theme-text) !important;
+  -webkit-text-fill-color: currentColor !important;
+}
+.app[data-theme] .trade-modal .trade-calculation-row {
+  border-bottom-color: var(--theme-border) !important;
+}
+.app[data-theme] .trade-modal .trade-calculation-row strong {
+  color: var(--theme-text) !important;
+  -webkit-text-fill-color: currentColor !important;
+}
+.app[data-theme] .trade-modal .trade-balance {
+  background: rgba(190,150,85,.14) !important;
+}
+.app[data-theme] .trade-modal .btn-close {
+  background: var(--theme-surface-raised) !important;
+  border-color: var(--theme-border) !important;
+  color: var(--theme-text) !important;
+}
+.app[data-theme="dark"] .trade-modal .trade-section-title,
+.app[data-theme="dark"] .trade-modal .trade-calculation-heading,
+.app[data-theme="dark"] .trade-modal .trade-offer span,
+.app[data-theme="dark"] .trade-modal .trade-offer strong,
+.app[data-theme="dark"] .trade-modal .trade-balance strong {
+  color: #e8c77e !important;
+  -webkit-text-fill-color: #e8c77e !important;
+}
+.app[data-theme="ivory"] .trade-modal .trade-section-title,
+.app[data-theme="ivory"] .trade-modal .trade-calculation-heading,
+.app[data-theme="ivory"] .trade-modal .trade-offer span,
+.app[data-theme="ivory"] .trade-modal .trade-offer strong,
+.app[data-theme="ivory"] .trade-modal .trade-balance strong {
+  color: #8d642b !important;
+  -webkit-text-fill-color: #8d642b !important;
+}
