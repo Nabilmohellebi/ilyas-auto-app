@@ -57,7 +57,7 @@ export default function TrackingPage({ onClose }) {
             </div>
 
             {cancelled ? (
-              <div style={{ background: 'rgba(255,255,255,.05)', border: '1px solid rgba(255,255,255,.1)', borderRadius: 10, padding: 14, textAlign: 'center', color: 'rgba(255,255,255,.5)', fontSize: 13 }}>
+              <div className="track-cancelled" style={{ background: 'rgba(255,255,255,.05)', border: '1px solid rgba(255,255,255,.1)', borderRadius: 10, padding: 14, textAlign: 'center', color: 'rgba(255,255,255,.5)', fontSize: 13 }}>
                 {t.tracking.annulee}
               </div>
             ) : (
