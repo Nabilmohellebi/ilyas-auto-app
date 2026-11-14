@@ -161,15 +161,7 @@ export default function VehicleForm({ vehicle, onClose, onSave }) {
     if (form.img === removedUrl) set('img', arr[0]?.url || '')
   }
 
-  // ── Galerie grand format (2e catégorie de photos) ──
-  async function handleGalleryFileSelect(e) {
-    const files = Array.from(e.target.files)
-    for (const file of files) {
-      const url = await uploadFile(file)
-      if (url) setForm(current => ({ ...current, images_gallery: [...current.images_gallery, { url }] }))
-    }
-    e.target.value = ''
-  }
+  // Gallery images use the same crop queue with a wide 16:9 frame.
   function moveGalleryImg(i, dir) {
     const j = dir === 'up' ? i - 1 : i + 1
     if (j < 0 || j >= form.images_gallery.length) return
