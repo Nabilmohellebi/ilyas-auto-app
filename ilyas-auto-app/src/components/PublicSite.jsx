@@ -35,7 +35,7 @@ function PublicSiteInner() {
   const [compareOpen, setCompareOpen] = useState(false)
   const [sellOpen, setSellOpen] = useState(false)
   const [vehicleCondition, setVehicleCondition] = useState('all')
-  const [publicTheme, setPublicTheme] = useState(() => { try { const saved = window.localStorage.getItem('hbr_public_theme'); if (saved === 'dark') return 'dark'; if (saved === 'light') window.localStorage.setItem('hbr_public_theme', 'ivory'); return 'ivory' } catch { return 'ivory' } })
+  const [publicTheme, setPublicTheme] = useState(() => { try { return window.localStorage.getItem('hbr_public_theme') === 'dark' ? 'dark' : 'ivory' } catch { return 'ivory' } })
 
   const [search, setSearch] = useState('')
   const [brand, setBrand] = useState('all')
@@ -71,7 +71,19 @@ function PublicSiteInner() {
     }
 
     loadStock()
-    getSettings().then(data => { if (!active) return; setSettings(data); try { if (!window.localStorage.getItem('hbr_public_theme') && ['light','dark','ivory'].includes(data.site_theme)) setPublicTheme(data.site_theme === 'dark' ? 'dark' : 'ivory') } catch {} }).catch(error => {
+    getSettings().then(data => {
+      if (!active) return
+      setSettings(data)
+      try {
+        const savedTheme = window.localStorage.getItem('hbr_public_theme')
+        if (savedTheme === 'light') {
+          window.localStorage.setItem('hbr_public_theme', 'ivory')
+          setPublicTheme('ivory')
+        } else if (!savedTheme && ['light', 'dark', 'ivory'].includes(data.site_theme)) {
+          setPublicTheme(data.site_theme === 'dark' ? 'dark' : 'ivory')
+        }
+      } catch {}
+    }).catch(error => {
       console.warn('HBR AUTO settings:', error)
     })
 
