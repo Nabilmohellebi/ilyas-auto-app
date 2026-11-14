@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '../../supabase'
-import { saveSetting, getSettings } from '../../utils/useSettings'
+import { saveSetting, getSettings, parseBrandIdentity, DEFAULT_BRAND_IDENTITY } from '../../utils/useSettings'
 import { openWA, fmt } from '../../utils/notify'
 import { STATUTS, PLACEHOLDER_IMG, flagURI } from '../../data/vehicles-data'
 import VehicleForm from './VehicleForm'
@@ -41,11 +41,18 @@ function AdminSettings({ onLogout, onToast, onBrandNameChange }) {
   const [showPw, setShowPw] = useState(false)
   const [siteTheme, setSiteTheme] = useState('light')
   const [themeSaving, setThemeSaving] = useState(false)
+  const [brandIdentity, setBrandIdentity] = useState(DEFAULT_BRAND_IDENTITY)
+  const [brandSaving, setBrandSaving] = useState(false)
+
+  const previewWords = (shop.name || 'Nabil Auto').trim().split(/\\s+/).filter(Boolean)
+  const previewAccent = previewWords.pop() || 'Auto'
+  const previewMain = previewWords.join(' ')
 
   useEffect(() => {
     getSettings().then(s => {
       setTradeMarginPercent(String(s.trade_margin_percent ?? '5'))
       setSiteTheme(['light', 'ivory', 'dark'].includes(s.site_theme) ? s.site_theme : 'light')
+      setBrandIdentity(parseBrandIdentity(s.brand_identity))
       setShop({
         name: s.shop_name || 'Nabil Auto',
         phone: s.shop_phone || '',
@@ -77,6 +84,18 @@ function AdminSettings({ onLogout, onToast, onBrandNameChange }) {
       setSiteTheme('light')
     } finally {
       setThemeSaving(false)
+    }
+  }
+
+  async function saveBrandIdentity() {
+    setBrandSaving(true)
+    try {
+      await saveSetting('brand_identity', JSON.stringify(parseBrandIdentity(JSON.stringify(brandIdentity))))
+      onToast && onToast('✅ Style du logo enregistré', 'default')
+    } catch (e) {
+      onToast && onToast('❌ Impossible d’enregistrer le style : ' + e.message, 'error')
+    } finally {
+      setBrandSaving(false)
     }
   }
 
@@ -231,14 +250,81 @@ function AdminSettings({ onLogout, onToast, onBrandNameChange }) {
         </div>
       </div>
 
+      <div className="pf-section brand-identity-settings" style={{ marginBottom: 14 }}>
+        <h3>✨ Identité visuelle du showroom</h3>
+        <p className="brand-settings-help">
+          Personnalise le nom à gauche du site : aperçu en direct, finition métallique et typographie.
+          Le choix du style ne modifie pas ton adresse web.
+        </p>
+        <div className={`brand-editor-preview nav-brand-font--${brandIdentity.fontStyle}`} style={{ '--brand-accent': brandIdentity.accentColor }}>
+          <span className="nav-brand-mark" aria-hidden="true"><span>✦</span></span>
+          <span className="nav-brand-copy">
+            <span className="nav-brand-name">
+              {previewMain && <span className="nav-brand-main">{previewMain} </span>}
+              <span className="nav-brand-accent">{previewAccent}</span>
+            </span>
+            <span className="nav-brand-caption">SHOWROOM AUTOMOBILE</span>
+          </span>
+        </div>
+        <div className="brand-identity-controls">
+          <div className="form-field">
+            <label>Typographie du logo</label>
+            <select
+              value={brandIdentity.fontStyle}
+              onChange={e => setBrandIdentity(s => ({ ...s, fontStyle: e.target.value }))}
+            >
+              <option value="sport">Sportive et puissante</option>
+              <option value="elegant">Élégante et premium</option>
+              <option value="modern">Moderne et épurée</option>
+            </select>
+          </div>
+          <div className="form-field">
+            <label>Couleur du dernier mot</label>
+            <div className="brand-color-presets">
+              {[
+                { label: 'Or', color: '#d7b15f' },
+                { label: 'Argent', color: '#aeb8c4' },
+                { label: 'Rouge', color: '#d43b4c' },
+                { label: 'Bleu', color: '#78a9d6' },
+              ].map(option => (
+                <button
+                  type="button"
+                  key={option.label}
+                  className={`brand-color-preset ${brandIdentity.accentColor.toLowerCase() === option.color ? 'active' : ''}`}
+                  onClick={() => setBrandIdentity(s => ({ ...s, accentColor: option.color }))}
+                  title={option.label}
+                  aria-label={`Choisir la finition ${option.label.toLowerCase()}`}
+                >
+                  <span style={{ background: option.color }} />
+                  {option.label}
+                </button>
+              ))}
+            </div>
+            <div className="brand-custom-color">
+              <span>Couleur personnalisée</span>
+              <input
+                aria-label="Couleur personnalisée du logo"
+                type="color"
+                value={brandIdentity.accentColor}
+                onChange={e => setBrandIdentity(s => ({ ...s, accentColor: e.target.value }))}
+              />
+              <code>{brandIdentity.accentColor.toUpperCase()}</code>
+            </div>
+          </div>
+        </div>
+        <button className="btn-save" onClick={saveBrandIdentity} disabled={brandSaving}>
+          {brandSaving ? '⏳...' : '💾 Enregistrer le style du logo'}
+        </button>
+      </div>
+
       <div className="pf-section" style={{ marginBottom: 14 }}>
         <h3>🏪 Informations du showroom</h3>
         <div className="pf-grid" style={{ marginBottom: 10 }}>
           <div className="form-field">
-            <label>Nom du garage</label>
+            <label>Nom du showroom (logo à gauche)</label>
             <input value={shop.name} maxLength={100} onChange={e => setShop(s => ({ ...s, name: e.target.value }))} />
             <small style={{ display: 'block', color: 'rgba(255,255,255,.42)', fontSize: 11, lineHeight: 1.5, marginTop: 6 }}>
-              Après l’enregistrement, le nom et l’adresse .vercel.app du garage sont synchronisés automatiquement avec Vercel.
+              Ce nom apparaît dans le logo à gauche, le titre du site et l’adresse .vercel.app. Son changement peut donc aussi renommer l’adresse Vercel.
             </small>
           </div>
           <div className="form-field"><label>Téléphone</label><input value={shop.phone} onChange={e => setShop(s => ({ ...s, phone: e.target.value }))} type="tel" /></div>
