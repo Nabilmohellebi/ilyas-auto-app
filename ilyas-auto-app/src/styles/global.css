@@ -1427,3 +1427,26 @@ input, select, textarea { font-family: var(--fb); outline: none; }
 .app[data-theme="dark"] svg * {
   -webkit-text-fill-color: initial;
 }
+
+
+/* SHOWROOM + FOOTER: enforce readable text in dark mode.
+   These legacy blocks have their own white/black text declarations.
+   Explicitly override both CSS color and WebKit text fill so the
+   address and opening hours remain visible on mobile and desktop. */
+.app[data-theme="dark"] #showroom .showroom-info-row,
+.app[data-theme="dark"] #showroom .showroom-info-row *,
+.app[data-theme="dark"] .footer-auto,
+.app[data-theme="dark"] .footer-auto * {
+  color: #f4f4f5 !important;
+  -webkit-text-fill-color: #f4f4f5 !important;
+  text-shadow: none !important;
+}
+.app[data-theme="dark"] #showroom .showroom-info-row p,
+.app[data-theme="dark"] .footer-auto .footer-sub {
+  color: #c4c4cc !important;
+  -webkit-text-fill-color: #c4c4cc !important;
+}
+.app[data-theme="dark"] #showroom .showroom-info-row .ic {
+  color: #ff6570 !important;
+  -webkit-text-fill-color: #ff6570 !important;
+}
