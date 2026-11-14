@@ -560,3 +560,202 @@
   color: #171719 !important;
   -webkit-text-fill-color: #171719 !important;
 }
+
+
+/* ============================================================
+   VEHICLE DETAIL — LIGHT THEME, WARM PREMIUM PRESENTATION
+   Replace the flat all-white sheet with layered warm surfaces.
+   ============================================================ */
+.app[data-theme="light"] .vd-ov {
+  background: #F1EFEA !important;
+  color: #292722 !important;
+}
+.app[data-theme="light"] .vd-gallery {
+  background: #E9E4DA !important;
+  box-shadow: 0 12px 34px rgba(47, 39, 27, .10);
+}
+.app[data-theme="light"] .vd-thumbs {
+  background: #E9E5DC !important;
+  border-top: 1px solid #DED7CA !important;
+}
+.app[data-theme="light"] .vd-info-col {
+  background: transparent !important;
+}
+.app[data-theme="light"] .vd-info {
+  background: linear-gradient(155deg, #FFFEFB 0%, #F9F6F0 100%) !important;
+  border: 1px solid #E5DED2 !important;
+  border-radius: 18px !important;
+  box-shadow: 0 12px 34px rgba(47, 39, 27, .075) !important;
+  color: #292722 !important;
+}
+.app[data-theme="light"] .vd-title {
+  color: #28251F !important;
+  -webkit-text-fill-color: #28251F !important;
+  letter-spacing: -.035em;
+}
+.app[data-theme="light"] .vd-price {
+  color: #987033 !important;
+  -webkit-text-fill-color: #987033 !important;
+  text-shadow: 0 2px 12px rgba(152, 112, 51, .12) !important;
+}
+.app[data-theme="light"] .vd-specs-grid div {
+  background: linear-gradient(145deg, #F6F2EA, #EEE9DF) !important;
+  border: 1px solid #E3DCCE !important;
+  color: #4A453C !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.8) !important;
+}
+.app[data-theme="light"] .vd-specs-grid div:hover {
+  border-color: #CDAA69 !important;
+  background: #F8F2E5 !important;
+}
+.app[data-theme="light"] .vd-specs-grid .ic {
+  color: #987033 !important;
+}
+.app[data-theme="light"] .vd-section {
+  margin-top: 20px !important;
+  padding: 17px !important;
+  border: 1px solid #E7DFD2 !important;
+  border-top: 2px solid #D7B15F !important;
+  border-radius: 14px !important;
+  background: linear-gradient(145deg, #FFFEFC, #F7F3EC) !important;
+  box-shadow: 0 6px 18px rgba(47, 39, 27, .045) !important;
+}
+.app[data-theme="light"] .vd-section h3 {
+  color: #514536 !important;
+  -webkit-text-fill-color: #514536 !important;
+}
+.app[data-theme="light"] .vd-description,
+.app[data-theme="light"] .vd-equip-item {
+  color: #625D54 !important;
+  -webkit-text-fill-color: #625D54 !important;
+}
+.app[data-theme="light"] .vd-equip-item span {
+  color: #987033 !important;
+  -webkit-text-fill-color: #987033 !important;
+}
+.app[data-theme="light"] .vd-video-card {
+  background: linear-gradient(135deg, #F8F1E4, #F1E7D5) !important;
+  border-color: #E2D2B5 !important;
+}
+.app[data-theme="light"] .vd-video-card .txt-title {
+  color: #514536 !important;
+  -webkit-text-fill-color: #514536 !important;
+}
+.app[data-theme="light"] .vd-gallery-full-wrap {
+  color: #514536 !important;
+}
+.app[data-theme="light"] .vd-gallery-full-title {
+  color: #514536 !important;
+  -webkit-text-fill-color: #514536 !important;
+  border-top-color: #DED7CA !important;
+}
+.app[data-theme="light"] .vd-bottom {
+  background: rgba(250, 247, 241, .97) !important;
+  border-top: 1px solid #DED3C1 !important;
+  box-shadow: 0 -8px 26px rgba(47, 39, 27, .08) !important;
+}
+.app[data-theme="light"] .vd-bottom-price .lbl {
+  color: #817767 !important;
+  -webkit-text-fill-color: #817767 !important;
+}
+
+/* The close button must have its own dark-red surface, not white text on white. */
+.app[data-theme="light"] .vd-close-float {
+  width: 42px !important;
+  height: 42px !important;
+  background: #850019 !important;
+  border: 2px solid rgba(255,255,255,.92) !important;
+  color: #FFFFFF !important;
+  -webkit-text-fill-color: #FFFFFF !important;
+  font-size: 19px !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+  box-shadow: 0 5px 18px rgba(72, 0, 15, .28), 0 0 0 1px rgba(133,0,25,.18) !important;
+}
+.app[data-theme="light"] .vd-close-float:hover {
+  background: #A10D2B !important;
+  border-color: #FFFFFF !important;
+  transform: scale(1.05);
+}
+
+/* Ivory gets a matching warm charcoal control for consistent contrast. */
+.app[data-theme="ivory"] .vd-close-float {
+  width: 42px !important;
+  height: 42px !important;
+  background: #463D32 !important;
+  border: 2px solid #D7B15F !important;
+  color: #F8E8C5 !important;
+  -webkit-text-fill-color: #F8E8C5 !important;
+  font-size: 19px !important;
+  font-weight: 900 !important;
+  box-shadow: 0 5px 18px rgba(50, 38, 22, .25) !important;
+}
+.app[data-theme="ivory"] .vd-close-float:hover {
+  background: #5A4935 !important;
+  border-color: #E8C77E !important;
+}
+
+/* Warm up the financing panel in light mode so it feels like part of the page. */
+.app[data-theme="light"] .finance-calculator .finance-calculator-description {
+  color: #726B60 !important;
+  -webkit-text-fill-color: #726B60 !important;
+}
+.app[data-theme="light"] .finance-calculator .form-field label {
+  color: #6A6052 !important;
+  -webkit-text-fill-color: #6A6052 !important;
+}
+.app[data-theme="light"] .finance-calculator .form-field select {
+  background: #F6F2EA !important;
+  border-color: #DDD3C3 !important;
+  color: #38332B !important;
+  -webkit-text-fill-color: #38332B !important;
+}
+.app[data-theme="light"] .finance-calculator .form-field input[type="range"] {
+  accent-color: #987033 !important;
+}
+.app[data-theme="light"] .finance-calculator .finance-result {
+  background: linear-gradient(145deg, #F2EBDD, #EAE1D1) !important;
+  border: 1px solid #DCCBAE !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.72) !important;
+}
+.app[data-theme="light"] .finance-calculator .finance-result .lbl {
+  color: #776B59 !important;
+  -webkit-text-fill-color: #776B59 !important;
+}
+.app[data-theme="light"] .finance-calculator .finance-result > div > strong {
+  color: #4B4133 !important;
+  -webkit-text-fill-color: #4B4133 !important;
+}
+.app[data-theme="light"] .finance-calculator .finance-highlight {
+  border-top-color: #D7C6A9 !important;
+}
+.app[data-theme="light"] .finance-calculator .finance-highlight strong {
+  color: #8A642D !important;
+  -webkit-text-fill-color: #8A642D !important;
+}
+
+@media (max-width: 859px) {
+  .app[data-theme="light"] .vd-info {
+    margin: 0 12px 20px !important;
+    padding: 20px 16px 100px !important;
+  }
+  .app[data-theme="light"] .vd-gallery {
+    margin: 12px 12px 0 !important;
+    width: calc(100% - 24px) !important;
+    border-radius: 16px !important;
+  }
+  .app[data-theme="light"] .vd-thumbs {
+    margin: 0 12px 12px !important;
+    border-radius: 0 0 14px 14px !important;
+  }
+}
+@media (min-width: 860px) {
+  .app[data-theme="light"] .vd-layout {
+    align-items: flex-start;
+    gap: 28px !important;
+    padding: 34px 32px 24px !important;
+  }
+  .app[data-theme="light"] .vd-info {
+    padding: 24px !important;
+  }
+}
