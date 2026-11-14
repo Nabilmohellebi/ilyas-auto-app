@@ -798,3 +798,53 @@
   outline: 2px solid #f2d18a;
   outline-offset: 3px;
 }
+
+
+/* Refined logo matte controls and visible transparency preview. */
+.image-cropper-stage-wrap {
+  background-color: #fff !important;
+  background-image:
+    linear-gradient(45deg, #d8dbe1 25%, transparent 25%),
+    linear-gradient(-45deg, #d8dbe1 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #d8dbe1 75%),
+    linear-gradient(-45deg, transparent 75%, #d8dbe1 75%) !important;
+  background-size: 18px 18px !important;
+  background-position: 0 0, 0 9px, 9px -9px, -9px 0 !important;
+}
+.image-cropper-canvas { touch-action: none; }
+.image-cropper-background-options { display: grid; gap: 10px; }
+.image-cropper-edge-control {
+  padding: 0 13px 11px 42px;
+}
+.image-cropper-edge-control > div {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+.image-cropper-edge-control label {
+  color: rgba(244,242,237,.88);
+  font-size: 11px;
+  font-weight: 750;
+}
+.image-cropper-edge-control strong {
+  color: #f2d18a;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+.image-cropper-edge-control input {
+  display: block;
+  width: 100%;
+  accent-color: #d7b15f;
+}
+.image-cropper-edge-control small {
+  display: block;
+  margin-top: 5px;
+  color: rgba(244,242,237,.55);
+  font-size: 10px;
+  line-height: 1.45;
+}
+@media (max-width: 560px) {
+  .image-cropper-edge-control { padding-left: 13px; }
+}
