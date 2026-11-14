@@ -568,16 +568,25 @@ function PublicSiteInner() {
               const disabled = v.statut === 'vendu'
               return (
                 <div key={v.id} className="veh-card" style={{ opacity: disabled ? .55 : 1 }}>
-                  <button
-                    type="button"
-                    className={`veh-favorite-btn ${favoriteIds.includes(String(v.id)) ? 'active' : ''}`}
-                    aria-pressed={favoriteIds.includes(String(v.id))}
-                    aria-label={favoriteIds.includes(String(v.id)) ? t.catalogue.retirerFavori : t.catalogue.ajouterFavori}
-                    title={favoriteIds.includes(String(v.id)) ? t.catalogue.retirerFavori : t.catalogue.ajouterFavori}
-                    onClick={() => toggleFavorite(v)}
-                  >
-                    {favoriteIds.includes(String(v.id)) ? '♥' : '♡'}
-                  </button>
+                  <div className="veh-card-top-overlay">
+                    <div className="veh-statut-badge" data-status={v.statut} style={{ background: statutColor(v.statut) }}>{statutLabel(v.statut, lang)}</div>
+                    <div className="veh-card-overlay-actions">
+                      <div className="veh-flag-badge">
+                        <img src={flagURI(v.provenance)} style={{ width: 14, height: 10, borderRadius: 2 }} alt="" />
+                        <span>{ORIGINS[v.provenance]?.label || 'Monde'}</span>
+                      </div>
+                      <button
+                        type="button"
+                        className={`veh-favorite-btn ${favoriteIds.includes(String(v.id)) ? 'active' : ''}`}
+                        aria-pressed={favoriteIds.includes(String(v.id))}
+                        aria-label={favoriteIds.includes(String(v.id)) ? t.catalogue.retirerFavori : t.catalogue.ajouterFavori}
+                        title={favoriteIds.includes(String(v.id)) ? t.catalogue.retirerFavori : t.catalogue.ajouterFavori}
+                        onClick={() => toggleFavorite(v)}
+                      >
+                        {favoriteIds.includes(String(v.id)) ? '♥' : '♡'}
+                      </button>
+                    </div>
+                  </div>
                   <div
                     className="veh-card-img"
                     role="button"
@@ -586,11 +595,6 @@ function PublicSiteInner() {
                     onClick={() => openVehicleDetail(v)}
                     onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openVehicleDetail(v) } }}
                   >
-                    <div className="veh-statut-badge" data-status={v.statut} style={{ background: statutColor(v.statut) }}>{statutLabel(v.statut, lang)}</div>
-                    <div className="veh-flag-badge">
-                      <img src={flagURI(v.provenance)} style={{ width: 14, height: 10, borderRadius: 2 }} alt="" />
-                      {ORIGINS[v.provenance]?.label || 'Monde'}
-                    </div>
                     {v.badge && <div className="veh-badge-tag">{v.badge}</div>}
                     {v.statut === 'vendu' && <div className="stamp-sold">{lang === 'ar' ? 'مباعة' : 'Vendu'}</div>}
                     <img src={v.img || PLACEHOLDER_IMG} alt={`${v.marque} ${v.modele}`} loading="lazy" decoding="async" />
