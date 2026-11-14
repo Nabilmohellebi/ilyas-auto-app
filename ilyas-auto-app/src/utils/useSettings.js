@@ -25,8 +25,43 @@ export function parseBrandIdentity(raw) {
     try { value = JSON.parse(raw) } catch { value = null }
   }
   if (!value || typeof value !== 'object' || Array.isArray(value)) return { ...fallback }
+
   const safeUrl = input => typeof input === 'string' && /^https:\/\/[^\s"'<>]+$/i.test(input) ? input : ''
-  const safePath = (input, folder) => typeof input === 'string' && new RegExp('^' + folder + '\\/[A-Za-z0-9._-]+
+  const safePath = (input, folder) => {
+    if (typeof input !== 'string' || !input.startsWith(folder + '/')) return ''
+    const filename = input.slice(folder.length + 1)
+    return /^[A-Za-z0-9._-]+$/.test(filename) ? input : ''
+  }
+
+  return {
+    accentColor: typeof value.accentColor === 'string' && /^#[0-9a-f]{6}$/i.test(value.accentColor)
+      ? value.accentColor
+      : fallback.accentColor,
+    fontStyle: ['sport', 'elegant', 'modern'].includes(value.fontStyle)
+      ? value.fontStyle
+      : fallback.fontStyle,
+    logoUrl: safeUrl(value.logoUrl),
+    logoPath: safePath(value.logoPath, 'logo'),
+  }
+}
+
+export function parseShowroomHeroImages(raw) {
+  let value = raw
+  if (typeof raw === 'string') {
+    try { value = JSON.parse(raw) } catch { value = [] }
+  }
+  if (!Array.isArray(value)) return []
+  return value.slice(0, 6).map(item => {
+    const url = typeof item === 'string' ? item : item?.url
+    if (typeof url !== 'string' || !/^https:\/\/[^\s"'<>]+$/i.test(url)) return null
+    const path = typeof item === 'object' && item && typeof item.path === 'string'
+      && item.path.startsWith('hero/')
+      && /^[A-Za-z0-9._-]+$/.test(item.path.slice(5))
+      ? item.path
+      : ''
+    return { url, path }
+  }).filter(Boolean)
+}
 
 const DEFAULTS = {
   brand_identity: JSON.stringify(DEFAULT_BRAND_IDENTITY),
