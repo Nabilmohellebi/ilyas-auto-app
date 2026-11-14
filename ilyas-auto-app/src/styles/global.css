@@ -1243,3 +1243,85 @@ input, select, textarea { font-family: var(--fb); outline: none; }
 .app[data-theme="light"] .veh-price-strip .old {
   color: #ffffff !important;
 }
+
+
+/* FINAL SYSTEMATIC LIGHT-THEME TEXT CONTRAST
+   A catch-all foreground rule covers components and labels added later,
+   not only the selectors that existed when the theme was first styled. */
+.app[data-theme="light"] {
+  color-scheme: light;
+  color: #242428 !important;
+}
+.app[data-theme="light"] :where(
+  h1,h2,h3,h4,h5,h6,p,span,a,label,small,strong,em,b,i,
+  li,dt,dd,th,td,figcaption,summary,legend,caption,
+  .nav-logo,.nav-links a,.nav-mobile a,.nav-burger,
+  .hero-auto-content,.hero-auto-content *,
+  .section-head,.section-head *,
+  .trust-bar,.trust-bar *,
+  .announce-bar,.announce-bar *,
+  .veh-strip,.veh-strip *,
+  .veh-card-body,.veh-card-body *,
+  .showroom-info-row,.showroom-info-row *,
+  .footer-auto,.footer-auto *,
+  .vd-info,.vd-info *,
+  .vd-specs-grid,.vd-specs-grid *,
+  .cmp-modal,.cmp-modal *,
+  .testimonials-section,.testimonials-section *,
+  .editorial-selection,.editorial-selection *
+) {
+  color: #242428 !important;
+  -webkit-text-fill-color: currentColor;
+  text-shadow: none !important;
+}
+/* Secondary copy stays softer but still passes ordinary contrast on white. */
+.app[data-theme="light"] :where(
+  .hero-auto-content p,.section-head p,.trust-grid .lbl,
+  .announce-item,.veh-strip-info .name,.veh-card-top p,.veh-specs,
+  .showroom-info-row p,.footer-sub,.vd-description,.vd-old-price,
+  .vd-bottom-price .lbl,.cmp-label-col,.cmp-veh-model,
+  .testi-quote,.testi-role
+) {
+  color: #62626a !important;
+  -webkit-text-fill-color: currentColor;
+}
+/* White lettering is retained only when its surface is intentionally dark/colored. */
+.app[data-theme="light"] :where(
+  .nav-wa-btn,.btn-hero-primary,.veh-card-wa-bar,.wa-float,
+  .veh-price-strip,.veh-price-strip *,
+  .veh-strip-tag,.veh-statut-badge,.veh-badge-tag,
+  .vd-badge,.vd-disc,.vd-arrow,.vd-close-float,
+  .vd-counter,.stamp-sold,
+  .btn-save,.act-btn.primary,.login-box button
+) {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
+.app[data-theme="light"] :where(
+  input,select,textarea,option
+) {
+  color: #242428 !important;
+  -webkit-text-fill-color: #242428 !important;
+  background-color: #ffffff !important;
+  caret-color: #242428 !important;
+}
+.app[data-theme="light"] :where(input,textarea)::placeholder {
+  color: #73737c !important;
+  -webkit-text-fill-color: #73737c !important;
+  opacity: 1 !important;
+}
+.app[data-theme="light"] :where(button:not(.nav-wa-btn):not(.btn-hero-primary):not(.veh-card-wa-bar):not(.wa-float):not(.btn-save):not(.act-btn.primary)) {
+  color: #242428;
+}
+.app[data-theme="light"] :where(
+  .nav,.nav-mobile,.trust-bar,.section,.showroom-grid,.footer-auto,
+  .veh-card,.veh-card-body,.veh-strip,.veh-strip-card,.announce-bar,
+  .vd-ov,.vd-info,.vd-info-col,.vd-thumbs,.cmp-float-bar,.cmp-modal,
+  .editorial-selection,.testimonials-section
+) {
+  color: #242428 !important;
+}
+.app[data-theme="light"] svg,
+.app[data-theme="light"] svg * {
+  -webkit-text-fill-color: initial;
+}
