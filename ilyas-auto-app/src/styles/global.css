@@ -1664,3 +1664,232 @@ input, select, textarea { font-family: var(--fb); outline: none; }
   border-color: rgba(255,255,255,.9) !important;
   text-shadow: 0 1px 2px rgba(0,0,0,.45) !important;
 }
+
+/* ============================================================
+   SHOWROOM BRAND — METALLIC WORDMARK
+   The first part follows the active theme; the final word carries
+   the admin-selected metallic accent and a restrained light sweep.
+   ============================================================ */
+.app .nav-brand {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  min-width: 0;
+  flex: 0 0 auto;
+  color: var(--theme-text, currentColor) !important;
+  text-decoration: none;
+  line-height: 1;
+}
+.app .nav-brand-copy,
+.brand-editor-preview .nav-brand-copy {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+.app .nav-brand-name,
+.brand-editor-preview .nav-brand-name {
+  display: block;
+  overflow: visible;
+  font-size: 22px;
+  font-weight: 900;
+  line-height: 1;
+  white-space: nowrap;
+  letter-spacing: -.045em;
+}
+.app[data-theme="light"] .nav-brand-main { color: #25252b !important; -webkit-text-fill-color: #25252b !important; }
+.app[data-theme="ivory"] .nav-brand-main { color: #463d32 !important; -webkit-text-fill-color: #463d32 !important; }
+.app[data-theme="dark"] .nav-brand-main { color: #f4f4f5 !important; -webkit-text-fill-color: #f4f4f5 !important; }
+.app .nav-brand-accent,
+.brand-editor-preview .nav-brand-accent {
+  display: inline-block;
+  color: var(--brand-accent, #d7b15f) !important;
+  background-image: linear-gradient(
+    112deg,
+    color-mix(in srgb, var(--brand-accent, #d7b15f) 38%, white) 0%,
+    var(--brand-accent, #d7b15f) 42%,
+    color-mix(in srgb, var(--brand-accent, #d7b15f) 58%, black) 72%,
+    color-mix(in srgb, var(--brand-accent, #d7b15f) 38%, white) 100%
+  );
+  background-size: 220% 100%;
+  background-position: 100% 50%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent !important;
+  filter: drop-shadow(0 1px 5px color-mix(in srgb, var(--brand-accent, #d7b15f) 24%, transparent));
+  transition: background-position .55s ease, filter .3s ease;
+}
+.app .nav-brand:hover .nav-brand-accent { background-position: 0% 50%; }
+.app .nav-brand-caption,
+.brand-editor-preview .nav-brand-caption {
+  display: block;
+  color: var(--theme-muted, #85858d);
+  font-size: 8px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+}
+.app .nav-brand-mark,
+.brand-editor-preview .nav-brand-mark {
+  position: relative;
+  display: inline-flex;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--brand-accent, #d7b15f) 72%, transparent);
+  border-radius: 10px;
+  color: #171719 !important;
+  background: linear-gradient(
+    145deg,
+    color-mix(in srgb, var(--brand-accent, #d7b15f) 45%, white),
+    var(--brand-accent, #d7b15f) 48%,
+    color-mix(in srgb, var(--brand-accent, #d7b15f) 65%, black)
+  );
+  box-shadow:
+    0 3px 12px color-mix(in srgb, var(--brand-accent, #d7b15f) 22%, transparent),
+    inset 0 1px 0 rgba(255,255,255,.65);
+}
+.app .nav-brand-mark > span,
+.brand-editor-preview .nav-brand-mark > span {
+  color: #171719 !important;
+  -webkit-text-fill-color: #171719 !important;
+  font-size: 19px;
+  line-height: 1;
+  text-shadow: 0 1px 0 rgba(255,255,255,.55);
+}
+.app .nav-brand-mark::after,
+.brand-editor-preview .nav-brand-mark::after {
+  content: '';
+  position: absolute;
+  top: -30%;
+  bottom: -30%;
+  left: -80%;
+  width: 44%;
+  transform: rotate(22deg);
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.7), transparent);
+  animation: brandMarkShine 5.5s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes brandMarkShine {
+  0%, 55% { left: -80%; }
+  80%, 100% { left: 145%; }
+}
+.app .nav-brand-font--sport .nav-brand-name,
+.brand-editor-preview.nav-brand-font--sport .nav-brand-name {
+  font-family: var(--ff, 'Montserrat', system-ui, sans-serif);
+  font-weight: 900;
+  letter-spacing: -.055em;
+}
+.app .nav-brand-font--elegant .nav-brand-name,
+.brand-editor-preview.nav-brand-font--elegant .nav-brand-name {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-weight: 700;
+  letter-spacing: -.025em;
+}
+.app .nav-brand-font--modern .nav-brand-name,
+.brand-editor-preview.nav-brand-font--modern .nav-brand-name {
+  font-family: 'Arial', system-ui, sans-serif;
+  font-weight: 900;
+  letter-spacing: -.06em;
+}
+.brand-identity-settings .brand-settings-help {
+  margin: 7px 0 15px;
+  color: rgba(244,242,237,.55);
+  font-size: 11px;
+  line-height: 1.65;
+}
+.brand-editor-preview {
+  display: flex;
+  min-height: 78px;
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 16px;
+  padding: 17px 20px;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--brand-accent, #d7b15f) 28%, rgba(255,255,255,.1));
+  border-radius: 12px;
+  background:
+    radial-gradient(circle at 14% 50%, color-mix(in srgb, var(--brand-accent, #d7b15f) 17%, transparent), transparent 38%),
+    linear-gradient(135deg, #202127, #111216);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.045);
+}
+.brand-editor-preview .nav-brand-main { color: #f4f4f5; }
+.brand-editor-preview .nav-brand-name { font-size: 25px; }
+.brand-editor-preview .nav-brand-caption { color: #9da0a8; }
+.brand-identity-controls {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 14px;
+}
+.brand-identity-controls select {
+  width: 100%;
+  min-height: 42px;
+  padding: 9px 11px;
+  border: 1px solid rgba(255,255,255,.13);
+  border-radius: 9px;
+  background: #17191d;
+  color: #f4f2ed;
+  font: inherit;
+}
+.brand-color-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+.brand-color-preset {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 34px;
+  padding: 6px 9px;
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 8px;
+  background: rgba(255,255,255,.035);
+  color: #dedee3;
+  font-size: 11px;
+  font-weight: 700;
+}
+.brand-color-preset.active { border-color: rgba(215,177,95,.65); background: rgba(215,177,95,.1); }
+.brand-color-preset > span {
+  width: 12px;
+  height: 12px;
+  border: 1px solid rgba(255,255,255,.35);
+  border-radius: 50%;
+}
+.brand-custom-color {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 9px;
+  color: rgba(244,242,237,.48);
+  font-size: 10px;
+}
+.brand-custom-color input[type="color"] {
+  width: 34px;
+  height: 28px;
+  padding: 2px;
+  border: 1px solid rgba(255,255,255,.15);
+  border-radius: 6px;
+  background: #17191d;
+  cursor: pointer;
+}
+.brand-custom-color code { color: #d9d9df; font-size: 10px; }
+@media (max-width: 720px) {
+  .app .nav-brand { gap: 8px; max-width: 48vw; }
+  .app .nav-brand-mark { width: 30px; height: 30px; flex-basis: 30px; border-radius: 9px; }
+  .app .nav-brand-name { font-size: 18px; }
+  .app .nav-brand-caption { font-size: 7px; letter-spacing: .15em; }
+  .brand-identity-controls { grid-template-columns: 1fr; }
+  .brand-editor-preview .nav-brand-name { font-size: 22px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .app .nav-brand-mark::after { animation: none; }
+  .app .nav-brand-accent { transition: none; }
+}

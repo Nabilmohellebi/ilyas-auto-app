@@ -302,8 +302,8 @@ on public.settings for select to anon, authenticated
 using (
   key = any (array[
     'shop_name', 'shop_phone', 'shop_whatsapp', 'shop_email', 'shop_address',
-    'shop_horaires', 'shop_maps_url', 'shop_maps_embed', 'shop_phones',
-    'maintenance', 'trade_margin_percent'
+    'shop_horaires', 'shop_maps_url', 'shop_maps_embed', 'shop_phones', 'brand_identity',
+    'maintenance', 'trade_margin_percent', 'site_theme'
   ])
   or (select private.hbr_admin_session_valid())
 );

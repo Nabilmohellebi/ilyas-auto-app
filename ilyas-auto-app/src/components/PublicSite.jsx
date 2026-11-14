@@ -2,7 +2,7 @@ import { lazy, Suspense, useState, useEffect, useMemo } from 'react'
 import { supabase } from '../supabase'
 import { fmt, waLink } from '../utils/notify'
 import { ORIGINS, flagURI, PLACEHOLDER_IMG, BODY_TYPES } from '../data/vehicles-data'
-import { getSettings } from '../utils/useSettings'
+import { getSettings, parseBrandIdentity } from '../utils/useSettings'
 import { statutLabel } from '../i18n/translations'
 import { LangProvider, useLang } from '../i18n/LangContext'
 const ReservationModal = lazy(() => import('./ReservationModal'))
@@ -117,6 +117,8 @@ function PublicSiteInner() {
       }
     })(),
   }), [settings])
+
+  const brandIdentity = useMemo(() => parseBrandIdentity(settings.brand_identity), [settings.brand_identity])
 
   // ── Logo dynamique — dernier mot du nom mis en avant (accent) ──
   const logoParts = useMemo(() => {
@@ -240,7 +242,21 @@ function PublicSiteInner() {
       {/* ── Navigation ── */}
       <nav className="nav">
         <div className="nav-inner">
-          <a href="#accueil" className="nav-logo">{logoParts.rest && logoParts.rest + ' '}<em>{logoParts.last}</em></a>
+          <a
+            href="#accueil"
+            className={`nav-logo nav-brand nav-brand-font--${brandIdentity.fontStyle}`}
+            style={{ '--brand-accent': brandIdentity.accentColor }}
+            aria-label={s.nom}
+          >
+            <span className="nav-brand-mark" aria-hidden="true"><span>✦</span></span>
+            <span className="nav-brand-copy">
+              <span className="nav-brand-name">
+                {logoParts.rest && <span className="nav-brand-main">{logoParts.rest} </span>}
+                <span className="nav-brand-accent">{logoParts.last}</span>
+              </span>
+              <span className="nav-brand-caption">{lang === 'ar' ? 'معرض السيارات' : 'SHOWROOM AUTOMOBILE'}</span>
+            </span>
+          </a>
           <button type="button" onClick={togglePublicTheme} className="theme-toggle mobile-theme-toggle" aria-pressed={publicTheme === "dark"} aria-label={publicTheme === 'dark' ? 'Activer le mode clair' : 'Activer le mode sombre'} title={publicTheme === 'dark' ? 'Mode clair' : 'Mode sombre'}><span aria-hidden="true">{publicTheme === 'dark' ? '☀️' : '🌙'}</span><span className="theme-toggle-label">{publicTheme === 'dark' ? 'Clair' : 'Sombre'}</span></button>
           <div className="nav-links">
             <a onClick={() => scrollTo('accueil')} href="#accueil">{t.nav.accueil}</a>

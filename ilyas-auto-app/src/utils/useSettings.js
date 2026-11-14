@@ -6,12 +6,35 @@ let cacheTime = 0
 const CACHE_TTL = 2 * 60 * 1000 // 2 minutes
 
 const PUBLIC_SETTING_KEYS = [
-  'shop_name', 'shop_phone', 'shop_whatsapp', 'shop_email', 'shop_address',
+  'brand_identity', 'shop_name', 'shop_phone', 'shop_whatsapp', 'shop_email', 'shop_address',
   'shop_horaires', 'shop_maps_url', 'shop_maps_embed', 'shop_phones',
   'maintenance', 'trade_margin_percent', 'site_theme',
 ]
 
+export const DEFAULT_BRAND_IDENTITY = Object.freeze({
+  accentColor: '#d7b15f',
+  fontStyle: 'sport',
+})
+
+export function parseBrandIdentity(raw) {
+  const fallback = DEFAULT_BRAND_IDENTITY
+  let value = raw
+  if (typeof raw === 'string') {
+    try { value = JSON.parse(raw) } catch { value = null }
+  }
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return { ...fallback }
+  return {
+    accentColor: typeof value.accentColor === 'string' && /^#[0-9a-f]{6}$/i.test(value.accentColor)
+      ? value.accentColor
+      : fallback.accentColor,
+    fontStyle: ['sport', 'elegant', 'modern'].includes(value.fontStyle)
+      ? value.fontStyle
+      : fallback.fontStyle,
+  }
+}
+
 const DEFAULTS = {
+  brand_identity: JSON.stringify(DEFAULT_BRAND_IDENTITY),
   shop_name:       'Nabil Auto',
   shop_phone:      '',
   shop_whatsapp:   '',
