@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 
 
-function removeBorderConnectedWhiteBackground(canvas, tolerance = 64) {
+function removeBorderConnectedWhiteBackground(canvas, tolerance = 112) {
   const context = canvas.getContext('2d', { willReadFrequently: true })
   if (!context) throw new Error('Le navigateur ne peut pas traiter cette image.')
 
@@ -43,7 +43,7 @@ function removeBorderConnectedWhiteBackground(canvas, tolerance = 64) {
   const visited = new Uint8Array(total)
   const queue = new Int32Array(total)
   let tail = 0
-  const limit = Math.max(12, Math.min(112, Number(tolerance) || 64))
+  const limit = Math.max(24, Math.min(180, Number(tolerance) || 112))
 
   // La zone supprimée doit être reliée au bord : les blancs enfermés dans
   // les lettres ou les symboles du logo ne sont donc pas sélectionnés.
@@ -114,8 +114,8 @@ function removeBorderConnectedWhiteBackground(canvas, tolerance = 64) {
 
 function clampOffset(offset, drawWidth, drawHeight, width, height) {
   return {
-    x: Math.max(width - drawWidth, Math.min(0, offset.x)),
-    y: Math.max(height - drawHeight, Math.min(0, offset.y)),
+    x: Math.max(Math.min(0, width - drawWidth), Math.min(Math.max(0, width - drawWidth), offset.x)),
+    y: Math.max(Math.min(0, height - drawHeight), Math.min(Math.max(0, height - drawHeight), offset.y)),
   }
 }
 
@@ -138,7 +138,7 @@ export default function ImageCropper({
   const [working, setWorking] = useState(false)
   const [error, setError] = useState('')
   const [removeWhiteBackground, setRemoveWhiteBackground] = useState(Boolean(allowWhiteBackgroundRemoval))
-  const [edgeTolerance, setEdgeTolerance] = useState(64)
+  const [edgeTolerance, setEdgeTolerance] = useState(112)
   const frameAspectRatio = fitToImage && imageRef.current?.naturalWidth
     ? imageRef.current.naturalWidth / imageRef.current.naturalHeight
     : aspectRatio
@@ -153,7 +153,7 @@ export default function ImageCropper({
     setZoom(1)
     setOffset({ x: 0, y: 0 })
     setRemoveWhiteBackground(Boolean(allowWhiteBackgroundRemoval))
-    setEdgeTolerance(64)
+    setEdgeTolerance(112)
     image.onload = () => {
       if (!active) return
       imageRef.current = image
@@ -334,7 +334,7 @@ export default function ImageCropper({
           <input
             id="image-cropper-zoom"
             type="range"
-            min="1"
+            min={fitToImage ? 0.55 : 1}
             max="3"
             step="0.05"
             value={zoom}
@@ -357,20 +357,20 @@ export default function ImageCropper({
             </label>
             <div className="image-cropper-edge-control">
               <div>
-                <label htmlFor="image-cropper-edge-tolerance">Affiner les contours</label>
-                <strong>{edgeTolerance}%</strong>
+                <label htmlFor="image-cropper-edge-tolerance">Tolérance des contours</label>
+                <strong>{edgeTolerance}</strong>
               </div>
               <input
                 id="image-cropper-edge-tolerance"
                 type="range"
-                min="20"
-                max="112"
+                min="24"
+                max="180"
                 step="2"
                 value={edgeTolerance}
                 onChange={event => setEdgeTolerance(Number(event.target.value))}
                 disabled={!ready || working || !removeWhiteBackground}
               />
-              <small>Augmente si un liseré blanc reste visible. Diminue si le détourage enlève des détails clairs.</small>
+              <small>Augmente pour retirer davantage de halo clair. Diminue si des détails clairs du logo disparaissent.</small>
             </div>
             </div>
           )}
