@@ -1893,3 +1893,58 @@ input, select, textarea { font-family: var(--fb); outline: none; }
   .app .nav-brand-mark::after { animation: none; }
   .app .nav-brand-accent { transition: none; }
 }
+
+
+/* WhatsApp actions: use the recognizable WhatsApp green across the public site. */
+.app[data-theme] .nav-wa-btn,
+.app[data-theme] .veh-card-wa-bar,
+.app[data-theme] .wa-float {
+  background: #25D366 !important;
+  background-image: none !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  border-color: #25D366 !important;
+  box-shadow: 0 5px 18px rgba(37, 211, 102, .22) !important;
+}
+.app[data-theme] .nav-wa-btn:hover,
+.app[data-theme] .veh-card-wa-bar:hover {
+  background: #1FBD5B !important;
+  border-color: #1FBD5B !important;
+  box-shadow: 0 7px 22px rgba(37, 211, 102, .30) !important;
+}
+.app[data-theme] .wa-float:hover {
+  background: #1FBD5B !important;
+  box-shadow: 0 8px 24px rgba(37, 211, 102, .34) !important;
+}
+
+/* Vehicle prices: warm champagne gold instead of alert-like red. */
+.app[data-theme] .veh-price-strip .price {
+  color: #E8C77E !important;
+  -webkit-text-fill-color: #E8C77E !important;
+  text-shadow: 0 1px 10px rgba(0, 0, 0, .28) !important;
+}
+.app[data-theme] .vd-price,
+.app[data-theme] .vd-bottom-price strong {
+  color: #B58A43 !important;
+  -webkit-text-fill-color: #B58A43 !important;
+  text-shadow: none !important;
+}
+.app[data-theme] .veh-strip-info .price,
+.app[data-theme] .edito-card-info .price,
+.app[data-theme] .cmp-price-cell {
+  color: #A77B35 !important;
+  -webkit-text-fill-color: #A77B35 !important;
+}
+.app[data-theme="dark"] .vd-price,
+.app[data-theme="dark"] .vd-bottom-price strong,
+.app[data-theme="dark"] .veh-strip-info .price,
+.app[data-theme="dark"] .edito-card-info .price,
+.app[data-theme="dark"] .cmp-price-cell {
+  color: #E8C77E !important;
+  -webkit-text-fill-color: #E8C77E !important;
+}
+.app[data-theme="ivory"] .vd-price,
+.app[data-theme="ivory"] .vd-bottom-price strong {
+  color: #987033 !important;
+  -webkit-text-fill-color: #987033 !important;
+}
