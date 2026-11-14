@@ -6,6 +6,7 @@ import { STATUTS, PLACEHOLDER_IMG, flagURI } from '../../data/vehicles-data'
 import VehicleForm from './VehicleForm'
 import CRMPanel from './CRMPanel'
 import FinancePanel from './FinancePanel'
+import ImageCropper from './ImageCropper'
 
 const RES_STATUTS = [
   { key: 'nouvelle',  label: '🆕 Nouvelle' },
@@ -47,6 +48,7 @@ function AdminSettings({ onLogout, onToast, onBrandNameChange }) {
   const [heroImages, setHeroImages] = useState([])
   const [heroUploading, setHeroUploading] = useState(false)
   const [heroSaving, setHeroSaving] = useState(false)
+  const [cropQueue, setCropQueue] = useState([])
   const logoInputRef = useRef(null)
   const heroInputRef = useRef(null)
   const initialLogoPath = useRef('')
@@ -127,24 +129,15 @@ function AdminSettings({ onLogout, onToast, onBrandNameChange }) {
     return { url: publicData.publicUrl, path: data.path }
   }
 
-  async function handleLogoUpload(event) {
+  function handleLogoUpload(event) {
     const file = event.target.files?.[0]
     event.target.value = ''
     if (!file) return
     setLogoUploading(true)
-    try {
-      const image = await uploadShowroomImage(file, 'logo')
-      // Map the generic upload result to the brand identity fields consumed by the site.
-      setBrandIdentity(current => ({ ...current, logoUrl: image.url, logoPath: image.path }))
-      onToast && onToast('✅ Logo importé. Clique sur « Enregistrer le logo » pour le publier.', 'default')
-    } catch (e) {
-      onToast && onToast('❌ Impossible d’importer le logo : ' + e.message, 'error')
-    } finally {
-      setLogoUploading(false)
-    }
+    setCropQueue([{ file, kind: 'logo', title: 'Recadrer mon logo', aspectRatio: 3.8, outputFormat: 'image/png' }])
   }
 
-  async function handleHeroUpload(event) {
+  function handleHeroUpload(event) {
     const files = Array.from(event.target.files || [])
     event.target.value = ''
     if (!files.length) return
@@ -153,16 +146,43 @@ function AdminSettings({ onLogout, onToast, onBrandNameChange }) {
       return
     }
     setHeroUploading(true)
+    setCropQueue(files.map((file, index) => ({
+      file,
+      kind: 'hero',
+      title: 'Recadrer la photo de couverture ' + (index + 1) + '/' + files.length,
+      aspectRatio: 16 / 9,
+      outputFormat: 'image/jpeg',
+    })))
+  }
+
+  async function confirmCropUpload(croppedFile) {
+    const task = cropQueue[0]
+    if (!task) return
     try {
-      const uploaded = []
-      for (const file of files) uploaded.push(await uploadShowroomImage(file, 'hero'))
-      setHeroImages(current => [...current, ...uploaded])
-      onToast && onToast(`✅ ${uploaded.length} photo(s) importée(s). Clique sur « Enregistrer les photos » pour publier.`, 'default')
+      const image = await uploadShowroomImage(croppedFile, task.kind === 'logo' ? 'logo' : 'hero')
+      if (task.kind === 'logo') {
+        setBrandIdentity(current => ({ ...current, logoUrl: image.url, logoPath: image.path }))
+        onToast && onToast('✅ Logo recadré et importé. Clique sur « Enregistrer le logo » pour le publier.', 'default')
+      } else {
+        setHeroImages(current => [...current, image])
+        onToast && onToast('✅ Photo recadrée et ajoutée. Clique sur « Enregistrer les photos » pour publier.', 'default')
+      }
     } catch (e) {
-      onToast && onToast('❌ Import des photos interrompu : ' + e.message, 'error')
+      onToast && onToast('❌ Impossible d’importer cette image : ' + e.message, 'error')
     } finally {
-      setHeroUploading(false)
+      const remaining = cropQueue.slice(1)
+      setCropQueue(remaining)
+      if (!remaining.length) {
+        setLogoUploading(false)
+        setHeroUploading(false)
+      }
     }
+  }
+
+  function cancelCropQueue() {
+    setCropQueue([])
+    setLogoUploading(false)
+    setHeroUploading(false)
   }
 
   async function saveBrandIdentity() {
@@ -545,6 +565,17 @@ function AdminSettings({ onLogout, onToast, onBrandNameChange }) {
         <h3>🚪 Session</h3>
         <button className="act-btn danger" onClick={onLogout}>🚪 Se déconnecter</button>
       </div>
+      {cropQueue[0] && (
+        <ImageCropper
+          key={cropQueue[0].kind + '-' + cropQueue[0].file.name + '-' + cropQueue.length}
+          file={cropQueue[0].file}
+          title={cropQueue[0].title}
+          aspectRatio={cropQueue[0].aspectRatio}
+          outputFormat={cropQueue[0].outputFormat}
+          onCancel={cancelCropQueue}
+          onConfirm={confirmCropUpload}
+        />
+      )}
     </div>
   )
 }
@@ -572,6 +603,7 @@ export default function AdminPanel({ onLogout, onToast }) {
   const [sellRequests, setSellRequests] = useState([])
   const [newTesti, setNewTesti] = useState({ nom: '', role: '', texte: '', note: 5, photo_url: '' })
   const [testiUploading, setTestiUploading] = useState(false)
+  const [testiCropFile, setTestiCropFile] = useState(null)
   const [newMsg, setNewMsg] = useState('')
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
@@ -1114,11 +1146,10 @@ export default function AdminPanel({ onLogout, onToast }) {
                 </div>
                 <div className="form-field">
                   <label>Photo (optionnel)</label>
-                  <input type="file" accept="image/*" onChange={async e => {
-                    const f = e.target.files[0]
-                    if (!f) return
-                    const url = await uploadTestiPhoto(f)
-                    if (url) setNewTesti(t => ({ ...t, photo_url: url }))
+                  <input type="file" accept="image/*" onChange={e => {
+                    const f = e.target.files?.[0]
+                    e.target.value = ''
+                    if (f) setTestiCropFile(f)
                   }} style={{ background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.1)', borderRadius: 9, padding: 8, color: 'white', fontSize: 12, width: '100%' }} />
                 </div>
               </div>
@@ -1190,6 +1221,20 @@ export default function AdminPanel({ onLogout, onToast }) {
 
       {editVeh !== null && (
         <VehicleForm vehicle={editVeh || null} onClose={() => setEditVeh(null)} onSave={saveVehicle} />
+      )}
+      {testiCropFile && (
+        <ImageCropper
+          file={testiCropFile}
+          title="Recadrer le portrait du témoignage"
+          aspectRatio={1}
+          outputFormat="image/jpeg"
+          onCancel={() => setTestiCropFile(null)}
+          onConfirm={async file => {
+            const url = await uploadTestiPhoto(file)
+            if (url) setNewTesti(t => ({ ...t, photo_url: url }))
+            setTestiCropFile(null)
+          }}
+        />
       )}
     </div>
   )
