@@ -500,3 +500,63 @@
   color: #B7B7BD !important;
   -webkit-text-fill-color: #B7B7BD !important;
 }
+
+
+/* Vehicle detail — financing simulator contrast in dark mode.
+   The shared legacy --card token is white in the public light preset;
+   give this nested result panel its own dark surface instead. */
+.app[data-theme="dark"] .finance-calculator .finance-calculator-description {
+  color: #B7B7BD !important;
+  -webkit-text-fill-color: #B7B7BD !important;
+}
+.app[data-theme="dark"] .finance-calculator .form-field label {
+  color: #C9C9D0 !important;
+  -webkit-text-fill-color: #C9C9D0 !important;
+}
+.app[data-theme="dark"] .finance-calculator .form-field input[type="range"] {
+  accent-color: #E8C77E !important;
+}
+.app[data-theme="dark"] .finance-calculator .form-field select {
+  background: #222226 !important;
+  border-color: #45454D !important;
+  color: #F4F4F5 !important;
+  -webkit-text-fill-color: #F4F4F5 !important;
+}
+.app[data-theme="dark"] .finance-calculator .finance-result {
+  background: linear-gradient(145deg, #25252B 0%, #1C1C21 100%) !important;
+  border: 1px solid #45454D !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.035), 0 8px 22px rgba(0,0,0,.16) !important;
+}
+.app[data-theme="dark"] .finance-calculator .finance-result .lbl {
+  color: #B7B7BD !important;
+  -webkit-text-fill-color: #B7B7BD !important;
+}
+.app[data-theme="dark"] .finance-calculator .finance-result > div > strong {
+  color: #F4F4F5 !important;
+  -webkit-text-fill-color: #F4F4F5 !important;
+}
+.app[data-theme="dark"] .finance-calculator .finance-highlight {
+  border-top-color: #45454D !important;
+}
+.app[data-theme="dark"] .finance-calculator .finance-highlight strong {
+  color: #E8C77E !important;
+  -webkit-text-fill-color: #E8C77E !important;
+}
+
+/* Close control stays visible over both light and dark vehicle photos. */
+.app[data-theme="dark"] .vd-close-float {
+  width: 42px !important;
+  height: 42px !important;
+  background: rgba(20,20,24,.96) !important;
+  border: 1px solid rgba(232,199,126,.78) !important;
+  color: #E8C77E !important;
+  -webkit-text-fill-color: #E8C77E !important;
+  font-size: 19px !important;
+  font-weight: 800 !important;
+  box-shadow: 0 5px 18px rgba(0,0,0,.42), 0 0 0 3px rgba(232,199,126,.08) !important;
+}
+.app[data-theme="dark"] .vd-close-float:hover {
+  background: #E8C77E !important;
+  color: #171719 !important;
+  -webkit-text-fill-color: #171719 !important;
+}

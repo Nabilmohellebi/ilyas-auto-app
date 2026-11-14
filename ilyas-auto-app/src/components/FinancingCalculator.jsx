@@ -22,9 +22,9 @@ export default function FinancingCalculator({ prix }) {
   }, [prix, apport, duree])
 
   return (
-    <div className="vd-section">
+    <div className="vd-section finance-calculator">
       <h3>{t.finance.titre}</h3>
-      <p style={{ fontSize: 12, color: 'rgba(255,255,255,.45)', marginBottom: 14, lineHeight: 1.6 }}>
+      <p className="finance-calculator-description">
         {t.finance.desc}
       </p>
 
