@@ -1877,3 +1877,35 @@
   .app .wa-float-close,
   .app .wa-dismiss-zone { transition: none; }
 }
+
+
+/* Reliable touch drag for the floating WhatsApp control. */
+.app .wa-float-shell,
+.app .wa-float {
+  touch-action: none !important;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.app .wa-float {
+  appearance: none;
+  -webkit-appearance: none;
+  padding: 0;
+  font: inherit;
+}
+.app .wa-float:focus-visible {
+  outline: 3px solid #128C7E;
+  outline-offset: 5px;
+}
+.app .wa-dismiss-zone {
+  width: min(250px, calc(100vw - 48px));
+  justify-content: center;
+  left: 50%;
+  bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+  padding: 9px 13px;
+  box-sizing: border-box;
+}
+.app .wa-dismiss-zone.visible {
+  background: rgba(23,28,32,.97);
+  border-color: rgba(239,68,68,.75);
+  box-shadow: 0 0 0 4px rgba(239,68,68,.13), 0 10px 30px rgba(0,0,0,.35);
+}
