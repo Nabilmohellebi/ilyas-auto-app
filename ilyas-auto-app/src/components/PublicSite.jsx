@@ -373,7 +373,7 @@ function PublicSiteInner() {
                     onClick={() => openVehicleDetail(v)}
                     onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openVehicleDetail(v) } }}
                   >
-                    <div className="veh-statut-badge" style={{ background: statutColor(v.statut) }}>{statutLabel(v.statut, lang)}</div>
+                    <div className="veh-statut-badge" data-status={v.statut} style={{ background: statutColor(v.statut) }}>{statutLabel(v.statut, lang)}</div>
                     <div className="veh-flag-badge">
                       <img src={flagURI(v.provenance)} style={{ width: 14, height: 10, borderRadius: 2 }} alt="" />
                       {ORIGINS[v.provenance]?.label || 'Monde'}
