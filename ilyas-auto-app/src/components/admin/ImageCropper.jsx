@@ -113,9 +113,14 @@ function removeBorderConnectedWhiteBackground(canvas, tolerance = 112) {
 }
 
 function clampOffset(offset, drawWidth, drawHeight, width, height) {
+  // Le décalage est symétrique autour du centre : on peut déplacer l’image
+  // aussi bien vers le haut que vers le bas, sans laisser apparaître de bord
+  // vide lorsque l’image est agrandie.
+  const rangeX = Math.abs(width - drawWidth) / 2
+  const rangeY = Math.abs(height - drawHeight) / 2
   return {
-    x: Math.max(Math.min(0, width - drawWidth), Math.min(Math.max(0, width - drawWidth), offset.x)),
-    y: Math.max(Math.min(0, height - drawHeight), Math.min(Math.max(0, height - drawHeight), offset.y)),
+    x: Math.max(-rangeX, Math.min(rangeX, offset.x)),
+    y: Math.max(-rangeY, Math.min(rangeY, offset.y)),
   }
 }
 
