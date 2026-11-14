@@ -1099,3 +1099,147 @@ input, select, textarea { font-family: var(--fb); outline: none; }
 .app[data-theme="dark"] .vd-ov,.app[data-theme="dark"] .vd-info,.app[data-theme="dark"] .vd-info-col {
  background:#171719 !important; color:#f4f4f5 !important;
 }
+
+
+/* ACCESSIBILITY / CONTRAST FIX — public light theme.
+   Older stylesheet rules still set many labels and headings to white.
+   Explicitly define readable foregrounds for every public-site text area. */
+.app[data-theme="light"] {
+  color: #242428 !important;
+  background: #ffffff !important;
+}
+.app[data-theme="light"] .hero-auto-content,
+.app[data-theme="light"] .hero-auto-content h1,
+.app[data-theme="light"] .hero-auto-content h1 span,
+.app[data-theme="light"] .hero-auto-content p,
+.app[data-theme="light"] .hero-eyebrow,
+.app[data-theme="light"] .section-head,
+.app[data-theme="light"] .section-head h2,
+.app[data-theme="light"] .section-head p,
+.app[data-theme="light"] .trust-grid .num,
+.app[data-theme="light"] .trust-grid .lbl,
+.app[data-theme="light"] .nav-logo,
+.app[data-theme="light"] .nav-links a,
+.app[data-theme="light"] .nav-burger,
+.app[data-theme="light"] .nav-mobile a,
+.app[data-theme="light"] .veh-strip-info .name,
+.app[data-theme="light"] .veh-strip-info .price,
+.app[data-theme="light"] .announce-item,
+.app[data-theme="light"] .filters-bar label,
+.app[data-theme="light"] .filters-bar input,
+.app[data-theme="light"] .filters-bar select,
+.app[data-theme="light"] .vehicle-category-tabs button,
+.app[data-theme="light"] .veh-card-top h3,
+.app[data-theme="light"] .veh-card-top p,
+.app[data-theme="light"] .veh-specs,
+.app[data-theme="light"] .veh-compare-check,
+.app[data-theme="light"] .showroom-info-row h4,
+.app[data-theme="light"] .showroom-info-row p,
+.app[data-theme="light"] .footer-logo,
+.app[data-theme="light"] .footer-sub,
+.app[data-theme="light"] .footer-social a,
+.app[data-theme="light"] .footer-track-btn,
+.app[data-theme="light"] .vd-title,
+.app[data-theme="light"] .vd-price,
+.app[data-theme="light"] .vd-old-price,
+.app[data-theme="light"] .vd-specs-grid,
+.app[data-theme="light"] .vd-specs-grid div,
+.app[data-theme="light"] .vd-section h3,
+.app[data-theme="light"] .vd-description,
+.app[data-theme="light"] .vd-equip-item,
+.app[data-theme="light"] .vd-video-card .txt-title,
+.app[data-theme="light"] .vd-gallery-full-title,
+.app[data-theme="light"] .vd-bottom-price .lbl,
+.app[data-theme="light"] .vd-print-btn,
+.app[data-theme="light"] .vd-share-btn,
+.app[data-theme="light"] .cmp-float-chip,
+.app[data-theme="light"] .cmp-hdr h2,
+.app[data-theme="light"] .cmp-table th,
+.app[data-theme="light"] .cmp-table td,
+.app[data-theme="light"] .cmp-label-col,
+.app[data-theme="light"] .cmp-veh-name,
+.app[data-theme="light"] .cmp-veh-model,
+.app[data-theme="light"] .empty,
+.app[data-theme="light"] .spinner {
+  color: #242428 !important;
+  text-shadow: none !important;
+}
+.app[data-theme="light"] .hero-eyebrow {
+  background: #f5f5f6 !important;
+  border-color: #e2e2e6 !important;
+}
+.app[data-theme="light"] .trust-grid .lbl,
+.app[data-theme="light"] .section-head p,
+.app[data-theme="light"] .veh-card-top p,
+.app[data-theme="light"] .veh-specs,
+.app[data-theme="light"] .announce-item,
+.app[data-theme="light"] .footer-sub,
+.app[data-theme="light"] .vd-old-price,
+.app[data-theme="light"] .vd-description,
+.app[data-theme="light"] .cmp-label-col,
+.app[data-theme="light"] .cmp-veh-model {
+  color: #62626a !important;
+}
+.app[data-theme="light"] .veh-strip,
+.app[data-theme="light"] .veh-strip-card,
+.app[data-theme="light"] .announce-bar,
+.app[data-theme="light"] .nav,
+.app[data-theme="light"] .nav-mobile,
+.app[data-theme="light"] .trust-bar,
+.app[data-theme="light"] .section,
+.app[data-theme="light"] .showroom-grid,
+.app[data-theme="light"] .footer-auto,
+.app[data-theme="light"] .vd-ov,
+.app[data-theme="light"] .vd-info,
+.app[data-theme="light"] .vd-info-col,
+.app[data-theme="light"] .vd-thumbs,
+.app[data-theme="light"] .cmp-float-bar,
+.app[data-theme="light"] .cmp-modal {
+  background-color: #ffffff !important;
+  color: #242428 !important;
+}
+.app[data-theme="light"] .veh-strip-tag,
+.app[data-theme="light"] .veh-statut-badge,
+.app[data-theme="light"] .veh-badge-tag,
+.app[data-theme="light"] .vd-badge,
+.app[data-theme="light"] .vd-disc,
+.app[data-theme="light"] .vd-arrow,
+.app[data-theme="light"] .vd-close-float,
+.app[data-theme="light"] .btn-hero-primary,
+.app[data-theme="light"] .nav-wa-btn,
+.app[data-theme="light"] .veh-card-wa-bar,
+.app[data-theme="light"] .wa-float {
+  color: #ffffff !important;
+}
+.app[data-theme="light"] .veh-strip-tag,
+.app[data-theme="light"] .veh-statut-badge,
+.app[data-theme="light"] .veh-badge-tag,
+.app[data-theme="light"] .vd-badge,
+.app[data-theme="light"] .vd-disc {
+  background-color: #850019 !important;
+}
+.app[data-theme="light"] .filters-bar input::placeholder {
+  color: #777780 !important;
+  opacity: 1 !important;
+}
+.app[data-theme="light"] .filters-bar input,
+.app[data-theme="light"] .filters-bar select {
+  background: #ffffff !important;
+  border-color: #d8d8de !important;
+}
+.app[data-theme="light"] .vd-specs-grid div,
+.app[data-theme="light"] .cmp-table th,
+.app[data-theme="light"] .cmp-table td,
+.app[data-theme="light"] .cmp-float-chip {
+  background: #f7f7f8 !important;
+  border-color: #e3e3e7 !important;
+}
+.app[data-theme="light"] .vd-print-btn,
+.app[data-theme="light"] .vd-share-btn {
+  background: #f5f5f6 !important;
+  border-color: #ddddE2 !important;
+}
+.app[data-theme="light"] .veh-price-strip .price,
+.app[data-theme="light"] .veh-price-strip .old {
+  color: #ffffff !important;
+}
