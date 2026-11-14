@@ -566,52 +566,52 @@
    VEHICLE DETAIL — LIGHT THEME, WARM PREMIUM PRESENTATION
    Replace the flat all-white sheet with layered warm surfaces.
    ============================================================ */
-.app[data-theme="light"] .vd-ov {
+.app[data-theme="ivory"] .vd-ov {
   background: #F1EFEA !important;
   color: #292722 !important;
 }
-.app[data-theme="light"] .vd-gallery {
+.app[data-theme="ivory"] .vd-gallery {
   background: #E9E4DA !important;
   box-shadow: 0 12px 34px rgba(47, 39, 27, .10);
 }
-.app[data-theme="light"] .vd-thumbs {
+.app[data-theme="ivory"] .vd-thumbs {
   background: #E9E5DC !important;
   border-top: 1px solid #DED7CA !important;
 }
-.app[data-theme="light"] .vd-info-col {
+.app[data-theme="ivory"] .vd-info-col {
   background: transparent !important;
 }
-.app[data-theme="light"] .vd-info {
+.app[data-theme="ivory"] .vd-info {
   background: linear-gradient(155deg, #FFFEFB 0%, #F9F6F0 100%) !important;
   border: 1px solid #E5DED2 !important;
   border-radius: 18px !important;
   box-shadow: 0 12px 34px rgba(47, 39, 27, .075) !important;
   color: #292722 !important;
 }
-.app[data-theme="light"] .vd-title {
+.app[data-theme="ivory"] .vd-title {
   color: #28251F !important;
   -webkit-text-fill-color: #28251F !important;
   letter-spacing: -.035em;
 }
-.app[data-theme="light"] .vd-price {
+.app[data-theme="ivory"] .vd-price {
   color: #987033 !important;
   -webkit-text-fill-color: #987033 !important;
   text-shadow: 0 2px 12px rgba(152, 112, 51, .12) !important;
 }
-.app[data-theme="light"] .vd-specs-grid div {
+.app[data-theme="ivory"] .vd-specs-grid div {
   background: linear-gradient(145deg, #F6F2EA, #EEE9DF) !important;
   border: 1px solid #E3DCCE !important;
   color: #4A453C !important;
   box-shadow: inset 0 1px 0 rgba(255,255,255,.8) !important;
 }
-.app[data-theme="light"] .vd-specs-grid div:hover {
+.app[data-theme="ivory"] .vd-specs-grid div:hover {
   border-color: #CDAA69 !important;
   background: #F8F2E5 !important;
 }
-.app[data-theme="light"] .vd-specs-grid .ic {
+.app[data-theme="ivory"] .vd-specs-grid .ic {
   color: #987033 !important;
 }
-.app[data-theme="light"] .vd-section {
+.app[data-theme="ivory"] .vd-section {
   margin-top: 20px !important;
   padding: 17px !important;
   border: 1px solid #E7DFD2 !important;
@@ -620,47 +620,47 @@
   background: linear-gradient(145deg, #FFFEFC, #F7F3EC) !important;
   box-shadow: 0 6px 18px rgba(47, 39, 27, .045) !important;
 }
-.app[data-theme="light"] .vd-section h3 {
+.app[data-theme="ivory"] .vd-section h3 {
   color: #514536 !important;
   -webkit-text-fill-color: #514536 !important;
 }
-.app[data-theme="light"] .vd-description,
-.app[data-theme="light"] .vd-equip-item {
+.app[data-theme="ivory"] .vd-description,
+.app[data-theme="ivory"] .vd-equip-item {
   color: #625D54 !important;
   -webkit-text-fill-color: #625D54 !important;
 }
-.app[data-theme="light"] .vd-equip-item span {
+.app[data-theme="ivory"] .vd-equip-item span {
   color: #987033 !important;
   -webkit-text-fill-color: #987033 !important;
 }
-.app[data-theme="light"] .vd-video-card {
+.app[data-theme="ivory"] .vd-video-card {
   background: linear-gradient(135deg, #F8F1E4, #F1E7D5) !important;
   border-color: #E2D2B5 !important;
 }
-.app[data-theme="light"] .vd-video-card .txt-title {
+.app[data-theme="ivory"] .vd-video-card .txt-title {
   color: #514536 !important;
   -webkit-text-fill-color: #514536 !important;
 }
-.app[data-theme="light"] .vd-gallery-full-wrap {
+.app[data-theme="ivory"] .vd-gallery-full-wrap {
   color: #514536 !important;
 }
-.app[data-theme="light"] .vd-gallery-full-title {
+.app[data-theme="ivory"] .vd-gallery-full-title {
   color: #514536 !important;
   -webkit-text-fill-color: #514536 !important;
   border-top-color: #DED7CA !important;
 }
-.app[data-theme="light"] .vd-bottom {
+.app[data-theme="ivory"] .vd-bottom {
   background: rgba(250, 247, 241, .97) !important;
   border-top: 1px solid #DED3C1 !important;
   box-shadow: 0 -8px 26px rgba(47, 39, 27, .08) !important;
 }
-.app[data-theme="light"] .vd-bottom-price .lbl {
+.app[data-theme="ivory"] .vd-bottom-price .lbl {
   color: #817767 !important;
   -webkit-text-fill-color: #817767 !important;
 }
 
 /* The close button must have its own dark-red surface, not white text on white. */
-.app[data-theme="light"] .vd-close-float {
+.app[data-theme="ivory"] .vd-close-float {
   width: 42px !important;
   height: 42px !important;
   background: #850019 !important;
@@ -672,7 +672,7 @@
   line-height: 1 !important;
   box-shadow: 0 5px 18px rgba(72, 0, 15, .28), 0 0 0 1px rgba(133,0,25,.18) !important;
 }
-.app[data-theme="light"] .vd-close-float:hover {
+.app[data-theme="ivory"] .vd-close-float:hover {
   background: #A10D2B !important;
   border-color: #FFFFFF !important;
   transform: scale(1.05);
@@ -696,66 +696,66 @@
 }
 
 /* Warm up the financing panel in light mode so it feels like part of the page. */
-.app[data-theme="light"] .finance-calculator .finance-calculator-description {
+.app[data-theme="ivory"] .finance-calculator .finance-calculator-description {
   color: #726B60 !important;
   -webkit-text-fill-color: #726B60 !important;
 }
-.app[data-theme="light"] .finance-calculator .form-field label {
+.app[data-theme="ivory"] .finance-calculator .form-field label {
   color: #6A6052 !important;
   -webkit-text-fill-color: #6A6052 !important;
 }
-.app[data-theme="light"] .finance-calculator .form-field select {
+.app[data-theme="ivory"] .finance-calculator .form-field select {
   background: #F6F2EA !important;
   border-color: #DDD3C3 !important;
   color: #38332B !important;
   -webkit-text-fill-color: #38332B !important;
 }
-.app[data-theme="light"] .finance-calculator .form-field input[type="range"] {
+.app[data-theme="ivory"] .finance-calculator .form-field input[type="range"] {
   accent-color: #987033 !important;
 }
-.app[data-theme="light"] .finance-calculator .finance-result {
+.app[data-theme="ivory"] .finance-calculator .finance-result {
   background: linear-gradient(145deg, #F2EBDD, #EAE1D1) !important;
   border: 1px solid #DCCBAE !important;
   box-shadow: inset 0 1px 0 rgba(255,255,255,.72) !important;
 }
-.app[data-theme="light"] .finance-calculator .finance-result .lbl {
+.app[data-theme="ivory"] .finance-calculator .finance-result .lbl {
   color: #776B59 !important;
   -webkit-text-fill-color: #776B59 !important;
 }
-.app[data-theme="light"] .finance-calculator .finance-result > div > strong {
+.app[data-theme="ivory"] .finance-calculator .finance-result > div > strong {
   color: #4B4133 !important;
   -webkit-text-fill-color: #4B4133 !important;
 }
-.app[data-theme="light"] .finance-calculator .finance-highlight {
+.app[data-theme="ivory"] .finance-calculator .finance-highlight {
   border-top-color: #D7C6A9 !important;
 }
-.app[data-theme="light"] .finance-calculator .finance-highlight strong {
+.app[data-theme="ivory"] .finance-calculator .finance-highlight strong {
   color: #8A642D !important;
   -webkit-text-fill-color: #8A642D !important;
 }
 
 @media (max-width: 859px) {
-  .app[data-theme="light"] .vd-info {
+  .app[data-theme="ivory"] .vd-info {
     margin: 0 12px 20px !important;
     padding: 20px 16px 100px !important;
   }
-  .app[data-theme="light"] .vd-gallery {
+  .app[data-theme="ivory"] .vd-gallery {
     margin: 12px 12px 0 !important;
     width: calc(100% - 24px) !important;
     border-radius: 16px !important;
   }
-  .app[data-theme="light"] .vd-thumbs {
+  .app[data-theme="ivory"] .vd-thumbs {
     margin: 0 12px 12px !important;
     border-radius: 0 0 14px 14px !important;
   }
 }
 @media (min-width: 860px) {
-  .app[data-theme="light"] .vd-layout {
+  .app[data-theme="ivory"] .vd-layout {
     align-items: flex-start;
     gap: 28px !important;
     padding: 34px 32px 24px !important;
   }
-  .app[data-theme="light"] .vd-info {
+  .app[data-theme="ivory"] .vd-info {
     padding: 24px !important;
   }
 }
@@ -847,4 +847,186 @@
 }
 @media (max-width: 560px) {
   .image-cropper-edge-control { padding-left: 13px; }
+}
+
+
+/* ============================================================
+   PUBLIC LIGHT PRESET — WARM IVORY, NOT PURE WHITE
+   This is the single light appearance used by the public toggle.
+   ============================================================ */
+.app[data-theme="ivory"] {
+  color-scheme: light;
+  background: #f4efe6 !important;
+  color: #463d32 !important;
+}
+.app[data-theme="ivory"] :where(
+  h1,h2,h3,h4,h5,h6,p,span,a,label,small,strong,em,b,i,
+  li,dt,dd,th,td,figcaption,summary,legend,caption,button
+) {
+  color: #463d32 !important;
+  -webkit-text-fill-color: currentColor;
+  text-shadow: none !important;
+}
+.app[data-theme="ivory"] :where(
+  .nav,.nav-mobile,.trust-bar,.section,.editorial-selection,.testimonials-section,
+  .showroom-grid,.footer-auto,.veh-strip,.veh-strip-card,.announce-bar,
+  .cmp-float-bar,.cmp-modal
+) {
+  background: #f4efe6 !important;
+  color: #463d32 !important;
+  border-color: #e4dacb !important;
+}
+.app[data-theme="ivory"] .nav {
+  background: rgba(248, 244, 236, .96) !important;
+  border-bottom: 1px solid #e4dacb !important;
+}
+.app[data-theme="ivory"] .nav-mobile {
+  background: #f8f4ec !important;
+  border-color: #e4dacb !important;
+}
+.app[data-theme="ivory"] .trust-bar,
+.app[data-theme="ivory"] .announce-bar,
+.app[data-theme="ivory"] .veh-strip,
+.app[data-theme="ivory"] .veh-strip-card {
+  background: #eee7db !important;
+}
+.app[data-theme="ivory"] .section,
+.app[data-theme="ivory"] .editorial-selection,
+.app[data-theme="ivory"] .testimonials-section,
+.app[data-theme="ivory"] .showroom-grid,
+.app[data-theme="ivory"] .footer-auto {
+  background: #f4efe6 !important;
+}
+.app[data-theme="ivory"] .veh-card {
+  background: linear-gradient(155deg, #fffdf8 0%, #f1eadf 100%) !important;
+  border: 1px solid #e2d8c8 !important;
+  box-shadow: 0 8px 24px rgba(73, 57, 35, .08) !important;
+}
+.app[data-theme="ivory"] .veh-card-body {
+  background: #fffaf2 !important;
+  color: #463d32 !important;
+}
+.app[data-theme="ivory"] .veh-card-top h3,
+.app[data-theme="ivory"] .section-head h2,
+.app[data-theme="ivory"] .nav-logo,
+.app[data-theme="ivory"] .nav-links a,
+.app[data-theme="ivory"] .nav-mobile a,
+.app[data-theme="ivory"] .veh-strip-info .name,
+.app[data-theme="ivory"] .showroom-info-row h4,
+.app[data-theme="ivory"] .footer-logo {
+  color: #463d32 !important;
+  -webkit-text-fill-color: #463d32 !important;
+}
+.app[data-theme="ivory"] :where(
+  .section-head p,.trust-grid .lbl,.announce-item,.veh-card-top p,.veh-specs,
+  .showroom-info-row p,.footer-sub,.testi-quote,.testi-role,
+  .veh-strip-info .name,.vd-description,.vd-old-price,.vd-bottom-price .lbl,
+  .cmp-label-col,.cmp-veh-model
+) {
+  color: #756958 !important;
+  -webkit-text-fill-color: currentColor !important;
+}
+.app[data-theme="ivory"] .filters-bar {
+  background: #eee7db !important;
+  border: 1px solid #ded2c0 !important;
+  box-shadow: 0 8px 22px rgba(73, 57, 35, .055) !important;
+}
+.app[data-theme="ivory"] :where(input,select,textarea,option) {
+  color: #463d32 !important;
+  -webkit-text-fill-color: #463d32 !important;
+  background-color: #fbf8f1 !important;
+  border-color: #ded4c5 !important;
+  caret-color: #463d32 !important;
+}
+.app[data-theme="ivory"] :where(input,textarea)::placeholder {
+  color: #8a7e6d !important;
+  -webkit-text-fill-color: #8a7e6d !important;
+  opacity: 1 !important;
+}
+.app[data-theme="ivory"] .filters-bar input,
+.app[data-theme="ivory"] .filters-bar select {
+  background: #fbf8f1 !important;
+  border-color: #ded4c5 !important;
+}
+.app[data-theme="ivory"] .hero-eyebrow {
+  background: rgba(70, 61, 50, .45) !important;
+  border-color: rgba(248, 232, 197, .45) !important;
+  color: #fbf4e7 !important;
+  -webkit-text-fill-color: #fbf4e7 !important;
+}
+.app[data-theme="ivory"] .hero-auto-content,
+.app[data-theme="ivory"] .hero-auto-content :where(h1,h2,h3,p,span) {
+  color: #fbf4e7 !important;
+  -webkit-text-fill-color: #fbf4e7 !important;
+}
+.app[data-theme="ivory"] .hero-auto-content h1 span {
+  color: #e8c77e !important;
+  -webkit-text-fill-color: #e8c77e !important;
+}
+.app[data-theme="ivory"] .vd-ov {
+  background: #f1ece3 !important;
+  color: #463d32 !important;
+}
+.app[data-theme="ivory"] .vd-gallery,
+.app[data-theme="ivory"] .vd-thumbs {
+  background: #e9e2d6 !important;
+  border-color: #ded4c5 !important;
+}
+.app[data-theme="ivory"] .vd-info {
+  background: linear-gradient(155deg, #fffaf2 0%, #f5eee3 100%) !important;
+  border-color: #e2d8c8 !important;
+  color: #463d32 !important;
+}
+.app[data-theme="ivory"] .vd-section,
+.app[data-theme="ivory"] .vd-specs-grid div,
+.app[data-theme="ivory"] .cmp-table th,
+.app[data-theme="ivory"] .cmp-table td,
+.app[data-theme="ivory"] .cmp-float-chip {
+  background: #f6f0e6 !important;
+  border-color: #e1d7c8 !important;
+  color: #514638 !important;
+}
+.app[data-theme="ivory"] .vd-bottom {
+  background: rgba(248, 244, 236, .97) !important;
+  border-top-color: #ded4c5 !important;
+}
+.app[data-theme="ivory"] .vd-title,
+.app[data-theme="ivory"] .vd-section h3 {
+  color: #40372d !important;
+  -webkit-text-fill-color: #40372d !important;
+}
+.app[data-theme="ivory"] .vd-price,
+.app[data-theme="ivory"] .vd-specs-grid .ic,
+.app[data-theme="ivory"] .vd-equip-item span {
+  color: #987033 !important;
+  -webkit-text-fill-color: #987033 !important;
+}
+.app[data-theme="ivory"] :where(
+  .nav-wa-btn,.btn-hero-primary,.veh-card-wa-bar,.wa-float,
+  .veh-price-strip,.veh-price-strip *,
+  .veh-strip-tag,.veh-statut-badge,.veh-badge-tag,
+  .vd-badge,.vd-disc,.vd-arrow,.vd-counter,.stamp-sold,
+  .btn-save,.act-btn.primary
+) {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
+.app[data-theme="ivory"] .vd-close-float {
+  color: #f8e8c5 !important;
+  -webkit-text-fill-color: #f8e8c5 !important;
+}
+.app[data-theme="ivory"] .theme-toggle {
+  color: #463d32 !important;
+  background: #eee7db !important;
+  border-color: #ded2c0 !important;
+}
+.app[data-theme="ivory"] .veh-strip-fade.left {
+  background: linear-gradient(90deg, #eee7db, transparent) !important;
+}
+.app[data-theme="ivory"] .veh-strip-fade.right {
+  background: linear-gradient(270deg, #eee7db, transparent) !important;
+}
+.app[data-theme="ivory"] svg,
+.app[data-theme="ivory"] svg * {
+  -webkit-text-fill-color: initial;
 }
