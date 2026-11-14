@@ -171,7 +171,7 @@ export default function VehicleDetail({ vehicle: v, onClose, onReserve, shopName
                 </div>
                 <div className="vd-counter">{idx + 1}/{images.length}</div>
               </>}
-              <div className="vd-statut-float" style={{ background: statutColor(v.statut) }}>{statutLabel(v.statut, lang)}</div>
+              <div className="vd-statut-float" data-status={v.statut} style={{ background: statutColor(v.statut) }}>{statutLabel(v.statut, lang)}</div>
               {disabled && <div className="stamp-sold">{lang === 'ar' ? 'مباعة' : 'Vendu'}</div>}
             </div>
           ) : (
