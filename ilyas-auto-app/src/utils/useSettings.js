@@ -21,6 +21,7 @@ const DEFAULTS = {
   shop_maps_url:   '',
   shop_maps_embed: '',
   maintenance:     'false',
+  site_theme:      'light',
 }
 
 export async function getSettings() {
