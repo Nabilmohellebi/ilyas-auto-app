@@ -1524,3 +1524,51 @@
 @media (prefers-reduced-motion: reduce) {
   .app[data-theme] .cmp-veh-card { transition: none; }
 }
+
+
+/* Partage des favoris — actions visibles, retour de copie et état désactivé. */
+.app[data-theme] .catalogue-share-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 38px;
+  padding: 8px 13px;
+  border: 1px solid var(--theme-border);
+  border-radius: 999px;
+  background: rgba(190,150,85,.12);
+  color: var(--theme-text) !important;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 850;
+  cursor: pointer;
+  transition: transform .18s ease, border-color .18s ease, background .18s ease, opacity .18s ease;
+}
+.app[data-theme] .catalogue-share-btn > span {
+  color: var(--brand-accent, #bd9557);
+  font-size: 15px;
+  line-height: 1;
+}
+.app[data-theme] .catalogue-share-btn:hover:not(:disabled) {
+  border-color: var(--brand-accent, #bd9557);
+  background: rgba(190,150,85,.2);
+  transform: translateY(-1px);
+}
+.app[data-theme] .catalogue-share-btn:disabled {
+  opacity: .45;
+  cursor: not-allowed;
+}
+.app[data-theme] .catalogue-share-feedback {
+  margin: -7px 0 14px;
+  color: var(--theme-muted) !important;
+  font-size: 11px;
+  line-height: 1.55;
+}
+.app[data-theme] .catalogue-share-btn:focus-visible {
+  outline: 2px solid var(--brand-accent, #bd9557);
+  outline-offset: 3px;
+}
+@media (max-width: 520px) {
+  .app[data-theme] .catalogue-share-btn { min-height: 42px; }
+  .app[data-theme] .catalogue-share-feedback { margin: -5px 0 12px; }
+}
