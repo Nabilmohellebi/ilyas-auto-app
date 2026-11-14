@@ -9,7 +9,7 @@ function isWhatsAppUrl(value) {
     const url = new URL(value)
     return url.protocol === 'https:'
       && url.hostname === 'wa.me'
-      && /^\\d{8,15}$/.test(url.pathname.replace(/^\\//, ''))
+      && /^\d{8,15}$/.test(url.pathname.replace(/^\//, ''))
   } catch {
     return false
   }
