@@ -999,10 +999,11 @@ input, select, textarea { font-family: var(--fb); outline: none; }
 .app .veh-specs { color: #5e5e65 !important; }
 .app .veh-actions { display: none !important; }
 .app .veh-compare-check { color: #66666d !important; }
-.app .veh-flag-badge {
-  background: rgba(255,255,255,.94) !important;
+.app[data-theme="light"] .veh-flag-badge {
+  background: rgba(255,255,255,.96) !important;
   color: #242428 !important;
   border: 1px solid #e6e6e9 !important;
+  -webkit-text-fill-color: #242428 !important;
 }
 .app .veh-statut-badge { color: #fff !important; }
 .app .showroom-info-row h4 { color: #242428 !important; }
@@ -1199,7 +1200,6 @@ input, select, textarea { font-family: var(--fb); outline: none; }
   color: #242428 !important;
 }
 .app[data-theme="light"] .veh-strip-tag,
-.app[data-theme="light"] .veh-statut-badge,
 .app[data-theme="light"] .veh-badge-tag,
 .app[data-theme="light"] .vd-badge,
 .app[data-theme="light"] .vd-disc,
@@ -1211,8 +1211,6 @@ input, select, textarea { font-family: var(--fb); outline: none; }
 .app[data-theme="light"] .wa-float {
   color: #ffffff !important;
 }
-.app[data-theme="light"] .veh-strip-tag,
-.app[data-theme="light"] .veh-statut-badge,
 .app[data-theme="light"] .veh-badge-tag,
 .app[data-theme="light"] .vd-badge,
 .app[data-theme="light"] .vd-disc {
@@ -1569,4 +1567,100 @@ input, select, textarea { font-family: var(--fb); outline: none; }
 .app[data-theme] .testimonials-section .testi-avatar {
   color: #850019 !important;
   -webkit-text-fill-color: #850019 !important;
+}
+
+/* ============================================================
+   VEHICLE PHOTO OVERLAYS — THEME-AWARE, CONTRAST-SAFE
+   Fixes legacy rules that forced a light provenance chip or
+   painted every light-theme status badge brand-red, overriding
+   its real available / reserved / sold status.
+   ============================================================ */
+
+/* Origin chip: its surface follows the active site theme. */
+.app[data-theme="light"] .veh-flag-badge {
+  background: rgba(255,255,255,.96) !important;
+  color: #242428 !important;
+  -webkit-text-fill-color: #242428 !important;
+  border: 1px solid #e3e3e7 !important;
+  box-shadow: 0 2px 10px rgba(20,20,25,.12);
+}
+.app[data-theme="ivory"] .veh-flag-badge {
+  background: rgba(255,250,241,.97) !important;
+  color: #463d32 !important;
+  -webkit-text-fill-color: #463d32 !important;
+  border: 1px solid #ddd2c1 !important;
+  box-shadow: 0 2px 10px rgba(70,61,50,.12);
+}
+.app[data-theme="dark"] .veh-flag-badge {
+  background: rgba(30,30,35,.94) !important;
+  color: #f4f4f5 !important;
+  -webkit-text-fill-color: #f4f4f5 !important;
+  border: 1px solid #4a4a52 !important;
+  box-shadow: 0 2px 12px rgba(0,0,0,.35);
+}
+
+/* Preserve the real status color from the vehicle record.
+   Only the foreground changes to stay readable on each status. */
+.app[data-theme] .veh-statut-badge[data-status="disponible"],
+.app[data-theme] .vd-statut-float[data-status="disponible"] {
+  color: #073b1d !important;
+  -webkit-text-fill-color: #073b1d !important;
+}
+.app[data-theme] .veh-statut-badge[data-status="reserve"],
+.app[data-theme] .vd-statut-float[data-status="reserve"] {
+  color: #422600 !important;
+  -webkit-text-fill-color: #422600 !important;
+}
+.app[data-theme] .veh-statut-badge[data-status="vendu"],
+.app[data-theme] .vd-statut-float[data-status="vendu"] {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
+
+/* Promotional tags keep the brand red; carousel labels keep their meaning. */
+.app[data-theme] .veh-badge-tag,
+.app[data-theme] .vd-badge,
+.app[data-theme] .vd-disc,
+.app[data-theme] .veh-strip-tag.promo {
+  background: #850019 !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  border-color: #a72a40 !important;
+}
+.app[data-theme] .veh-strip-tag.new {
+  background: #166534 !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
+
+/* Photo controls and sold watermark are deliberately dark/red overlays,
+   so their labels remain white even when the ivory theme is active. */
+.app[data-theme] .vd-counter,
+.app[data-theme] .vd-arrow,
+.app[data-theme] .stamp-sold,
+.app[data-theme] .veh-price-strip,
+.app[data-theme] .veh-price-strip * {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
+.app[data-theme] .vd-counter,
+.app[data-theme] .vd-arrow {
+  background-color: rgba(12,12,15,.78) !important;
+  border: 1px solid rgba(255,255,255,.2) !important;
+}
+.app[data-theme] .veh-price-strip {
+  background: linear-gradient(0deg,rgba(4,7,10,.96),rgba(4,7,10,.68) 60%,transparent) !important;
+}
+.app[data-theme] .veh-price-strip .price {
+  color: #ff6570 !important;
+  -webkit-text-fill-color: #ff6570 !important;
+}
+.app[data-theme] .veh-price-strip .old {
+  color: rgba(255,255,255,.72) !important;
+  -webkit-text-fill-color: rgba(255,255,255,.72) !important;
+}
+.app[data-theme] .stamp-sold {
+  background: rgba(133,0,25,.94) !important;
+  border-color: rgba(255,255,255,.9) !important;
+  text-shadow: 0 1px 2px rgba(0,0,0,.45) !important;
 }
