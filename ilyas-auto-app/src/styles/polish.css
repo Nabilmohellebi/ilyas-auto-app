@@ -759,3 +759,42 @@
     padding: 24px !important;
   }
 }
+
+
+/* Logo cropper: clear, accessible white-background removal control. */
+.image-cropper-background-toggle {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  margin: 14px 0 4px;
+  padding: 12px 13px;
+  border: 1px solid rgba(215,177,95,.32);
+  border-radius: 12px;
+  background: rgba(215,177,95,.075);
+  cursor: pointer;
+}
+.image-cropper-background-toggle input {
+  width: 18px;
+  height: 18px;
+  margin: 2px 0 0;
+  flex: 0 0 auto;
+  accent-color: #d7b15f;
+}
+.image-cropper-background-toggle span {
+  display: grid;
+  gap: 4px;
+}
+.image-cropper-background-toggle strong {
+  color: #f2d18a;
+  font-size: 12px;
+  line-height: 1.35;
+}
+.image-cropper-background-toggle small {
+  color: rgba(244,242,237,.72);
+  font-size: 11px;
+  line-height: 1.55;
+}
+.image-cropper-background-toggle input:focus-visible {
+  outline: 2px solid #f2d18a;
+  outline-offset: 3px;
+}
