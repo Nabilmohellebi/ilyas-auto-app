@@ -999,7 +999,7 @@ input, select, textarea { font-family: var(--fb); outline: none; }
 .app .veh-specs { color: #5e5e65 !important; }
 .app .veh-actions { display: none !important; }
 .app .veh-compare-check { color: #66666d !important; }
-.app[data-theme="ivory"] .veh-flag-badge {
+.app[data-theme="light"] .veh-flag-badge {
   background: rgba(255,255,255,.96) !important;
   color: #242428 !important;
   border: 1px solid #e6e6e9 !important;
@@ -1105,140 +1105,140 @@ input, select, textarea { font-family: var(--fb); outline: none; }
 /* ACCESSIBILITY / CONTRAST FIX — public light theme.
    Older stylesheet rules still set many labels and headings to white.
    Explicitly define readable foregrounds for every public-site text area. */
-.app[data-theme="ivory"] {
+.app[data-theme="light"] {
   color: #242428 !important;
   background: #ffffff !important;
 }
-.app[data-theme="ivory"] .hero-auto-content,
-.app[data-theme="ivory"] .hero-auto-content h1,
-.app[data-theme="ivory"] .hero-auto-content h1 span,
-.app[data-theme="ivory"] .hero-auto-content p,
-.app[data-theme="ivory"] .hero-eyebrow,
-.app[data-theme="ivory"] .section-head,
-.app[data-theme="ivory"] .section-head h2,
-.app[data-theme="ivory"] .section-head p,
-.app[data-theme="ivory"] .trust-grid .num,
-.app[data-theme="ivory"] .trust-grid .lbl,
-.app[data-theme="ivory"] .nav-logo,
-.app[data-theme="ivory"] .nav-links a,
-.app[data-theme="ivory"] .nav-burger,
-.app[data-theme="ivory"] .nav-mobile a,
-.app[data-theme="ivory"] .veh-strip-info .name,
-.app[data-theme="ivory"] .veh-strip-info .price,
-.app[data-theme="ivory"] .announce-item,
-.app[data-theme="ivory"] .filters-bar label,
-.app[data-theme="ivory"] .filters-bar input,
-.app[data-theme="ivory"] .filters-bar select,
-.app[data-theme="ivory"] .vehicle-category-tabs button,
-.app[data-theme="ivory"] .veh-card-top h3,
-.app[data-theme="ivory"] .veh-card-top p,
-.app[data-theme="ivory"] .veh-specs,
-.app[data-theme="ivory"] .veh-compare-check,
-.app[data-theme="ivory"] .showroom-info-row h4,
-.app[data-theme="ivory"] .showroom-info-row p,
-.app[data-theme="ivory"] .footer-logo,
-.app[data-theme="ivory"] .footer-sub,
-.app[data-theme="ivory"] .footer-social a,
-.app[data-theme="ivory"] .footer-track-btn,
-.app[data-theme="ivory"] .vd-title,
-.app[data-theme="ivory"] .vd-price,
-.app[data-theme="ivory"] .vd-old-price,
-.app[data-theme="ivory"] .vd-specs-grid,
-.app[data-theme="ivory"] .vd-specs-grid div,
-.app[data-theme="ivory"] .vd-section h3,
-.app[data-theme="ivory"] .vd-description,
-.app[data-theme="ivory"] .vd-equip-item,
-.app[data-theme="ivory"] .vd-video-card .txt-title,
-.app[data-theme="ivory"] .vd-gallery-full-title,
-.app[data-theme="ivory"] .vd-bottom-price .lbl,
-.app[data-theme="ivory"] .vd-print-btn,
-.app[data-theme="ivory"] .vd-share-btn,
-.app[data-theme="ivory"] .cmp-float-chip,
-.app[data-theme="ivory"] .cmp-hdr h2,
-.app[data-theme="ivory"] .cmp-table th,
-.app[data-theme="ivory"] .cmp-table td,
-.app[data-theme="ivory"] .cmp-label-col,
-.app[data-theme="ivory"] .cmp-veh-name,
-.app[data-theme="ivory"] .cmp-veh-model,
-.app[data-theme="ivory"] .empty,
-.app[data-theme="ivory"] .spinner {
+.app[data-theme="light"] .hero-auto-content,
+.app[data-theme="light"] .hero-auto-content h1,
+.app[data-theme="light"] .hero-auto-content h1 span,
+.app[data-theme="light"] .hero-auto-content p,
+.app[data-theme="light"] .hero-eyebrow,
+.app[data-theme="light"] .section-head,
+.app[data-theme="light"] .section-head h2,
+.app[data-theme="light"] .section-head p,
+.app[data-theme="light"] .trust-grid .num,
+.app[data-theme="light"] .trust-grid .lbl,
+.app[data-theme="light"] .nav-logo,
+.app[data-theme="light"] .nav-links a,
+.app[data-theme="light"] .nav-burger,
+.app[data-theme="light"] .nav-mobile a,
+.app[data-theme="light"] .veh-strip-info .name,
+.app[data-theme="light"] .veh-strip-info .price,
+.app[data-theme="light"] .announce-item,
+.app[data-theme="light"] .filters-bar label,
+.app[data-theme="light"] .filters-bar input,
+.app[data-theme="light"] .filters-bar select,
+.app[data-theme="light"] .vehicle-category-tabs button,
+.app[data-theme="light"] .veh-card-top h3,
+.app[data-theme="light"] .veh-card-top p,
+.app[data-theme="light"] .veh-specs,
+.app[data-theme="light"] .veh-compare-check,
+.app[data-theme="light"] .showroom-info-row h4,
+.app[data-theme="light"] .showroom-info-row p,
+.app[data-theme="light"] .footer-logo,
+.app[data-theme="light"] .footer-sub,
+.app[data-theme="light"] .footer-social a,
+.app[data-theme="light"] .footer-track-btn,
+.app[data-theme="light"] .vd-title,
+.app[data-theme="light"] .vd-price,
+.app[data-theme="light"] .vd-old-price,
+.app[data-theme="light"] .vd-specs-grid,
+.app[data-theme="light"] .vd-specs-grid div,
+.app[data-theme="light"] .vd-section h3,
+.app[data-theme="light"] .vd-description,
+.app[data-theme="light"] .vd-equip-item,
+.app[data-theme="light"] .vd-video-card .txt-title,
+.app[data-theme="light"] .vd-gallery-full-title,
+.app[data-theme="light"] .vd-bottom-price .lbl,
+.app[data-theme="light"] .vd-print-btn,
+.app[data-theme="light"] .vd-share-btn,
+.app[data-theme="light"] .cmp-float-chip,
+.app[data-theme="light"] .cmp-hdr h2,
+.app[data-theme="light"] .cmp-table th,
+.app[data-theme="light"] .cmp-table td,
+.app[data-theme="light"] .cmp-label-col,
+.app[data-theme="light"] .cmp-veh-name,
+.app[data-theme="light"] .cmp-veh-model,
+.app[data-theme="light"] .empty,
+.app[data-theme="light"] .spinner {
   color: #242428 !important;
   text-shadow: none !important;
 }
-.app[data-theme="ivory"] .hero-eyebrow {
+.app[data-theme="light"] .hero-eyebrow {
   background: #f5f5f6 !important;
   border-color: #e2e2e6 !important;
 }
-.app[data-theme="ivory"] .trust-grid .lbl,
-.app[data-theme="ivory"] .section-head p,
-.app[data-theme="ivory"] .veh-card-top p,
-.app[data-theme="ivory"] .veh-specs,
-.app[data-theme="ivory"] .announce-item,
-.app[data-theme="ivory"] .footer-sub,
-.app[data-theme="ivory"] .vd-old-price,
-.app[data-theme="ivory"] .vd-description,
-.app[data-theme="ivory"] .cmp-label-col,
-.app[data-theme="ivory"] .cmp-veh-model {
+.app[data-theme="light"] .trust-grid .lbl,
+.app[data-theme="light"] .section-head p,
+.app[data-theme="light"] .veh-card-top p,
+.app[data-theme="light"] .veh-specs,
+.app[data-theme="light"] .announce-item,
+.app[data-theme="light"] .footer-sub,
+.app[data-theme="light"] .vd-old-price,
+.app[data-theme="light"] .vd-description,
+.app[data-theme="light"] .cmp-label-col,
+.app[data-theme="light"] .cmp-veh-model {
   color: #62626a !important;
 }
-.app[data-theme="ivory"] .veh-strip,
-.app[data-theme="ivory"] .veh-strip-card,
-.app[data-theme="ivory"] .announce-bar,
-.app[data-theme="ivory"] .nav,
-.app[data-theme="ivory"] .nav-mobile,
-.app[data-theme="ivory"] .trust-bar,
-.app[data-theme="ivory"] .section,
-.app[data-theme="ivory"] .showroom-grid,
-.app[data-theme="ivory"] .footer-auto,
-.app[data-theme="ivory"] .vd-ov,
-.app[data-theme="ivory"] .vd-info,
-.app[data-theme="ivory"] .vd-info-col,
-.app[data-theme="ivory"] .vd-thumbs,
-.app[data-theme="ivory"] .cmp-float-bar,
-.app[data-theme="ivory"] .cmp-modal {
+.app[data-theme="light"] .veh-strip,
+.app[data-theme="light"] .veh-strip-card,
+.app[data-theme="light"] .announce-bar,
+.app[data-theme="light"] .nav,
+.app[data-theme="light"] .nav-mobile,
+.app[data-theme="light"] .trust-bar,
+.app[data-theme="light"] .section,
+.app[data-theme="light"] .showroom-grid,
+.app[data-theme="light"] .footer-auto,
+.app[data-theme="light"] .vd-ov,
+.app[data-theme="light"] .vd-info,
+.app[data-theme="light"] .vd-info-col,
+.app[data-theme="light"] .vd-thumbs,
+.app[data-theme="light"] .cmp-float-bar,
+.app[data-theme="light"] .cmp-modal {
   background-color: #ffffff !important;
   color: #242428 !important;
 }
-.app[data-theme="ivory"] .veh-strip-tag,
-.app[data-theme="ivory"] .veh-badge-tag,
-.app[data-theme="ivory"] .vd-badge,
-.app[data-theme="ivory"] .vd-disc,
-.app[data-theme="ivory"] .vd-arrow,
-.app[data-theme="ivory"] .vd-close-float,
-.app[data-theme="ivory"] .btn-hero-primary,
-.app[data-theme="ivory"] .nav-wa-btn,
-.app[data-theme="ivory"] .veh-card-wa-bar,
-.app[data-theme="ivory"] .wa-float {
+.app[data-theme="light"] .veh-strip-tag,
+.app[data-theme="light"] .veh-badge-tag,
+.app[data-theme="light"] .vd-badge,
+.app[data-theme="light"] .vd-disc,
+.app[data-theme="light"] .vd-arrow,
+.app[data-theme="light"] .vd-close-float,
+.app[data-theme="light"] .btn-hero-primary,
+.app[data-theme="light"] .nav-wa-btn,
+.app[data-theme="light"] .veh-card-wa-bar,
+.app[data-theme="light"] .wa-float {
   color: #ffffff !important;
 }
-.app[data-theme="ivory"] .veh-badge-tag,
-.app[data-theme="ivory"] .vd-badge,
-.app[data-theme="ivory"] .vd-disc {
+.app[data-theme="light"] .veh-badge-tag,
+.app[data-theme="light"] .vd-badge,
+.app[data-theme="light"] .vd-disc {
   background-color: #850019 !important;
 }
-.app[data-theme="ivory"] .filters-bar input::placeholder {
+.app[data-theme="light"] .filters-bar input::placeholder {
   color: #777780 !important;
   opacity: 1 !important;
 }
-.app[data-theme="ivory"] .filters-bar input,
-.app[data-theme="ivory"] .filters-bar select {
+.app[data-theme="light"] .filters-bar input,
+.app[data-theme="light"] .filters-bar select {
   background: #ffffff !important;
   border-color: #d8d8de !important;
 }
-.app[data-theme="ivory"] .vd-specs-grid div,
-.app[data-theme="ivory"] .cmp-table th,
-.app[data-theme="ivory"] .cmp-table td,
-.app[data-theme="ivory"] .cmp-float-chip {
+.app[data-theme="light"] .vd-specs-grid div,
+.app[data-theme="light"] .cmp-table th,
+.app[data-theme="light"] .cmp-table td,
+.app[data-theme="light"] .cmp-float-chip {
   background: #f7f7f8 !important;
   border-color: #e3e3e7 !important;
 }
-.app[data-theme="ivory"] .vd-print-btn,
-.app[data-theme="ivory"] .vd-share-btn {
+.app[data-theme="light"] .vd-print-btn,
+.app[data-theme="light"] .vd-share-btn {
   background: #f5f5f6 !important;
   border-color: #ddddE2 !important;
 }
-.app[data-theme="ivory"] .veh-price-strip .price,
-.app[data-theme="ivory"] .veh-price-strip .old {
+.app[data-theme="light"] .veh-price-strip .price,
+.app[data-theme="light"] .veh-price-strip .old {
   color: #ffffff !important;
 }
 
@@ -1246,11 +1246,11 @@ input, select, textarea { font-family: var(--fb); outline: none; }
 /* FINAL SYSTEMATIC LIGHT-THEME TEXT CONTRAST
    A catch-all foreground rule covers components and labels added later,
    not only the selectors that existed when the theme was first styled. */
-.app[data-theme="ivory"] {
+.app[data-theme="light"] {
   color-scheme: light;
   color: #242428 !important;
 }
-.app[data-theme="ivory"] :where(
+.app[data-theme="light"] :where(
   h1,h2,h3,h4,h5,h6,p,span,a,label,small,strong,em,b,i,
   li,dt,dd,th,td,figcaption,summary,legend,caption,
   .nav-logo,.nav-links a,.nav-mobile a,.nav-burger,
@@ -1273,7 +1273,7 @@ input, select, textarea { font-family: var(--fb); outline: none; }
   text-shadow: none !important;
 }
 /* Secondary copy stays softer but still passes ordinary contrast on white. */
-.app[data-theme="ivory"] :where(
+.app[data-theme="light"] :where(
   .hero-auto-content p,.section-head p,.trust-grid .lbl,
   .announce-item,.veh-strip-info .name,.veh-card-top p,.veh-specs,
   .showroom-info-row p,.footer-sub,.vd-description,.vd-old-price,
@@ -1284,7 +1284,7 @@ input, select, textarea { font-family: var(--fb); outline: none; }
   -webkit-text-fill-color: currentColor;
 }
 /* White lettering is retained only when its surface is intentionally dark/colored. */
-.app[data-theme="ivory"] :where(
+.app[data-theme="light"] :where(
   .nav-wa-btn,.btn-hero-primary,.veh-card-wa-bar,.wa-float,
   .veh-price-strip,.veh-price-strip *,
   .veh-strip-tag,.veh-statut-badge,.veh-badge-tag,
@@ -1295,7 +1295,7 @@ input, select, textarea { font-family: var(--fb); outline: none; }
   color: #ffffff !important;
   -webkit-text-fill-color: #ffffff !important;
 }
-.app[data-theme="ivory"] :where(
+.app[data-theme="light"] :where(
   input,select,textarea,option
 ) {
   color: #242428 !important;
@@ -1303,15 +1303,15 @@ input, select, textarea { font-family: var(--fb); outline: none; }
   background-color: #ffffff !important;
   caret-color: #242428 !important;
 }
-.app[data-theme="ivory"] :where(input,textarea)::placeholder {
+.app[data-theme="light"] :where(input,textarea)::placeholder {
   color: #73737c !important;
   -webkit-text-fill-color: #73737c !important;
   opacity: 1 !important;
 }
-.app[data-theme="ivory"] :where(button:not(.nav-wa-btn):not(.btn-hero-primary):not(.veh-card-wa-bar):not(.wa-float):not(.btn-save):not(.act-btn.primary)) {
+.app[data-theme="light"] :where(button:not(.nav-wa-btn):not(.btn-hero-primary):not(.veh-card-wa-bar):not(.wa-float):not(.btn-save):not(.act-btn.primary)) {
   color: #242428;
 }
-.app[data-theme="ivory"] :where(
+.app[data-theme="light"] :where(
   .nav,.nav-mobile,.trust-bar,.section,.showroom-grid,.footer-auto,
   .veh-card,.veh-card-body,.veh-strip,.veh-strip-card,.announce-bar,
   .vd-ov,.vd-info,.vd-info-col,.vd-thumbs,.cmp-float-bar,.cmp-modal,
@@ -1319,8 +1319,8 @@ input, select, textarea { font-family: var(--fb); outline: none; }
 ) {
   color: #242428 !important;
 }
-.app[data-theme="ivory"] svg,
-.app[data-theme="ivory"] svg * {
+.app[data-theme="light"] svg,
+.app[data-theme="light"] svg * {
   -webkit-text-fill-color: initial;
 }
 
@@ -1330,7 +1330,7 @@ input, select, textarea { font-family: var(--fb); outline: none; }
 .app .theme-toggle span:first-child{font-size:17px;line-height:1}
 .app .theme-toggle-label{font-size:11px;letter-spacing:.02em}
 .app[data-theme="dark"] .theme-toggle{color:#f4f4f5!important;background:#25252b;border-color:#414149}
-.app[data-theme="ivory"] .theme-toggle,.app[data-theme="ivory"] .theme-toggle{color:#29292f!important;background:#f5f5f7;border-color:#dedee4}
+.app[data-theme="light"] .theme-toggle,.app[data-theme="ivory"] .theme-toggle{color:#29292f!important;background:#f5f5f7;border-color:#dedee4}
 .app .mobile-theme-toggle{display:none}
 
 /* Crossfade both directions: the actual page surfaces and text interpolate together. */
@@ -1455,7 +1455,7 @@ input, select, textarea { font-family: var(--fb); outline: none; }
    One surface/text palette for light, ivory and dark modes.
    This final layer overrides legacy hard-coded white surfaces.
    ============================================================ */
-.app[data-theme="ivory"] {
+.app[data-theme="light"] {
   --theme-bg:#ffffff; --theme-surface:#ffffff; --theme-surface-raised:#f7f7f8;
   --theme-text:#242428; --theme-muted:#62626a; --theme-border:#e3e3e7; --theme-field:#ffffff;
   color-scheme:light; background:var(--theme-bg)!important; color:var(--theme-text)!important;
@@ -1577,7 +1577,7 @@ input, select, textarea { font-family: var(--fb); outline: none; }
    ============================================================ */
 
 /* Origin chip: its surface follows the active site theme. */
-.app[data-theme="ivory"] .veh-flag-badge {
+.app[data-theme="light"] .veh-flag-badge {
   background: rgba(255,255,255,.96) !important;
   color: #242428 !important;
   -webkit-text-fill-color: #242428 !important;
@@ -1699,7 +1699,7 @@ input, select, textarea { font-family: var(--fb); outline: none; }
   white-space: nowrap;
   letter-spacing: -.045em;
 }
-.app[data-theme="ivory"] .nav-brand-main { color: #25252b !important; -webkit-text-fill-color: #25252b !important; }
+.app[data-theme="light"] .nav-brand-main { color: #25252b !important; -webkit-text-fill-color: #25252b !important; }
 .app[data-theme="ivory"] .nav-brand-main { color: #463d32 !important; -webkit-text-fill-color: #463d32 !important; }
 .app[data-theme="dark"] .nav-brand-main { color: #f4f4f5 !important; -webkit-text-fill-color: #f4f4f5 !important; }
 .app .nav-brand-accent,
