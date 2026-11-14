@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react'
 import { supabase } from '../../supabase'
 import { BRANDS, TRANSMISSIONS, FUELS, BODY_TYPES, BADGES, STATUTS, ORIGINS } from '../../data/vehicles-data'
+import ImageCropper from './ImageCropper'
 
 export default function VehicleForm({ vehicle, onClose, onSave }) {
   const isEdit = !!vehicle && !vehicle.__new
@@ -28,6 +29,7 @@ export default function VehicleForm({ vehicle, onClose, onSave }) {
   })
   const [newSpec, setNewSpec] = useState('')
   const [uploading, setUploading] = useState(false)
+  const [cropQueue, setCropQueue] = useState([])
   const [saveError, setSaveError] = useState('')
   const fileRef = useRef()
 
@@ -83,19 +85,64 @@ export default function VehicleForm({ vehicle, onClose, onSave }) {
     return publicUrl
   }
 
-  async function handleFileSelect(e) {
-    const files = Array.from(e.target.files)
-    for (const file of files) {
-      const url = await uploadFile(file)
-      if (url) {
-        setForm(current => ({
-          ...current,
-          images: [...current.images, { url }],
-          img: current.img || url,
-        }))
+  async function queueVehicleImages(files, target) {
+    const incoming = Array.from(files || [])
+    const supported = incoming.filter(file => ['image/jpeg', 'image/png', 'image/webp', 'image/gif'].includes(file.type))
+    if (supported.length !== incoming.length) {
+      alert('Certains fichiers ne sont pas acceptés. Utilise JPG, PNG, WebP ou GIF.')
+    }
+
+    // Keep animated GIFs intact; all still photos open in the crop editor first.
+    for (const gif of supported.filter(file => file.type === 'image/gif')) {
+      const url = await uploadFile(gif)
+      if (url && target === 'main') {
+        setForm(current => ({ ...current, images: [...current.images, { url }], img: current.img || url }))
+      } else if (url && target === 'gallery') {
+        setForm(current => ({ ...current, images_gallery: [...current.images_gallery, { url }] }))
       }
     }
+
+    const stillImages = supported.filter(file => file.type !== 'image/gif')
+    if (stillImages.length) {
+      const ratio = target === 'main' ? 4 / 3 : 16 / 9
+      setCropQueue(current => [...current, ...stillImages.map(file => ({
+        file,
+        target,
+        aspectRatio: ratio,
+        title: target === 'main' ? 'Recadrer la photo du véhicule' : 'Recadrer la photo de galerie',
+      }))])
+    }
+  }
+
+  function handleFileSelect(e) {
+    const files = Array.from(e.target.files || [])
     e.target.value = ''
+    queueVehicleImages(files, 'main')
+  }
+
+  async function confirmVehicleCrop(croppedFile) {
+    const task = cropQueue[0]
+    if (!task) return
+    try {
+      const url = await uploadFile(croppedFile)
+      if (url && task.target === 'main') {
+        setForm(current => ({ ...current, images: [...current.images, { url }], img: current.img || url }))
+      } else if (url && task.target === 'gallery') {
+        setForm(current => ({ ...current, images_gallery: [...current.images_gallery, { url }] }))
+      }
+    } finally {
+      setCropQueue(current => current.slice(1))
+    }
+  }
+
+  function handleGalleryFileSelect(e) {
+    const files = Array.from(e.target.files || [])
+    e.target.value = ''
+    queueVehicleImages(files, 'gallery')
+  }
+
+  function cancelVehicleCropQueue() {
+    setCropQueue([])
   }
 
   function moveImg(i, dir) {
@@ -114,15 +161,7 @@ export default function VehicleForm({ vehicle, onClose, onSave }) {
     if (form.img === removedUrl) set('img', arr[0]?.url || '')
   }
 
-  // ── Galerie grand format (2e catégorie de photos) ──
-  async function handleGalleryFileSelect(e) {
-    const files = Array.from(e.target.files)
-    for (const file of files) {
-      const url = await uploadFile(file)
-      if (url) setForm(current => ({ ...current, images_gallery: [...current.images_gallery, { url }] }))
-    }
-    e.target.value = ''
-  }
+  // Gallery images use the same crop queue with a wide 16:9 frame.
   function moveGalleryImg(i, dir) {
     const j = dir === 'up' ? i - 1 : i + 1
     if (j < 0 || j >= form.images_gallery.length) return
@@ -355,13 +394,9 @@ export default function VehicleForm({ vehicle, onClose, onSave }) {
             <h3>📸 Photos du véhicule</h3>
             <label className="upload-zone"
               onDragOver={e => e.preventDefault()}
-              onDrop={async e => {
+              onDrop={e => {
                 e.preventDefault()
-                const files = Array.from(e.dataTransfer.files)
-                for (const f of files) {
-                  const url = await uploadFile(f)
-                  if (url) setForm(current => ({ ...current, images: [...current.images, { url }], img: current.img || url }))
-                }
+                queueVehicleImages(e.dataTransfer.files, 'main')
               }}
             >
               <input ref={fileRef} type="file" accept="image/*" multiple onChange={handleFileSelect} />
@@ -403,13 +438,9 @@ export default function VehicleForm({ vehicle, onClose, onSave }) {
             </p>
             <label className="upload-zone"
               onDragOver={e => e.preventDefault()}
-              onDrop={async e => {
+              onDrop={e => {
                 e.preventDefault()
-                const files = Array.from(e.dataTransfer.files)
-                for (const f of files) {
-                  const url = await uploadFile(f)
-                  if (url) setForm(current => ({ ...current, images_gallery: [...current.images_gallery, { url }] }))
-                }
+                queueVehicleImages(e.dataTransfer.files, 'gallery')
               }}
             >
               <input type="file" accept="image/*" multiple onChange={handleGalleryFileSelect} />
@@ -453,11 +484,22 @@ export default function VehicleForm({ vehicle, onClose, onSave }) {
         <div className="pf-footer">
           {saveError && <div role="alert" style={{ flex: '1 1 100%', color: '#ffb3b8', fontSize: 12, lineHeight: 1.5 }}>{saveError}</div>}
           <button className="btn-cancel" onClick={onClose}>Annuler</button>
-          <button className="btn-save" onClick={handleSave} disabled={uploading || !form.marque.trim() || !form.modele.trim() || !form.prix}>
+          <button className="btn-save" onClick={handleSave} disabled={uploading || cropQueue.length > 0 || !form.marque.trim() || !form.modele.trim() || !form.prix}>
             {uploading ? '⏳ Photos en cours…' : isEdit ? '💾 Enregistrer' : '➕ Ajouter au stock'}
           </button>
         </div>
       </div>
+      {cropQueue[0] && (
+        <ImageCropper
+          key={cropQueue[0].target + '-' + cropQueue[0].file.name + '-' + cropQueue.length}
+          file={cropQueue[0].file}
+          title={cropQueue[0].title}
+          aspectRatio={cropQueue[0].aspectRatio}
+          outputFormat="image/jpeg"
+          onCancel={cancelVehicleCropQueue}
+          onConfirm={confirmVehicleCrop}
+        />
+      )}
     </div>
   )
 }
