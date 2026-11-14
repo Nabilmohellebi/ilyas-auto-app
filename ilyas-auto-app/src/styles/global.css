@@ -1325,3 +1325,21 @@ input, select, textarea { font-family: var(--fb); outline: none; }
 .app[data-theme="light"] svg * {
   -webkit-text-fill-color: initial;
 }
+
+/* PUBLIC THEME SWITCH — accessible sun/moon control and expanding liquid wipe */
+.app .theme-toggle{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:38px;padding:7px 12px;border:1px solid rgba(128,128,140,.28);border-radius:999px;background:rgba(128,128,140,.09);color:inherit;font:700 12px/1 inherit;cursor:pointer;transition:background .2s ease,border-color .2s ease,transform .2s ease}
+.app .theme-toggle:hover{background:rgba(230,57,70,.12);border-color:rgba(230,57,70,.45);transform:translateY(-1px)}
+.app .theme-toggle span:first-child{font-size:17px;line-height:1}
+.app .theme-toggle-label{font-size:11px;letter-spacing:.02em}
+.app[data-theme="dark"] .theme-toggle{color:#f4f4f5!important;background:#25252b;border-color:#414149}
+.app[data-theme="light"] .theme-toggle,.app[data-theme="ivory"] .theme-toggle{color:#29292f!important;background:#f5f5f7;border-color:#dedee4}
+.app .nav-mobile .theme-toggle{margin-top:6px;width:fit-content}
+.app .theme-transition-wave{position:fixed;z-index:10000;width:34px;height:34px;border-radius:50%;pointer-events:none;transform:translate(-50%,-50%) scale(0);animation:themeLiquidReveal .88s cubic-bezier(.16,1,.3,1) forwards;will-change:transform;box-shadow:0 0 0 2px rgba(255,255,255,.08)}
+.app .theme-transition-wave.dark{background:#111113}
+.app .theme-transition-wave.light{background:#fff}
+@keyframes themeLiquidReveal{0%{transform:translate(-50%,-50%) scale(0);border-radius:50%}65%{border-radius:42% 58% 55% 45%/48% 42% 58% 52%}100%{transform:translate(-50%,-50%) scale(100);border-radius:50%;opacity:0}}
+.app[data-theme="dark"] .nav,.app[data-theme="dark"] .nav-mobile{background:#171719!important;color:#f4f4f5!important}
+.app[data-theme="dark"] .nav-mobile{border-color:#34343a!important}
+.app[data-theme="dark"] .nav-mobile a,.app[data-theme="dark"] .nav-burger{color:#f4f4f5!important}
+.app[data-theme="dark"] .veh-strip-info .price{color:#ff6570!important}
+@media(prefers-reduced-motion:reduce){.app .theme-transition-wave{animation-duration:.01ms}.app .theme-toggle{transition:none}}
