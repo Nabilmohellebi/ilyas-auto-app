@@ -110,9 +110,9 @@ export default function ReservationModal({ vehicle, onClose, shopName = 'Nabil A
             <p style={{ fontSize: 13, color: 'rgba(255,255,255,.55)', marginBottom: 20, lineHeight: 1.6 }}>
               {t.reservation.merci}<br />{t.reservation.confirmerWA}
             </p>
-            <a href={waLink(`Bonjour ${shopName}, ${waConfirmText}`, whatsapp)} target="_blank" rel="noreferrer" className="btn-hero-primary whatsapp-action-btn" style={{ width: '100%', justifyContent: 'center', marginBottom: 10 }}>
+            {waLink(`Bonjour ${shopName}, ${waConfirmText}`, whatsapp) && <a href={waLink(`Bonjour ${shopName}, ${waConfirmText}`, whatsapp)} target="_blank" rel="noreferrer" className="btn-hero-primary whatsapp-action-btn" style={{ width: '100%', justifyContent: 'center', marginBottom: 10 }}>
               <WhatsAppIcon size={19} /> {t.reservation.confirmerBtn}
-            </a>
+            </a>}
             <button onClick={onClose} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,.4)', fontSize: 12.5, textDecoration: 'underline', cursor: 'pointer' }}>{t.reservation.fermer}</button>
           </div>
         )}
