@@ -21,6 +21,7 @@ export default function VehicleForm({ vehicle, onClose, onSave }) {
     statut:        vehicle?.statut || 'disponible',
     description:   vehicle?.description || '',
     specs:         vehicle?.specs ? (typeof vehicle.specs === 'string' ? JSON.parse(vehicle.specs) : vehicle.specs) : [],
+    technical_specs: (() => { try { const value = typeof vehicle?.technical_specs === 'string' ? JSON.parse(vehicle.technical_specs) : vehicle?.technical_specs; return Array.isArray(value) ? value : [] } catch { return [] } })(),
     images:        vehicle?.images ? (typeof vehicle.images === 'string' ? JSON.parse(vehicle.images) : vehicle.images) : [],
     images_gallery: vehicle?.images_gallery ? (typeof vehicle.images_gallery === 'string' ? JSON.parse(vehicle.images_gallery) : vehicle.images_gallery) : [],
     video_url:     vehicle?.video_url || '',
@@ -28,6 +29,8 @@ export default function VehicleForm({ vehicle, onClose, onSave }) {
     display_order: vehicle?.display_order || 99,
   })
   const [newSpec, setNewSpec] = useState('')
+  const [newTechLabel, setNewTechLabel] = useState('')
+  const [newTechValue, setNewTechValue] = useState('')
   const [uploading, setUploading] = useState(false)
   const [cropQueue, setCropQueue] = useState([])
   const [saveError, setSaveError] = useState('')
@@ -180,6 +183,21 @@ export default function VehicleForm({ vehicle, onClose, onSave }) {
   }
   function removeSpec(i) { set('specs', form.specs.filter((_, idx) => idx !== i)) }
 
+  function addTechnicalSpec() {
+    const label = newTechLabel.trim()
+    const value = newTechValue.trim()
+    if (!label || !value) return
+    set('technical_specs', [...form.technical_specs, { label, value }])
+    setNewTechLabel('')
+    setNewTechValue('')
+  }
+  function updateTechnicalSpec(index, key, value) {
+    set('technical_specs', form.technical_specs.map((item, i) => i === index ? { ...item, [key]: value } : item))
+  }
+  function removeTechnicalSpec(index) {
+    set('technical_specs', form.technical_specs.filter((_, i) => i !== index))
+  }
+
   function handleSave() {
     const year = Number(form.annee)
     const price = Number(form.prix)
@@ -229,6 +247,7 @@ export default function VehicleForm({ vehicle, onClose, onSave }) {
       statut:        form.statut,
       description:   form.description,
       specs:         form.specs,
+      technical_specs: form.technical_specs.filter(item => item?.label?.trim() && item?.value?.trim()),
       images:        form.images,
       images_gallery: form.images_gallery,
       video_url:     form.video_url || null,
@@ -360,17 +379,19 @@ export default function VehicleForm({ vehicle, onClose, onSave }) {
             )}
           </div>
 
-          {/* ── Description ── */}
+          {/* ── Notes du vendeur ── */}
           <div className="pf-section">
-            <h3>📝 Description</h3>
+            <h3>📝 Notes du vendeur</h3>
             <div className="form-field">
-              <textarea rows={4} placeholder="Historique, état général, entretien..." value={form.description} onChange={e => set('description', e.target.value)} />
+              <textarea rows={5} placeholder="Présente le véhicule, ses points forts, son état, son historique et son entretien..." value={form.description} onChange={e => set('description', e.target.value)} />
+              <small style={{ color: 'rgba(255,255,255,.52)', lineHeight: 1.5 }}>Ce texte apparaîtra dans la fiche du véhicule, sous les photos et les caractéristiques.</small>
             </div>
           </div>
 
-          {/* ── Équipements ── */}
+          {/* ── Fonctionnalités supplémentaires ── */}
           <div className="pf-section">
-            <h3>⚙️ Équipements & Options</h3>
+            <h3>⚙️ Fonctionnalités supplémentaires</h3>
+            <p style={{ color: 'rgba(255,255,255,.52)', fontSize: 12, lineHeight: 1.5, marginBottom: 10 }}>Ajoute les équipements présents sur ce véhicule : ABS, airbags, Bluetooth, caméra de recul, etc.</p>
             {form.specs.map((s, i) => (
               <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6, background: 'rgba(255,255,255,.03)', borderRadius: 8, padding: '7px 10px' }}>
                 <span style={{ flex: 1, fontSize: 13, color: 'white' }}>✓ {s}</span>
@@ -386,6 +407,27 @@ export default function VehicleForm({ vehicle, onClose, onSave }) {
                 onKeyDown={e => e.key === 'Enter' && addSpec()}
               />
               <button className="act-btn" onClick={addSpec}>+ Ajouter</button>
+            </div>
+          </div>
+
+          {/* ── Caractéristiques techniques détaillées ── */}
+          <div className="pf-section">
+            <h3>📊 Caractéristiques techniques</h3>
+            <p style={{ color: 'rgba(255,255,255,.52)', fontSize: 12, lineHeight: 1.5, marginBottom: 10 }}>Ajoute uniquement les informations connues. Chaque ligne s’affichera dans un tableau sous les photos (ex. moteur, puissance, couple, dimensions, autonomie...).</p>
+            {form.technical_specs.map((item, i) => (
+              <div key={i} style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr) minmax(0,1fr) auto', gap: 8, alignItems: 'center', marginBottom: 8, background: 'rgba(255,255,255,.035)', border: '1px solid rgba(255,255,255,.08)', borderRadius: 9, padding: 8 }}>
+                <input aria-label={`Nom de la caractéristique ${i + 1}`} value={item.label || ''} onChange={e => updateTechnicalSpec(i, 'label', e.target.value)} placeholder="Caractéristique" style={{ minWidth: 0, background: '#1b1b23', border: '1px solid rgba(255,255,255,.1)', borderRadius: 7, padding: '9px 10px', color: 'white', fontSize: 12 }} />
+                <input aria-label={`Valeur de la caractéristique ${i + 1}`} value={item.value || ''} onChange={e => updateTechnicalSpec(i, 'value', e.target.value)} placeholder="Valeur" style={{ minWidth: 0, background: '#1b1b23', border: '1px solid rgba(255,255,255,.1)', borderRadius: 7, padding: '9px 10px', color: 'white', fontSize: 12 }} />
+                <button type="button" onClick={() => removeTechnicalSpec(i)} aria-label="Supprimer cette caractéristique" style={{ background: 'none', border: 'none', color: '#ff8a8a', cursor: 'pointer', fontSize: 18, padding: '4px 7px' }}>✕</button>
+              </div>
+            ))}
+            <datalist id="vehicle-technical-labels">
+              {['Moteur', 'Puissance maximale', 'Couple maximal (Nm)', 'Vitesse maximale (km/h)', 'Transmission', 'Type de traction', 'Batterie', 'Autonomie (km)', 'Dimensions (mm)', 'Empattement (mm)', 'Nombre de portes', 'Nombre de places', 'Poids (kg)', 'Consommation (L/100 km)'].map(label => <option key={label} value={label} />)}
+            </datalist>
+            <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr) minmax(0,1fr) auto', gap: 8, marginTop: 10 }}>
+              <input list="vehicle-technical-labels" aria-label="Nom de la caractéristique" value={newTechLabel} onChange={e => setNewTechLabel(e.target.value)} placeholder="Ex. : Puissance maximale" style={{ minWidth: 0, background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.1)', borderRadius: 8, padding: '9px 10px', color: 'white', fontSize: 12 }} />
+              <input aria-label="Valeur technique" value={newTechValue} onChange={e => setNewTechValue(e.target.value)} placeholder="Ex. : 83 kW (113 ch)" style={{ minWidth: 0, background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.1)', borderRadius: 8, padding: '9px 10px', color: 'white', fontSize: 12 }} onKeyDown={e => e.key === 'Enter' && addTechnicalSpec()} />
+              <button type="button" className="act-btn" onClick={addTechnicalSpec} disabled={!newTechLabel.trim() || !newTechValue.trim()}>+ Ajouter</button>
             </div>
           </div>
 
