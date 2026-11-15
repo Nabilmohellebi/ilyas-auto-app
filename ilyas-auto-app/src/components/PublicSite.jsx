@@ -442,10 +442,10 @@ function PublicSiteInner() {
         ))}
         <div className="hero-auto-overlay" />
         <div className="hero-auto-content">
-          <div className="hero-eyebrow">
-            <img src={flagURI('france')} style={{ width: 16, height: 11, borderRadius: 2 }} alt="" />
-            <img src={flagURI('allemagne')} style={{ width: 16, height: 11, borderRadius: 2 }} alt="" />
-            {t.hero.eyebrow}
+          <div className="hero-eyebrow" aria-label={t.hero.eyebrow}>
+            <img className="hero-origin-flag" src={flagURI('france')} alt="France" />
+            <img className="hero-origin-flag" src={flagURI('allemagne')} alt="Allemagne" />
+            <span className="hero-eyebrow-text">{t.hero.eyebrow}</span>
           </div>
           <h1>{t.hero.titre1}<br /><span>{t.hero.titre2}</span></h1>
           <p>{t.hero.desc(s.nom, s.adresse)}</p>
