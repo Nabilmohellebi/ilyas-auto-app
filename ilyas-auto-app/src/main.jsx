@@ -5,6 +5,7 @@ import './styles/global.css'
 import './styles/premium.css'
 import './styles/polish.css'
 import './styles/theme-refinement.css'
+import './styles/visual-polish.css'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
