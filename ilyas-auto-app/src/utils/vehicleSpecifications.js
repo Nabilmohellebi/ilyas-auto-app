@@ -83,7 +83,10 @@ export function mergeTechnicalSpecs(existing = [], incoming = []) {
 
 /** Put common vehicle data in a familiar order; custom rows follow alphabetically. */
 export function sortTechnicalSpecs(items = []) {
-  const clean = (Array.isArray(items) ? items : []).filter(item => item?.label?.trim() && item?.value?.trim())
+  const clean = uniqueByLabel(
+    (Array.isArray(items) ? items : []).filter(item => typeof item?.label === 'string' && item.label.trim() && typeof item?.value === 'string' && item.value.trim()),
+    item => item.label,
+  )
   const priority = label => {
     const key = normalizeKey(label)
     const index = TECHNICAL_ORDER.findIndex(term => key === term || key.startsWith(term + ' ') || key.startsWith(term + '('))
