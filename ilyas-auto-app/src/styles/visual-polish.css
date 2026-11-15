@@ -1032,3 +1032,153 @@
     font-size: 13px;
   }
 }
+
+
+/* Bulk line-by-line editors for vehicle equipment and technical data. */
+.pf .bulk-entry-box {
+  margin-top: 14px;
+  padding: 13px;
+  border: 1px solid rgba(215, 177, 95, .25);
+  border-radius: 12px;
+  background: rgba(215, 177, 95, .045);
+}
+.pf .bulk-entry-box > label {
+  display: block;
+  margin-bottom: 8px;
+  color: #f1d69b;
+  font-size: 12px;
+  font-weight: 850;
+}
+.pf .bulk-entry-box textarea {
+  display: block;
+  width: 100%;
+  min-height: 112px;
+  box-sizing: border-box;
+  resize: vertical;
+  padding: 11px 12px;
+  border: 1px solid rgba(255, 255, 255, .14);
+  border-radius: 9px;
+  outline: none;
+  background: #171b22;
+  color: #f7f3e9;
+  font: inherit;
+  font-size: 12px;
+  line-height: 1.65;
+  white-space: pre;
+}
+.pf .bulk-entry-box textarea:focus {
+  border-color: #c99a4c;
+  box-shadow: 0 0 0 3px rgba(201, 154, 76, .13);
+}
+.pf .bulk-entry-box textarea::placeholder {
+  color: rgba(234, 228, 216, .38);
+}
+.pf .bulk-entry-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin-top: 10px;
+}
+.pf .bulk-entry-footer small,
+.pf .bulk-list-empty {
+  color: rgba(238, 232, 221, .58);
+  font-size: 11px;
+  line-height: 1.5;
+}
+.pf .bulk-list-current {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 7px;
+}
+.pf .bulk-list-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  padding: 8px 9px;
+  border: 1px solid rgba(255, 255, 255, .09);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, .035);
+  color: #f4efe5;
+  font-size: 12px;
+  line-height: 1.4;
+}
+.pf .bulk-list-chip > span:nth-child(2) {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.pf .bulk-list-check {
+  display: inline-grid;
+  place-items: center;
+  width: 17px;
+  height: 17px;
+  flex: 0 0 17px;
+  border-radius: 50%;
+  background: rgba(46, 184, 111, .17);
+  color: #7ee0a6;
+  font-size: 11px;
+  font-weight: 900;
+}
+.pf .bulk-list-chip button,
+.pf .bulk-tech-row button {
+  width: 26px;
+  height: 26px;
+  flex: 0 0 26px;
+  border: 1px solid rgba(255, 120, 120, .18);
+  border-radius: 7px;
+  background: rgba(230, 57, 70, .08);
+  color: #ff9b9b;
+  cursor: pointer;
+}
+.pf .bulk-tech-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 30px;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  padding: 8px;
+  border: 1px solid rgba(255, 255, 255, .08);
+  border-radius: 9px;
+  background: rgba(255, 255, 255, .025);
+}
+.pf .bulk-tech-row input {
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 9px 10px;
+  border: 1px solid rgba(255, 255, 255, .12);
+  border-radius: 7px;
+  background: #171b22;
+  color: #f7f3e9;
+  font-size: 12px;
+}
+.pf .bulk-entry-footer .act-btn:disabled {
+  opacity: .42;
+  cursor: not-allowed;
+}
+@media (max-width: 560px) {
+  .pf .bulk-list-current {
+    grid-template-columns: 1fr;
+  }
+  .pf .bulk-entry-footer {
+    align-items: stretch;
+  }
+  .pf .bulk-entry-footer .act-btn {
+    width: 100%;
+  }
+  .pf .bulk-tech-row {
+    grid-template-columns: minmax(0, 1fr) 30px;
+  }
+  .pf .bulk-tech-row input:first-child {
+    grid-column: 1;
+  }
+  .pf .bulk-tech-row input:nth-child(2) {
+    grid-column: 1;
+  }
+  .pf .bulk-tech-row button {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+  }
+}
