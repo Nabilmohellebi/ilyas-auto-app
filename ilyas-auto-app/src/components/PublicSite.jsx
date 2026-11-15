@@ -59,7 +59,7 @@ function PublicSiteInner() {
   const [sharedFavoritesStatus, setSharedFavoritesStatus] = useState('')
   const [sellOpen, setSellOpen] = useState(false)
   const [vehicleCondition, setVehicleCondition] = useState('all')
-  const [publicTheme, setPublicTheme] = useState(() => { try { return window.localStorage.getItem('hbr_public_theme') === 'dark' ? 'dark' : 'ivory' } catch { return 'ivory' } })
+  const publicTheme = (() => { try { return window.localStorage.getItem('hbr_public_theme') === 'dark' ? 'dark' : 'ivory' } catch { return 'ivory' } })()
 
   const [search, setSearch] = useState('')
   const [brand, setBrand] = useState('all')
@@ -347,10 +347,28 @@ function PublicSiteInner() {
     origin !== 'all' || bodyType !== 'all' || budget !== 'all' || sort !== 'default' || showFavorites
   )
 
-  function togglePublicTheme() {
-    const nextTheme = publicTheme === 'dark' ? 'ivory' : 'dark'
-    setPublicTheme(nextTheme)
+  function togglePublicTheme(event) {
+    // La bascule de thème ne doit pas rerendre tout le catalogue et ses nombreuses cartes.
+    const app = event.currentTarget.closest('.app')
+    if (!app) return
+
+    const nextTheme = app.dataset.theme === 'dark' ? 'ivory' : 'dark'
+    const isDark = nextTheme === 'dark'
+
+    // L'attribut data-theme pilote déjà toute la palette CSS du site.
+    app.dataset.theme = nextTheme
     try { window.localStorage.setItem('hbr_public_theme', nextTheme) } catch {}
+
+    // Synchronise les boutons desktop et mobile sans déclencher un rendu React global.
+    app.querySelectorAll('.theme-toggle').forEach(button => {
+      const icon = button.querySelector('[aria-hidden="true"]')
+      const label = button.querySelector('.theme-toggle-label')
+      if (icon) icon.textContent = isDark ? '☀️' : '🌙'
+      if (label) label.textContent = isDark ? 'Ivoire' : 'Sombre'
+      button.setAttribute('aria-pressed', String(isDark))
+      button.setAttribute('aria-label', isDark ? 'Activer le thème ivoire' : 'Activer le mode sombre')
+      button.setAttribute('title', isDark ? 'Thème ivoire' : 'Mode sombre')
+    })
   }
 
   function resetCatalogueFilters() {
