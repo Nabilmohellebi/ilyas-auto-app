@@ -193,7 +193,7 @@ export default function VehicleForm({ vehicle, onClose, onSave }) {
   }
   function updateTechnicalSpec(index, key, value) {
     const updated = form.technical_specs.map((item, i) => i === index ? { ...item, [key]: value } : item)
-    set('technical_specs', sortTechnicalSpecs(updated))
+    set('technical_specs', updated)
   }
   function removeTechnicalSpec(index) {
     set('technical_specs', form.technical_specs.filter((_, i) => i !== index))
