@@ -1,0 +1,905 @@
+/* ============================================================
+   HBR AUTO — COMPLETE COLOR & TYPOGRAPHY PASS
+   Final visual layer for the public showroom and admin dashboard.
+   No layout, data, navigation or business behavior is changed.
+   ============================================================ */
+
+/* A clearer, consistent palette for both public themes. */
+.app[data-theme="dark"] {
+  --theme-bg: #11151a;
+  --theme-surface: #171d24;
+  --theme-surface-raised: #222a34;
+  --theme-text: #f6f3ed;
+  --theme-muted: #c0c5cc;
+  --theme-border: #3b4652;
+  --theme-field: #1e252e;
+  --public-accent: #efcc82;
+  --public-accent-strong: #f6dda7;
+  --public-accent-soft: rgba(239, 204, 130, .13);
+  --public-accent-ink: #21190e;
+  --public-brand: #a31b32;
+  background: var(--theme-bg) !important;
+  color: var(--theme-text) !important;
+}
+.app[data-theme="ivory"] {
+  --theme-bg: #e9e1d5;
+  --theme-surface: #f7f1e7;
+  --theme-surface-raised: #e9dfd1;
+  --theme-text: #372e23;
+  --theme-muted: #625647;
+  --theme-border: #d1c2ae;
+  --theme-field: #fbf6ee;
+  --public-accent: #845a2a;
+  --public-accent-strong: #69451f;
+  --public-accent-soft: rgba(132, 90, 42, .12);
+  --public-accent-ink: #fffaf2;
+  --public-brand: #850019;
+  background:
+    radial-gradient(ellipse at 15% 0%, rgba(174, 134, 81, .09), transparent 34rem),
+    linear-gradient(180deg, #eee7dc 0%, var(--theme-bg) 100%) !important;
+  color: var(--theme-text) !important;
+}
+
+/* Shared typography: stronger hierarchy and better secondary-text contrast. */
+.app[data-theme] :where(
+  .section-head h2,
+  .showroom-info-row h4,
+  .vd-title,
+  .vd-section h3,
+  .vd-gallery-full-title,
+  .res-box h2,
+  .cmp-hdr h2,
+  .finance-header h2,
+  .crm-header h2
+) {
+  color: var(--theme-text) !important;
+  -webkit-text-fill-color: currentColor !important;
+  font-weight: 850 !important;
+  letter-spacing: -.025em;
+}
+.app[data-theme] :where(
+  .section-head p,
+  .veh-card-top p,
+  .veh-specs,
+  .showroom-info-row p,
+  .footer-sub,
+  .testi-quote,
+  .testi-role,
+  .vd-description,
+  .vd-old-price,
+  .vd-bottom-price .lbl,
+  .finance-calculator-description,
+  .cmp-heading-copy p,
+  .cmp-veh-model,
+  .cmp-footnote,
+  .catalogue-results-count,
+  .catalogue-share-feedback
+) {
+  color: var(--theme-muted) !important;
+  -webkit-text-fill-color: currentColor !important;
+}
+.app[data-theme] .section-head p {
+  font-size: 14px;
+  line-height: 1.75;
+}
+.app[data-theme] .section-head h2 {
+  font-size: clamp(27px, 3.5vw, 42px);
+  line-height: 1.12;
+}
+.app[data-theme] .section-head .bar {
+  width: 52px;
+  height: 3px;
+  border-radius: 99px;
+  background: linear-gradient(90deg, var(--public-accent-strong), var(--public-accent)) !important;
+  box-shadow: 0 2px 8px var(--public-accent-soft);
+}
+.app[data-theme] .trust-grid .num {
+  color: var(--public-accent) !important;
+  -webkit-text-fill-color: currentColor !important;
+  font-size: clamp(20px, 2.2vw, 27px);
+  font-weight: 900;
+  letter-spacing: -.035em;
+}
+.app[data-theme] .trust-grid .lbl {
+  color: var(--theme-muted) !important;
+  -webkit-text-fill-color: currentColor !important;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .075em;
+  line-height: 1.5;
+}
+.app[data-theme] .announce-item {
+  color: var(--theme-muted) !important;
+  -webkit-text-fill-color: currentColor !important;
+  font-weight: 700;
+}
+.app[data-theme] .announce-dot {
+  color: var(--public-accent) !important;
+}
+
+/* Navigation and small controls. */
+.app[data-theme] .nav,
+.app[data-theme] .nav-mobile {
+  background: color-mix(in srgb, var(--theme-surface) 94%, transparent) !important;
+  border-color: var(--theme-border) !important;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, .07) !important;
+}
+.app[data-theme] .nav-links a,
+.app[data-theme] .nav-mobile a {
+  color: var(--theme-text) !important;
+  -webkit-text-fill-color: currentColor !important;
+  font-size: 12.5px;
+  font-weight: 750;
+  transition: color .18s ease, opacity .18s ease;
+}
+.app[data-theme] .nav-links a:hover,
+.app[data-theme] .nav-mobile a:hover {
+  color: var(--public-accent) !important;
+  -webkit-text-fill-color: currentColor !important;
+}
+.app[data-theme] .nav-burger {
+  color: var(--theme-text) !important;
+  -webkit-text-fill-color: currentColor !important;
+}
+.app[data-theme] .lang-toggle {
+  background: var(--public-accent-soft) !important;
+  border: 1px solid color-mix(in srgb, var(--public-accent) 42%, var(--theme-border)) !important;
+  color: var(--public-accent-strong) !important;
+  -webkit-text-fill-color: currentColor !important;
+  font-weight: 850;
+}
+.app[data-theme="ivory"] .lang-toggle {
+  color: #68471f !important;
+  -webkit-text-fill-color: #68471f !important;
+}
+.app[data-theme] .theme-toggle {
+  min-height: 40px;
+  padding: 8px 13px;
+  background: var(--theme-surface-raised) !important;
+  border: 1px solid var(--theme-border) !important;
+  color: var(--theme-text) !important;
+  -webkit-text-fill-color: currentColor !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .05);
+}
+.app[data-theme] .theme-toggle:hover {
+  border-color: var(--public-accent) !important;
+  background: var(--public-accent-soft) !important;
+}
+.app[data-theme] .theme-toggle-label {
+  color: inherit !important;
+  -webkit-text-fill-color: currentColor !important;
+  font-weight: 850;
+}
+.app[data-theme] .footer-auto {
+  background: var(--theme-surface-raised) !important;
+  border-top: 1px solid var(--theme-border) !important;
+}
+.app[data-theme] .footer-logo {
+  color: var(--theme-text) !important;
+  -webkit-text-fill-color: currentColor !important;
+}
+.app[data-theme] .footer-logo em {
+  color: var(--public-accent) !important;
+  -webkit-text-fill-color: currentColor !important;
+}
+.app[data-theme] .footer-social a,
+.app[data-theme] .footer-track-btn {
+  color: var(--theme-muted) !important;
+  -webkit-text-fill-color: currentColor !important;
+}
+.app[data-theme] .footer-social a:hover,
+.app[data-theme] .footer-track-btn:hover {
+  color: var(--public-accent) !important;
+  -webkit-text-fill-color: currentColor !important;
+}
+
+/* Catalogue filters, result actions and category chips. */
+.app[data-theme] .filters-bar {
+  background: var(--theme-surface-raised) !important;
+  border: 1px solid var(--theme-border) !important;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, .055) !important;
+}
+.app[data-theme] .filters-bar label {
+  color: var(--theme-muted) !important;
+  -webkit-text-fill-color: currentColor !important;
+  font-size: 11px;
+  font-weight: 850;
+  letter-spacing: .035em;
+}
+.app[data-theme] .filters-bar :where(input, select) {
+  background: var(--theme-field) !important;
+  border: 1px solid var(--theme-border) !important;
+  color: var(--theme-text) !important;
+  -webkit-text-fill-color: currentColor !important;
+  border-radius: 8px;
+  font-weight: 600;
+}
+.app[data-theme] .filters-bar :where(input, select):focus {
+  border-color: var(--public-accent) !important;
+  box-shadow: 0 0 0 3px var(--public-accent-soft) !important;
+}
+.app[data-theme] .filters-bar :where(input, select)::placeholder {
+  color: var(--theme-muted) !important;
+  -webkit-text-fill-color: currentColor !important;
+  opacity: .9;
+}
+.app[data-theme] .filter-btn {
+  background: var(--theme-surface-raised) !important;
+  border: 1px solid var(--theme-border) !important;
+  color: var(--theme-text) !important;
+  -webkit-text-fill-color: currentColor !important;
+  font-weight: 800;
+}
+.app[data-theme] .filter-btn:hover:not(.active) {
+  border-color: var(--public-accent) !important;
+  background: var(--public-accent-soft) !important;
+}
+.app[data-theme] .filter-btn.active {
+  background: var(--public-accent) !important;
+  border-color: var(--public-accent) !important;
+  color: var(--public-accent-ink) !important;
+  -webkit-text-fill-color: currentColor !important;
+  box-shadow: 0 5px 14px var(--public-accent-soft);
+}
+.app[data-theme] .vehicle-category-tabs button {
+  border-radius: 999px !important;
+  font-size: 12px;
+  font-weight: 850;
+}
+.app[data-theme] .vehicle-category-tabs button.active {
+  background: linear-gradient(135deg, var(--public-accent-strong), var(--public-accent)) !important;
+  border-color: var(--public-accent) !important;
+  color: var(--public-accent-ink) !important;
+  -webkit-text-fill-color: currentColor !important;
+  box-shadow: 0 6px 18px var(--public-accent-soft) !important;
+}
+.app[data-theme] .catalogue-results-count {
+  font-size: 12.5px;
+  font-weight: 850;
+}
+.app[data-theme] :where(.catalogue-reset-btn, .catalogue-favorites-toggle, .catalogue-share-btn) {
+  background: var(--theme-surface-raised) !important;
+  border-color: var(--theme-border) !important;
+  color: var(--theme-text) !important;
+  -webkit-text-fill-color: currentColor !important;
+  font-weight: 850;
+}
+.app[data-theme] :where(.catalogue-reset-btn, .catalogue-favorites-toggle, .catalogue-share-btn):hover {
+  border-color: var(--public-accent) !important;
+  background: var(--public-accent-soft) !important;
+}
+.app[data-theme] .catalogue-favorites-toggle > span:first-child,
+.app[data-theme] .catalogue-share-btn > span {
+  color: var(--public-accent) !important;
+  -webkit-text-fill-color: currentColor !important;
+}
+
+/* Vehicle cards: stronger names, specifications and purposeful price color. */
+.app[data-theme] .veh-card,
+.app[data-theme] .veh-card-body,
+.app[data-theme] .veh-strip-card,
+.app[data-theme] .edito-card,
+.app[data-theme] .testi-card {
+  background: var(--theme-surface) !important;
+  border-color: var(--theme-border) !important;
+  color: var(--theme-text) !important;
+}
+.app[data-theme] .veh-card {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .08) !important;
+}
+.app[data-theme] .veh-card:hover,
+.app[data-theme] .edito-card:hover,
+.app[data-theme] .testi-card:hover {
+  border-color: color-mix(in srgb, var(--public-accent) 58%, var(--theme-border)) !important;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, .14) !important;
+}
+.app[data-theme] .veh-card-top h3 {
+  color: var(--theme-text) !important;
+  -webkit-text-fill-color: currentColor !important;
+  font-size: 17px;
+  font-weight: 900;
+  letter-spacing: -.02em;
+}
+.app[data-theme] .veh-card-top p {
+  color: var(--theme-muted) !important;
+  -webkit-text-fill-color: currentColor !important;
+  font-size: 13px;
+  font-weight: 650;
+}
+.app[data-theme] .veh-specs {
+  color: var(--theme-muted) !important;
+  -webkit-text-fill-color: currentColor !important;
+  font-size: 12.5px;
+  font-weight: 650;
+  line-height: 1.5;
+}
+.app[data-theme] .veh-year-badge {
+  background: var(--theme-surface-raised) !important;
+  border: 1px solid var(--theme-border) !important;
+  color: var(--theme-text) !important;
+  -webkit-text-fill-color: currentColor !important;
+  font-size: 11px;
+  font-weight: 900;
+}
+.app[data-theme] .veh-condition-label {
+  border-width: 1px !important;
+  font-size: 10.5px;
+  font-weight: 900;
+  letter-spacing: .055em;
+}
+.app[data-theme="dark"] .veh-condition-label.new {
+  background: rgba(239, 204, 130, .14) !important;
+  border-color: rgba(239, 204, 130, .38) !important;
+  color: #f2d493 !important;
+  -webkit-text-fill-color: currentColor !important;
+}
+.app[data-theme="dark"] .veh-condition-label.used {
+  background: rgba(102, 190, 133, .14) !important;
+  border-color: rgba(102, 190, 133, .35) !important;
+  color: #b7e4c6 !important;
+  -webkit-text-fill-color: currentColor !important;
+}
+.app[data-theme="ivory"] .veh-condition-label.new {
+  background: #f1e4c9 !important;
+  border-color: #d5bd8c !important;
+  color: #63491f !important;
+  -webkit-text-fill-color: currentColor !important;
+}
+.app[data-theme="ivory"] .veh-condition-label.used {
+  background: #e0eddf !important;
+  border-color: #b5d0b5 !important;
+  color: #28583a !important;
+  -webkit-text-fill-color: currentColor !important;
+}
+.app[data-theme] .veh-price-strip .price {
+  color: #f0cd83 !important;
+  -webkit-text-fill-color: currentColor !important;
+  font-size: clamp(20px, 2.1vw, 25px);
+  font-weight: 900;
+  letter-spacing: -.025em;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, .32) !important;
+}
+.app[data-theme] .veh-price-strip .old {
+  color: #e2ded5 !important;
+  -webkit-text-fill-color: currentColor !important;
+  font-size: 12px;
+  font-weight: 650;
+}
+.app[data-theme] .veh-strip-info .name,
+.app[data-theme] .edito-card-info .name {
+  color: var(--theme-text) !important;
+  -webkit-text-fill-color: currentColor !important;
+  font-weight: 800;
+}
+.app[data-theme="dark"] :where(.veh-strip-info .price, .edito-card-info .price, .vd-price, .vd-bottom-price strong, .cmp-price-cell) {
+  color: #efcc82 !important;
+  -webkit-text-fill-color: currentColor !important;
+}
+.app[data-theme="ivory"] :where(.veh-strip-info .price, .edito-card-info .price, .vd-price, .vd-bottom-price strong, .cmp-price-cell) {
+  color: #805a2d !important;
+  -webkit-text-fill-color: currentColor !important;
+}
+.app[data-theme] .veh-price-strip .old,
+.app[data-theme] .vd-old-price {
+  text-decoration-color: currentColor;
+}
+.app[data-theme] .veh-flag-badge {
+  font-weight: 850;
+  letter-spacing: .01em;
+}
+.app[data-theme] .veh-badge-tag,
+.app[data-theme] .vd-badge,
+.app[data-theme] .vd-disc {
+  background: #850019 !important;
+  border: 1px solid #a62d43 !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  font-weight: 850;
+}
+.app[data-theme] .veh-statut-badge,
+.app[data-theme] .vd-statut-float {
+  font-weight: 900;
+  letter-spacing: .015em;
+  border: 1px solid rgba(255, 255, 255, .3);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .18);
+}
+
+/* Testimonials and showroom information. */
+.app[data-theme] .testi-card {
+  border-radius: 14px !important;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, .06) !important;
+}
+.app[data-theme] .testi-name {
+  color: var(--theme-text) !important;
+  -webkit-text-fill-color: currentColor !important;
+  font-size: 13.5px;
+  font-weight: 900;
+}
+.app[data-theme] .testi-role,
+.app[data-theme] .testi-quote {
+  color: var(--theme-muted) !important;
+  -webkit-text-fill-color: currentColor !important;
+}
+.app[data-theme] .testi-quote {
+  font-size: 13.5px;
+  line-height: 1.75;
+}
+.app[data-theme] .testi-stars {
+  color: #c28b12 !important;
+  -webkit-text-fill-color: currentColor !important;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, .08);
+}
+.app[data-theme] .showroom-info-row {
+  padding: 12px 14px;
+  margin-bottom: 10px;
+  border: 1px solid var(--theme-border);
+  border-radius: 12px;
+  background: var(--theme-surface) !important;
+}
+.app[data-theme] .showroom-info-row h4 {
+  color: var(--theme-text) !important;
+  -webkit-text-fill-color: currentColor !important;
+  font-size: 13px;
+  font-weight: 900;
+}
+.app[data-theme] .showroom-info-row p {
+  color: var(--theme-muted) !important;
+  -webkit-text-fill-color: currentColor !important;
+  font-size: 13px;
+  line-height: 1.7;
+}
+.app[data-theme] .showroom-info-row .ic {
+  color: var(--public-accent) !important;
+  -webkit-text-fill-color: currentColor !important;
+}
+
+/* Vehicle detail and comparison: make secondary facts as clear as the title. */
+.app[data-theme] .vd-info {
+  background: var(--theme-surface) !important;
+  border-color: var(--theme-border) !important;
+  color: var(--theme-text) !important;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, .07) !important;
+}
+.app[data-theme] .vd-title {
+  color: var(--theme-text) !important;
+  -webkit-text-fill-color: currentColor !important;
+  font-size: clamp(24px, 2.7vw, 32px);
+  font-weight: 900;
+}
+.app[data-theme] .vd-price {
+  font-size: clamp(29px, 3vw, 38px);
+  font-weight: 900;
+  letter-spacing: -.035em;
+}
+.app[data-theme] .vd-specs-grid div {
+  background: var(--theme-surface-raised) !important;
+  border: 1px solid var(--theme-border) !important;
+  color: var(--theme-text) !important;
+  -webkit-text-fill-color: currentColor !important;
+  font-size: 12.5px;
+  font-weight: 700;
+}
+.app[data-theme] .vd-specs-grid .ic,
+.app[data-theme] .vd-equip-item span {
+  color: var(--public-accent) !important;
+  -webkit-text-fill-color: currentColor !important;
+}
+.app[data-theme] .vd-section {
+  background: var(--theme-surface-raised) !important;
+  border: 1px solid var(--theme-border) !important;
+  border-top: 3px solid var(--public-accent) !important;
+  border-radius: 13px;
+  padding: 18px !important;
+}
+.app[data-theme] .vd-section h3 {
+  color: var(--theme-text) !important;
+  -webkit-text-fill-color: currentColor !important;
+  font-size: 13px;
+  font-weight: 900;
+}
+.app[data-theme] .vd-description,
+.app[data-theme] .vd-equip-item {
+  color: var(--theme-muted) !important;
+  -webkit-text-fill-color: currentColor !important;
+  font-size: 13px;
+  line-height: 1.75;
+}
+.app[data-theme] .vd-video-card {
+  background: var(--theme-surface-raised) !important;
+  border: 1px solid var(--theme-border) !important;
+}
+.app[data-theme] .vd-video-card .txt-title {
+  color: var(--theme-text) !important;
+  -webkit-text-fill-color: currentColor !important;
+  font-weight: 850;
+}
+.app[data-theme] .vd-bottom {
+  background: var(--theme-surface) !important;
+  border-top: 1px solid var(--theme-border) !important;
+  box-shadow: 0 -8px 26px rgba(0, 0, 0, .12) !important;
+}
+.app[data-theme] .vd-bottom-price .lbl {
+  color: var(--theme-muted) !important;
+  -webkit-text-fill-color: currentColor !important;
+  font-weight: 750;
+}
+.app[data-theme] .vd-close-float {
+  background: #262b32 !important;
+  border: 2px solid var(--public-accent) !important;
+  color: #fff5df !important;
+  -webkit-text-fill-color: #fff5df !important;
+  box-shadow: 0 5px 18px rgba(0, 0, 0, .35) !important;
+}
+
+/* Popovers, comparison table and floating compare bar. */
+.app[data-theme] .cmp-box {
+  background: var(--theme-surface) !important;
+  border-color: var(--theme-border) !important;
+  color: var(--theme-text) !important;
+}
+.app[data-theme] .cmp-hdr,
+.app[data-theme] .cmp-scroll,
+.app[data-theme] .cmp-footnote {
+  background: var(--theme-surface) !important;
+}
+.app[data-theme] .cmp-table th,
+.app[data-theme] .cmp-table td {
+  background: var(--theme-surface-raised) !important;
+  border-color: var(--theme-border) !important;
+  color: var(--theme-text) !important;
+  -webkit-text-fill-color: currentColor !important;
+  font-weight: 650;
+}
+.app[data-theme] .cmp-table .cmp-label-col {
+  background: var(--theme-surface) !important;
+  color: var(--theme-muted) !important;
+  -webkit-text-fill-color: currentColor !important;
+  font-weight: 850;
+}
+.app[data-theme] .cmp-veh-name {
+  color: var(--theme-text) !important;
+  -webkit-text-fill-color: currentColor !important;
+  font-size: 12px;
+  font-weight: 900;
+}
+.app[data-theme] .cmp-veh-model,
+.app[data-theme] .cmp-footnote {
+  color: var(--theme-muted) !important;
+  -webkit-text-fill-color: currentColor !important;
+}
+.app[data-theme] .cmp-highlight-badge {
+  background: var(--public-accent-soft) !important;
+  color: var(--public-accent) !important;
+  -webkit-text-fill-color: currentColor !important;
+  border: 1px solid color-mix(in srgb, var(--public-accent) 35%, transparent);
+}
+.app[data-theme] .cmp-highlight-cell {
+  background: var(--public-accent-soft) !important;
+  color: var(--theme-text) !important;
+  -webkit-text-fill-color: currentColor !important;
+}
+.app[data-theme] .cmp-float-bar {
+  background: var(--theme-surface) !important;
+  border-top: 1px solid var(--theme-border) !important;
+  box-shadow: 0 -8px 24px rgba(0, 0, 0, .12) !important;
+}
+.app[data-theme] .cmp-float-chip {
+  background: var(--theme-surface-raised) !important;
+  border-color: var(--theme-border) !important;
+  color: var(--theme-text) !important;
+  -webkit-text-fill-color: currentColor !important;
+}
+
+/* Reservation, tracking and exchange modals. */
+.app[data-theme] .res-box,
+.app[data-theme] .track-modal,
+.app[data-theme] .trade-modal {
+  background: var(--theme-surface) !important;
+  border: 1px solid var(--theme-border) !important;
+  color: var(--theme-text) !important;
+  box-shadow: 0 24px 72px rgba(0, 0, 0, .28) !important;
+}
+.app[data-theme] .res-box :where(h2, .nom, .res-veh-preview .nom),
+.app[data-theme] .track-modal h2,
+.app[data-theme] .trade-modal h2 {
+  color: var(--theme-text) !important;
+  -webkit-text-fill-color: currentColor !important;
+}
+.app[data-theme] .res-box > p,
+.app[data-theme] .track-modal > p,
+.app[data-theme] .trade-modal > p,
+.app[data-theme] .res-success p,
+.app[data-theme] .res-success h2 {
+  color: var(--theme-muted) !important;
+  -webkit-text-fill-color: currentColor !important;
+}
+.app[data-theme] .res-box .res-veh-preview {
+  background: var(--theme-surface-raised) !important;
+  border-color: var(--theme-border) !important;
+}
+.app[data-theme] .res-box .res-veh-preview .prix {
+  color: var(--public-accent) !important;
+  -webkit-text-fill-color: currentColor !important;
+  font-weight: 900;
+}
+.app[data-theme] .res-box .form-field label,
+.app[data-theme] .trade-modal .form-field label,
+.app[data-theme] .track-modal .form-field label {
+  color: var(--theme-muted) !important;
+  -webkit-text-fill-color: currentColor !important;
+  font-size: 11px;
+  font-weight: 850;
+  letter-spacing: .025em;
+}
+.app[data-theme] .res-box :where(input, select, textarea),
+.app[data-theme] .track-modal :where(input, select, textarea),
+.app[data-theme] .trade-modal :where(input, select, textarea) {
+  background: var(--theme-field) !important;
+  border: 1px solid var(--theme-border) !important;
+  color: var(--theme-text) !important;
+  -webkit-text-fill-color: currentColor !important;
+}
+.app[data-theme] .res-box :where(input, select, textarea)::placeholder,
+.app[data-theme] .track-modal :where(input, select, textarea)::placeholder,
+.app[data-theme] .trade-modal :where(input, select, textarea)::placeholder {
+  color: var(--theme-muted) !important;
+  -webkit-text-fill-color: currentColor !important;
+  opacity: .85 !important;
+}
+.app[data-theme] .res-box .btn-close,
+.app[data-theme] .track-modal .btn-close,
+.app[data-theme] .trade-modal .btn-close,
+.app[data-theme] .cmp-hdr .btn-close {
+  background: var(--theme-surface-raised) !important;
+  border: 1px solid var(--theme-border) !important;
+  color: var(--theme-text) !important;
+  -webkit-text-fill-color: currentColor !important;
+}
+.app[data-theme] .trade-form-section,
+.app[data-theme] .trade-type-option,
+.app[data-theme] .trade-calculation,
+.app[data-theme] .track-summary,
+.app[data-theme] .res-box .res-veh-preview {
+  background: var(--theme-surface-raised) !important;
+  border-color: var(--theme-border) !important;
+}
+.app[data-theme] .trade-section-title,
+.app[data-theme] .trade-calculation-heading {
+  color: var(--public-accent) !important;
+  -webkit-text-fill-color: currentColor !important;
+  font-weight: 900;
+}
+.app[data-theme] .trade-calculation-row {
+  border-bottom-color: var(--theme-border) !important;
+  color: var(--theme-muted) !important;
+  -webkit-text-fill-color: currentColor !important;
+}
+.app[data-theme] .trade-calculation-row strong,
+.app[data-theme] .trade-balance strong,
+.app[data-theme] .track-summary strong {
+  color: var(--theme-text) !important;
+  -webkit-text-fill-color: currentColor !important;
+}
+.app[data-theme] .trade-offer span,
+.app[data-theme] .trade-offer strong,
+.app[data-theme] .track-summary > div:nth-child(2) strong {
+  color: var(--public-accent) !important;
+  -webkit-text-fill-color: currentColor !important;
+}
+.app[data-theme] .trade-balance {
+  background: var(--public-accent-soft) !important;
+  border: 1px solid color-mix(in srgb, var(--public-accent) 35%, var(--theme-border));
+}
+.app[data-theme] .trade-balance small,
+.app[data-theme] .trade-muted,
+.app[data-theme] .trade-disclaimer,
+.app[data-theme] .track-desc,
+.app[data-theme] .track-label {
+  color: var(--theme-muted) !important;
+  -webkit-text-fill-color: currentColor !important;
+}
+.app[data-theme] .track-label.done {
+  color: var(--theme-text) !important;
+  -webkit-text-fill-color: currentColor !important;
+  font-weight: 850;
+}
+.app[data-theme] .track-current-tag {
+  background: var(--public-accent-soft) !important;
+  border-color: color-mix(in srgb, var(--public-accent) 40%, var(--theme-border)) !important;
+  color: var(--public-accent) !important;
+  -webkit-text-fill-color: currentColor !important;
+}
+
+/* Financing results, printable/share actions and form focus states. */
+.app[data-theme] .finance-result {
+  background: var(--theme-surface-raised) !important;
+  border: 1px solid var(--theme-border) !important;
+}
+.app[data-theme] .finance-result .lbl {
+  color: var(--theme-muted) !important;
+  -webkit-text-fill-color: currentColor !important;
+  font-weight: 750;
+}
+.app[data-theme] .finance-result strong,
+.app[data-theme] .finance-highlight strong {
+  color: var(--public-accent) !important;
+  -webkit-text-fill-color: currentColor !important;
+}
+.app[data-theme] .vd-print-btn,
+.app[data-theme] .vd-share-btn {
+  background: var(--theme-surface-raised) !important;
+  border: 1px solid var(--theme-border) !important;
+  color: var(--theme-text) !important;
+  -webkit-text-fill-color: currentColor !important;
+  font-weight: 850;
+}
+.app[data-theme] .vd-print-btn:hover,
+.app[data-theme] .vd-share-btn:hover {
+  border-color: var(--public-accent) !important;
+  background: var(--public-accent-soft) !important;
+}
+.app[data-theme] :where(button, a, input, select, textarea):focus-visible {
+  outline: 3px solid var(--public-accent) !important;
+  outline-offset: 3px !important;
+}
+.app[data-theme] :where(input, select, textarea):focus {
+  border-color: var(--public-accent) !important;
+  box-shadow: 0 0 0 3px var(--public-accent-soft) !important;
+}
+
+/* Keep real action colors recognizable and readable. */
+.app[data-theme] :where(.nav-wa-btn, .nav-mobile-wa-btn, .veh-card-wa-bar, .whatsapp-action-btn, .wa-float) {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
+.app[data-theme] :where(.btn-hero-primary, .btn-save, .btn-veh-reserve) {
+  font-weight: 900;
+  letter-spacing: .01em;
+}
+.app[data-theme="dark"] .btn-hero-primary,
+.app[data-theme="dark"] .btn-save,
+.app[data-theme="dark"] .btn-veh-reserve {
+  background: linear-gradient(135deg, #efcc82, #c99547) !important;
+  border-color: #d7ad62 !important;
+  color: #20180d !important;
+  -webkit-text-fill-color: currentColor !important;
+  box-shadow: 0 7px 20px rgba(201, 149, 71, .18) !important;
+}
+.app[data-theme="dark"] .btn-hero-primary:hover,
+.app[data-theme="dark"] .btn-save:hover,
+.app[data-theme="dark"] .btn-veh-reserve:hover {
+  background: linear-gradient(135deg, #f6dda7, #e0b96d) !important;
+  color: #20180d !important;
+  -webkit-text-fill-color: currentColor !important;
+}
+.app[data-theme="ivory"] .btn-hero-primary,
+.app[data-theme="ivory"] .btn-save,
+.app[data-theme="ivory"] .btn-veh-reserve {
+  background: linear-gradient(135deg, #970d2c, #76001b) !important;
+  border-color: #850019 !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: currentColor !important;
+  box-shadow: 0 7px 20px rgba(133, 0, 25, .16) !important;
+}
+.app[data-theme="ivory"] .btn-hero-primary:hover,
+.app[data-theme="ivory"] .btn-save:hover,
+.app[data-theme="ivory"] .btn-veh-reserve:hover {
+  background: linear-gradient(135deg, #ad1b3c, #850019) !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: currentColor !important;
+}
+.app[data-theme="dark"] .hero-cta .btn-hero-secondary {
+  background: rgba(255, 255, 255, .055) !important;
+  border: 1px solid rgba(239, 204, 130, .5) !important;
+  color: #f6f3ed !important;
+  -webkit-text-fill-color: currentColor !important;
+}
+.app[data-theme="dark"] .hero-cta .btn-hero-secondary:hover {
+  background: rgba(239, 204, 130, .14) !important;
+  color: #f6dda7 !important;
+  -webkit-text-fill-color: currentColor !important;
+}
+
+/* Admin dashboard: lift muted labels and helper copy without changing its dark UI. */
+.adm {
+  color: #f3f1eb;
+}
+.adm :where(
+  .adm-welcome p,
+  .adm-queue-row small,
+  .adm-stock-label,
+  .adm-recent-main span,
+  .adm-recent-main small,
+  .adm-empty-inline,
+  .crm-header p,
+  .crm-stat-card span,
+  .crm-client-identity small,
+  .crm-history-content > small,
+  .crm-history-content > p,
+  .crm-empty p,
+  .crm-footnote,
+  .finance-header p,
+  .finance-stat span,
+  .finance-stat small,
+  .finance-footnote,
+  .finance-record-main small,
+  .finance-record-notes,
+  .finance-record-grid span,
+  .adm-overview-card .muted
+) {
+  color: #bbc3cc !important;
+  -webkit-text-fill-color: currentColor !important;
+}
+.adm :where(.adm-welcome h1, .adm-overview-heading h3, .crm-header h2, .finance-header h2) {
+  color: #f7f3e9 !important;
+  -webkit-text-fill-color: currentColor !important;
+}
+.adm .adm-eyebrow,
+.adm .adm-text-link,
+.adm .crm-stat-card strong.crm-highlight {
+  color: #efc982 !important;
+  -webkit-text-fill-color: currentColor !important;
+}
+.adm .adm-tab:not(.active) {
+  color: #c2c8d0 !important;
+}
+.adm .adm-tab.active {
+  color: #f4d69a !important;
+  background: rgba(217, 170, 112, .16) !important;
+  border-color: rgba(217, 170, 112, .42) !important;
+}
+.adm .adm-overview-card,
+.adm .crm-stat-card,
+.adm .crm-client-card,
+.adm .finance-stat,
+.adm .finance-record {
+  border-color: rgba(231, 215, 190, .14) !important;
+}
+.adm :where(.adm-overview-card, .crm-stat-card, .finance-stat, .finance-record):hover {
+  border-color: rgba(239, 201, 130, .32) !important;
+}
+
+/* Avoid dim text in unavailable / disabled states. */
+.app[data-theme] :where(button, a, input, select, textarea):disabled {
+  opacity: .58;
+  cursor: not-allowed;
+}
+@media (prefers-reduced-motion: reduce) {
+  .app[data-theme] *,
+  .app[data-theme] *::before,
+  .app[data-theme] *::after {
+    transition-duration: .01ms !important;
+    animation-duration: .01ms !important;
+  }
+}
+
+
+/* Keep WhatsApp confirmation actions green even when they also use the
+   shared primary-button class. Success headings retain full emphasis. */
+.app[data-theme] .whatsapp-action-btn {
+  background: linear-gradient(135deg, #25D366 0%, #1fbd63 48%, #128C7E 100%) !important;
+  border-color: #25D366 !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  box-shadow: 0 7px 22px rgba(18, 140, 126, .2) !important;
+}
+.app[data-theme] .whatsapp-action-btn:hover {
+  background: linear-gradient(135deg, #2be477 0%, #25D366 48%, #1FBD5B 100%) !important;
+  border-color: #1FBD5B !important;
+}
+.app[data-theme] .res-success h2 {
+  color: var(--theme-text) !important;
+  -webkit-text-fill-color: currentColor !important;
+}
+.app[data-theme="dark"] .btn-hero-primary:not(.whatsapp-action-btn),
+.app[data-theme="dark"] .btn-save,
+.app[data-theme="dark"] .btn-veh-reserve {
+  color: #20180d !important;
+  -webkit-text-fill-color: currentColor !important;
+}
+.app[data-theme="ivory"] .btn-hero-primary:not(.whatsapp-action-btn),
+.app[data-theme="ivory"] .btn-save,
+.app[data-theme="ivory"] .btn-veh-reserve {
+  color: #ffffff !important;
+  -webkit-text-fill-color: currentColor !important;
+}
