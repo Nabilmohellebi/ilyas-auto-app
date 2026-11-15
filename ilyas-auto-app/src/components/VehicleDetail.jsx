@@ -124,7 +124,7 @@ function getEmbedUrl(url) {
   return { type: 'external', src: url }
 }
 
-export default function VehicleDetail({ vehicle: v, onClose, onReserve, shopName = 'Nabil Auto' }) {
+export default function VehicleDetail({ vehicle: v, onClose, onReserve, shopName = 'Nabil Auto', showFinancingCalculator = true }) {
   const { lang, t } = useLang()
   const images = Array.isArray(v.images) && v.images.length > 0 ? v.images : (v.img ? [{ url: v.img }] : [])
   const gallery = Array.isArray(v.images_gallery) ? v.images_gallery : []
@@ -135,6 +135,7 @@ export default function VehicleDetail({ vehicle: v, onClose, onReserve, shopName
 
   const disc = v.prix_old && v.prix_old > v.prix ? Math.round(100 - (v.prix / v.prix_old) * 100) : 0
   const disabled = v.statut === 'vendu'
+  const shouldShowFinancing = showFinancingCalculator && !disabled
   const specs = Array.isArray(v.specs) ? v.specs : []
   const technicalSpecs = Array.isArray(v.technical_specs) ? v.technical_specs.filter(item => item && String(item.label || '').trim() && String(item.value || '').trim()) : []
   const vehicleCondition = v.etat_vehicule || (Number(v.km || 0) > 0 ? 'occasion' : 'neuf')
@@ -276,7 +277,7 @@ export default function VehicleDetail({ vehicle: v, onClose, onReserve, shopName
         </div>
       )}
 
-      {(specs.length > 0 || technicalSpecs.length > 0 || v.description || !disabled) && (
+      {(specs.length > 0 || technicalSpecs.length > 0 || v.description || shouldShowFinancing) && (
         <div className="vd-detail-sections">
           {specs.length > 0 && (
             <section className="vd-section vd-feature-section">
@@ -317,7 +318,7 @@ export default function VehicleDetail({ vehicle: v, onClose, onReserve, shopName
             </section>
           )}
 
-          {!disabled && <FinancingCalculator prix={v.prix} />}
+          {shouldShowFinancing && <FinancingCalculator prix={v.prix} />}
         </div>
       )}
 

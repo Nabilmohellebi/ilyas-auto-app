@@ -8,7 +8,7 @@ const CACHE_TTL = 2 * 60 * 1000 // 2 minutes
 const PUBLIC_SETTING_KEYS = [
   'brand_identity', 'hero_images', 'shop_name', 'shop_phone', 'shop_whatsapp', 'shop_email', 'shop_address',
   'shop_horaires', 'shop_maps_url', 'shop_maps_embed', 'shop_phones',
-  'maintenance', 'trade_margin_percent', 'site_theme',
+  'maintenance', 'trade_margin_percent', 'site_theme', 'show_financing_calculator',
 ]
 
 export const DEFAULT_BRAND_IDENTITY = Object.freeze({
@@ -76,6 +76,7 @@ const DEFAULTS = {
   shop_maps_embed: '',
   maintenance:     'false',
   site_theme:      'light',
+  show_financing_calculator: 'true',
 }
 
 export async function getSettings() {
