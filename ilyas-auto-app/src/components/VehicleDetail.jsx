@@ -22,6 +22,7 @@ function safePrintImageUrl(value) {
 
 function printVehicleSheet(v, images, shopName = 'Nabil Auto') {
   const specs = Array.isArray(v.specs) ? v.specs : []
+  const technicalSpecs = Array.isArray(v.technical_specs) ? v.technical_specs.filter(item => item && item.label && item.value) : []
   const name = escapePrintHtml(`${v.marque} ${v.modele}`)
   const safeShopName = escapePrintHtml(shopName)
   const description = escapePrintHtml(v.description)
@@ -30,6 +31,7 @@ function printVehicleSheet(v, images, shopName = 'Nabil Auto') {
   const imageAlt = escapePrintHtml(name)
   const origin = escapePrintHtml(ORIGINS[v.provenance]?.label || 'Monde')
   const specItems = specs.map(item => `<li>${escapePrintHtml(item)}</li>`).join('')
+  const technicalItems = technicalSpecs.map(item => `<div><small>${escapePrintHtml(item.label)}</small><strong>${escapePrintHtml(item.value)}</strong></div>`).join('')
   const win = window.open('', '_blank')
   if (!win) return
   win.document.write(`<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>${name}</title>
@@ -45,6 +47,10 @@ function printVehicleSheet(v, images, shopName = 'Nabil Auto') {
     .price { font-size:26px; font-weight:900; color:#e63946; margin-bottom:16px; }
     .specs { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:20px; }
     .specs div { background:#f7f7f7; border-radius:8px; padding:8px 12px; font-size:13px; }
+    .technical-specs { display:grid; grid-template-columns:1fr 1fr; gap:7px; margin-bottom:16px; }
+    .technical-specs div { background:#f7f7f7; border-radius:8px; padding:9px 12px; font-size:13px; }
+    .technical-specs small { display:block; color:#777; margin-bottom:4px; }
+    .technical-specs strong { display:block; color:#222; }
     .section-title { font-size:13px; font-weight:800; text-transform:uppercase; letter-spacing:.04em; color:#555; margin-bottom:8px; border-top:1px solid #eee; padding-top:14px; }
     p.desc { font-size:13px; line-height:1.7; margin-bottom:16px; }
     ul { padding-left:18px; margin-bottom:16px; }
@@ -66,11 +72,26 @@ function printVehicleSheet(v, images, shopName = 'Nabil Auto') {
       <div>🚙 Carrosserie : ${escapePrintHtml(v.carrosserie || '—')}</div>
       <div>🌍 Provenance : ${origin}</div>
     </div>
-    ${description ? `<div class="section-title">Description</div><p class="desc">${description}</p>` : ''}
-    ${specItems ? `<div class="section-title">Équipements</div><ul>${specItems}</ul>` : ''}
+    ${specItems ? `<div class="section-title">Fonctionnalités supplémentaires</div><ul>${specItems}</ul>` : ''}
+    ${technicalItems ? `<div class="section-title">Caractéristiques techniques</div><div class="technical-specs">${technicalItems}</div>` : ''}
+    ${description ? `<div class="section-title">Notes du vendeur</div><p class="desc">${description}</p>` : ''}
     <div class="footer">${safeShopName} · Document généré automatiquement · Prix indicatif, sous réserve de disponibilité.</div>
   </body></html>`)
   win.document.close()
+}
+
+function technicalSpecIcon(label) {
+  const value = String(label || '').normalize('NFD').replace(/[\\u0300-\\u036f]/g, '').toLowerCase()
+  if (/moteur|engine|cylindre/.test(value)) return '⚙️'
+  if (/puissance|power/.test(value)) return '⚡'
+  if (/couple|torque/.test(value)) return '↗'
+  if (/vitesse|max speed/.test(value)) return '🏁'
+  if (/batterie|autonomie|range/.test(value)) return '🔋'
+  if (/dimension|taille|empattement/.test(value)) return '📐'
+  if (/place|siege/.test(value)) return '💺'
+  if (/carburant|fuel/.test(value)) return '⛽'
+  if (/transmission|boite|lecteur|drive/.test(value)) return '⚙️'
+  return '◆'
 }
 
 function statutColor(key) {
@@ -116,6 +137,7 @@ export default function VehicleDetail({ vehicle: v, onClose, onReserve, shopName
   const disc = v.prix_old && v.prix_old > v.prix ? Math.round(100 - (v.prix / v.prix_old) * 100) : 0
   const disabled = v.statut === 'vendu'
   const specs = Array.isArray(v.specs) ? v.specs : []
+  const technicalSpecs = Array.isArray(v.technical_specs) ? v.technical_specs.filter(item => item && String(item.label || '').trim() && String(item.value || '').trim()) : []
   const vehicleCondition = v.etat_vehicule || (Number(v.km || 0) > 0 ? 'occasion' : 'neuf')
 
   function next() { setIdx(i => (i + 1) % images.length) }
@@ -241,23 +263,7 @@ export default function VehicleDetail({ vehicle: v, onClose, onReserve, shopName
               )
             })()}
 
-            {v.description && (
-              <div className="vd-section">
-                <h3>{t.detail.description}</h3>
-                <p className="vd-description">{v.description}</p>
-              </div>
-            )}
 
-            {!disabled && <FinancingCalculator prix={v.prix} />}
-
-            {specs.length > 0 && (
-              <div className="vd-section">
-                <h3>{t.detail.equipements}</h3>
-                <div className="vd-equip-grid">
-                  {specs.map((s, i) => <div key={i} className="vd-equip-item"><span>✓</span>{s}</div>)}
-                </div>
-              </div>
-            )}
           </div>
         </div>
       </div>
@@ -268,6 +274,51 @@ export default function VehicleDetail({ vehicle: v, onClose, onReserve, shopName
           <div className="vd-gallery-full">
             {gallery.map((img, i) => <img key={i} src={img.url} alt="" loading="lazy" />)}
           </div>
+        </div>
+      )}
+
+      {(specs.length > 0 || technicalSpecs.length > 0 || v.description || !disabled) && (
+        <div className="vd-detail-sections">
+          {specs.length > 0 && (
+            <section className="vd-section vd-feature-section">
+              <div className="vd-section-kicker">{lang === 'ar' ? 'التجهيزات' : 'FONCTIONNALITÉS'}</div>
+              <h3>{lang === 'ar' ? 'التجهيزات الإضافية' : 'Fonctionnalités supplémentaires'}</h3>
+              <div className="vd-equip-grid">
+                {specs.map((item, i) => (
+                  <div key={i} className="vd-equip-item">
+                    <span className="vd-equip-check" aria-hidden="true">✓</span>
+                    <span>{item}</span>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {technicalSpecs.length > 0 && (
+            <section className="vd-section vd-technical-section">
+              <div className="vd-section-kicker">{lang === 'ar' ? 'التفاصيل' : 'FICHE TECHNIQUE'}</div>
+              <h3>{lang === 'ar' ? 'المواصفات التقنية' : 'Caractéristiques techniques'}</h3>
+              <div className="vd-technical-grid">
+                {technicalSpecs.map((item, i) => (
+                  <div className="vd-technical-item" key={`${item.label}-${i}`}>
+                    <span className="vd-technical-icon" aria-hidden="true">{technicalSpecIcon(item.label)}</span>
+                    <span className="vd-technical-label">{item.label}</span>
+                    <strong className="vd-technical-value">{item.value}</strong>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {v.description && (
+            <section className="vd-section vd-seller-notes">
+              <div className="vd-section-kicker">{lang === 'ar' ? 'معلومات إضافية' : 'À PROPOS DU VÉHICULE'}</div>
+              <h3>{lang === 'ar' ? 'ملاحظات البائع' : 'Notes du vendeur'}</h3>
+              <p className="vd-description">{v.description}</p>
+            </section>
+          )}
+
+          {!disabled && <FinancingCalculator prix={v.prix} />}
         </div>
       )}
 
