@@ -1,0 +1,322 @@
+/* Public showroom — refined warm ivory theme.
+   Scoped to the ivory preset so the dark theme and admin stay untouched. */
+
+.app[data-theme="ivory"] {
+  color-scheme: light;
+  --ivory-page: #ebe4d9;
+  --ivory-section: #f0e9df;
+  --ivory-surface: #f7f2e9;
+  --ivory-raised: #fbf7ef;
+  --ivory-soft: #e5dccf;
+  --ivory-line: #d9cebf;
+  --ivory-ink: #342e26;
+  --ivory-muted: #746959;
+  --ivory-gold: #98703d;
+  background:
+    radial-gradient(ellipse at 14% 0%, rgba(181, 142, 91, .10), transparent 34rem),
+    linear-gradient(180deg, #eee8de 0%, var(--ivory-page) 100%) !important;
+  color: var(--ivory-ink) !important;
+}
+
+/* Calm, warm layers instead of one continuous white page. */
+.app[data-theme="ivory"] .nav,
+.app[data-theme="ivory"] .nav-mobile {
+  background: rgba(246, 240, 230, .96) !important;
+  border-color: var(--ivory-line) !important;
+  box-shadow: 0 5px 18px rgba(58, 45, 29, .06) !important;
+}
+.app[data-theme="ivory"] .hero-auto {
+  min-height: 55vh !important;
+  background:
+    radial-gradient(ellipse at 50% 10%, rgba(190, 155, 105, .18), transparent 55%),
+    linear-gradient(145deg, #e8dfd2 0%, #f0e9df 72%, #e6dccf 100%) !important;
+  color: var(--ivory-ink) !important;
+}
+.app[data-theme="ivory"] .trust-bar {
+  background: #e4dacc !important;
+  border-block: 1px solid #d8cbbb !important;
+}
+.app[data-theme="ivory"] .section,
+.app[data-theme="ivory"] .editorial-selection,
+.app[data-theme="ivory"] .testimonials-section,
+.app[data-theme="ivory"] .showroom-grid {
+  background: var(--ivory-page) !important;
+  color: var(--ivory-ink) !important;
+}
+.app[data-theme="ivory"] .footer-auto {
+  background: #e2d8ca !important;
+  border-top: 1px solid #d4c7b6 !important;
+}
+.app[data-theme="ivory"] .announce-bar,
+.app[data-theme="ivory"] .veh-strip {
+  background: #e7dfd3 !important;
+  border-color: #d8cbbb !important;
+}
+.app[data-theme="ivory"] .veh-strip-fade.left {
+  background: linear-gradient(90deg, #e7dfd3, transparent) !important;
+}
+.app[data-theme="ivory"] .veh-strip-fade.right {
+  background: linear-gradient(270deg, #e7dfd3, transparent) !important;
+}
+
+/* Readable typography throughout the public showroom. */
+.app[data-theme="ivory"] :where(
+  h1, h2, h3, h4, h5, h6, p, span, a, label, small, strong, em,
+  li, dt, dd, th, td, figcaption, summary, legend, caption,
+  .nav-logo, .nav-links a, .nav-mobile a, .nav-burger,
+  .hero-auto-content, .hero-auto-content *,
+  .section-head, .section-head *,
+  .trust-bar, .trust-bar *,
+  .announce-bar, .announce-bar *,
+  .veh-strip-info, .veh-strip-info *,
+  .veh-card-body, .veh-card-body *,
+  .showroom-info-row, .showroom-info-row *,
+  .footer-auto, .footer-auto *,
+  .vd-info, .vd-info *,
+  .vd-specs-grid, .vd-specs-grid *,
+  .cmp-box, .cmp-box *,
+  .testimonials-section, .testimonials-section *,
+  .editorial-selection, .editorial-selection *
+) {
+  color: var(--ivory-ink) !important;
+  -webkit-text-fill-color: currentColor;
+  text-shadow: none !important;
+}
+.app[data-theme="ivory"] :where(
+  .hero-auto-content p, .section-head p, .trust-grid .lbl,
+  .announce-item, .veh-strip-info .name, .veh-card-top p,
+  .veh-specs, .showroom-info-row p, .footer-sub,
+  .vd-description, .vd-old-price, .vd-bottom-price .lbl,
+  .cmp-label-col, .cmp-veh-model, .testi-quote, .testi-role
+) {
+  color: var(--ivory-muted) !important;
+  -webkit-text-fill-color: currentColor;
+}
+.app[data-theme="ivory"] .hero-auto h1 span,
+.app[data-theme="ivory"] .trust-grid .num,
+.app[data-theme="ivory"] .section-head h2,
+.app[data-theme="ivory"] .vd-price {
+  color: #805a2e !important;
+  -webkit-text-fill-color: currentColor;
+}
+.app[data-theme="ivory"] .section-head .bar {
+  background: #98703d !important;
+}
+
+/* Cards have a gentle elevation and a visible edge against the page. */
+.app[data-theme="ivory"] .veh-card,
+.app[data-theme="ivory"] .veh-card-body,
+.app[data-theme="ivory"] .veh-strip-card,
+.app[data-theme="ivory"] .edito-card,
+.app[data-theme="ivory"] .testi-card {
+  background: var(--ivory-surface) !important;
+  border: 1px solid var(--ivory-line) !important;
+  box-shadow: 0 7px 22px rgba(55, 42, 27, .055) !important;
+}
+.app[data-theme="ivory"] .veh-card:hover,
+.app[data-theme="ivory"] .edito-card:hover,
+.app[data-theme="ivory"] .testi-card:hover {
+  border-color: rgba(133, 0, 25, .28) !important;
+  box-shadow: 0 12px 28px rgba(55, 42, 27, .09) !important;
+}
+.app[data-theme="ivory"] .veh-card-img,
+.app[data-theme="ivory"] .veh-strip-img {
+  background: #ded5c8 !important;
+}
+.app[data-theme="ivory"] .veh-year-badge,
+.app[data-theme="ivory"] .hero-eyebrow {
+  background: #e9e0d4 !important;
+  border: 1px solid #d8cbbb !important;
+  color: #514637 !important;
+}
+.app[data-theme="ivory"] .veh-card-top h3,
+.app[data-theme="ivory"] .edito-card-info .name,
+.app[data-theme="ivory"] .testi-name {
+  color: #342e26 !important;
+}
+.app[data-theme="ivory"] .veh-price-strip {
+  background: linear-gradient(0deg, rgba(12, 13, 15, .94), rgba(12, 13, 15, .58) 62%, transparent) !important;
+}
+.app[data-theme="ivory"] .veh-price-strip,
+.app[data-theme="ivory"] .veh-price-strip *,
+.app[data-theme="ivory"] .veh-strip-tag,
+.app[data-theme="ivory"] .veh-statut-badge,
+.app[data-theme="ivory"] .veh-badge-tag,
+.app[data-theme="ivory"] .stamp-sold {
+  color: #fff !important;
+  -webkit-text-fill-color: #fff !important;
+}
+
+/* Filters and category chips. */
+.app[data-theme="ivory"] .filters-bar {
+  background: #e5dccf !important;
+  border: 1px solid #d5c9b8 !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.34) !important;
+}
+.app[data-theme="ivory"] .filters-bar input,
+.app[data-theme="ivory"] .filters-bar select,
+.app[data-theme="ivory"] :where(input:not([type="checkbox"]):not([type="radio"]), select, textarea) {
+  background: #faf6ef !important;
+  border-color: #d8cbbb !important;
+  color: #342e26 !important;
+  caret-color: #342e26 !important;
+  -webkit-text-fill-color: #342e26 !important;
+}
+.app[data-theme="ivory"] :where(input, textarea)::placeholder {
+  color: #817665 !important;
+  -webkit-text-fill-color: #817665 !important;
+  opacity: 1 !important;
+}
+.app[data-theme="ivory"] .filters-bar label {
+  color: #655a4b !important;
+}
+.app[data-theme="ivory"] .vehicle-category-tabs button,
+.app[data-theme="ivory"] .filter-btn {
+  background: #e6ddd0 !important;
+  border: 1px solid #d6cabb !important;
+  color: #514637 !important;
+}
+.app[data-theme="ivory"] .vehicle-category-tabs button.active,
+.app[data-theme="ivory"] .filter-btn.active {
+  background: #850019 !important;
+  border-color: #850019 !important;
+  color: #fff !important;
+  -webkit-text-fill-color: #fff !important;
+}
+
+/* Keep branded actions high-contrast on the warmer background. */
+.app[data-theme="ivory"] .btn-hero-primary,
+.app[data-theme="ivory"] .btn-veh-reserve,
+.app[data-theme="ivory"] .veh-card-wa-bar {
+  background: #850019 !important;
+  border-color: #850019 !important;
+  color: #fff !important;
+  -webkit-text-fill-color: #fff !important;
+}
+.app[data-theme="ivory"] .btn-hero-secondary {
+  background: rgba(255,255,255,.18) !important;
+  border-color: #c9bba8 !important;
+  color: #44392c !important;
+}
+.app[data-theme="ivory"] .nav-wa-btn {
+  color: #fff !important;
+  -webkit-text-fill-color: #fff !important;
+}
+.app[data-theme="ivory"] .theme-toggle {
+  background: #e6ddd0 !important;
+  border-color: #d3c6b5 !important;
+  color: #514637 !important;
+}
+
+/* Vehicle detail, comparison and financing surfaces. */
+.app[data-theme="ivory"] .vd-ov {
+  background: #e9e2d7 !important;
+  color: var(--ivory-ink) !important;
+}
+.app[data-theme="ivory"] .vd-gallery,
+.app[data-theme="ivory"] .vd-thumbs {
+  background: #ded5c8 !important;
+}
+.app[data-theme="ivory"] .vd-info {
+  background: linear-gradient(155deg, #f8f3ea, #eee6da) !important;
+  border: 1px solid #d9cebf !important;
+  box-shadow: 0 10px 30px rgba(55, 42, 27, .07) !important;
+}
+.app[data-theme="ivory"] .vd-specs-grid div,
+.app[data-theme="ivory"] .vd-section,
+.app[data-theme="ivory"] .finance-calculator .finance-result {
+  background: #eee6da !important;
+  border-color: #d8cbbb !important;
+}
+.app[data-theme="ivory"] .vd-section {
+  border-top-color: #b28a50 !important;
+}
+.app[data-theme="ivory"] .vd-close-float {
+  background: #453b30 !important;
+  border: 2px solid #c5a36d !important;
+  color: #fff3dc !important;
+  -webkit-text-fill-color: #fff3dc !important;
+}
+.app[data-theme="ivory"] .vd-bottom {
+  background: rgba(241, 234, 223, .97) !important;
+  border-top-color: #d5c9b8 !important;
+}
+.app[data-theme="ivory"] .cmp-ov {
+  background: rgba(38, 31, 23, .66) !important;
+}
+.app[data-theme="ivory"] .cmp-box {
+  background: #f4eee5 !important;
+  border-color: #d6cabb !important;
+}
+.app[data-theme="ivory"] .cmp-hdr {
+  border-bottom-color: #d8cbbb !important;
+}
+.app[data-theme="ivory"] .cmp-table th,
+.app[data-theme="ivory"] .cmp-table td,
+.app[data-theme="ivory"] .cmp-float-chip {
+  background: #eee6da !important;
+  border-color: #d8cbbb !important;
+}
+
+/* Booking, tracking and trade forms keep the same visual language. */
+.app[data-theme="ivory"] .trade-type-option {
+  background: #f6f0e7 !important;
+  border-color: #d8cbbb !important;
+  color: #342e26 !important;
+}
+.app[data-theme="ivory"] .trade-type-option small,
+.app[data-theme="ivory"] .trade-muted,
+.app[data-theme="ivory"] .trade-disclaimer {
+  color: #746959 !important;
+}
+.app[data-theme="ivory"] .trade-type-option.active {
+  background: #eee2ce !important;
+  border-color: #b58b51 !important;
+}
+.app[data-theme="ivory"] .trade-form-section {
+  background: #f6f0e7 !important;
+  border-color: #d8cbbb !important;
+}
+.app[data-theme="ivory"] .trade-section-title,
+.app[data-theme="ivory"] .trade-calculation-heading {
+  color: #805a2e !important;
+}
+.app[data-theme="ivory"] .trade-calculation {
+  background: #eee4d5 !important;
+  border-color: #d6c5a9 !important;
+}
+.app[data-theme="ivory"] .trade-calculation-row {
+  border-bottom-color: #d8cbbb !important;
+  color: #655a4b !important;
+}
+.app[data-theme="ivory"] .trade-calculation-row strong,
+.app[data-theme="ivory"] .trade-balance strong {
+  color: #44382a !important;
+}
+.app[data-theme="ivory"] .trade-balance {
+  background: #e6dac8 !important;
+}
+.app[data-theme="ivory"] .track-summary,
+.app[data-theme="ivory"] .finance-result {
+  background: #eee6da !important;
+  border-color: #d8cbbb !important;
+}
+.app[data-theme="ivory"] .track-summary .lbl,
+.app[data-theme="ivory"] .track-desc,
+.app[data-theme="ivory"] .track-label {
+  color: #746959 !important;
+}
+.app[data-theme="ivory"] .track-label.done,
+.app[data-theme="ivory"] .track-summary strong {
+  color: #342e26 !important;
+}
+
+/* Respect the brand accent while keeping the theme cohesive on small screens. */
+@media (max-width: 720px) {
+  .app[data-theme="ivory"] .nav-mobile {
+    background: #f3ede3 !important;
+  }
+  .app[data-theme="ivory"] .section {
+    padding-inline: 16px !important;
+  }
+}
