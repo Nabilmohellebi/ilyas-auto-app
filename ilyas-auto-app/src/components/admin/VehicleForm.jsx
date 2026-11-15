@@ -19,6 +19,7 @@ export default function VehicleForm({ vehicle, onClose, onSave }) {
     provenance:    vehicle?.provenance || 'france',
     badge:         vehicle?.badge || '',
     statut:        vehicle?.statut || 'disponible',
+    financing_enabled: vehicle?.financing_enabled !== false,
     description:   vehicle?.description || '',
     specs:         vehicle?.specs ? (typeof vehicle.specs === 'string' ? JSON.parse(vehicle.specs) : vehicle.specs) : [],
     technical_specs: (() => { try { const value = typeof vehicle?.technical_specs === 'string' ? JSON.parse(vehicle.technical_specs) : vehicle?.technical_specs; return Array.isArray(value) ? value : [] } catch { return [] } })(),
@@ -245,6 +246,7 @@ export default function VehicleForm({ vehicle, onClose, onSave }) {
       provenance:    form.provenance,
       badge:         form.badge,
       statut:        form.statut,
+      financing_enabled: Boolean(form.financing_enabled),
       description:   form.description,
       specs:         form.specs,
       technical_specs: form.technical_specs.filter(item => item?.label?.trim() && item?.value?.trim()),
@@ -339,6 +341,28 @@ export default function VehicleForm({ vehicle, onClose, onSave }) {
                 <input type="number" min="0" step="10000" placeholder="Pour afficher une réduction" value={form.prix_old} onChange={e => set('prix_old', e.target.value)} />
               </div>
             </div>
+          </div>
+
+          {/* ── Options d'affichage de cette fiche ── */}
+          <div className="pf-section">
+            <h3>🧩 Options de la fiche véhicule</h3>
+            <label style={{ display: 'flex', alignItems: 'center', gap: 12, padding: 13, borderRadius: 10, border: '1px solid rgba(255,255,255,.12)', background: 'rgba(255,255,255,.035)', cursor: 'pointer' }}>
+              <input
+                type="checkbox"
+                checked={form.financing_enabled}
+                onChange={e => set('financing_enabled', e.target.checked)}
+                style={{ width: 19, height: 19, accentColor: '#c58b3d', flexShrink: 0 }}
+              />
+              <span style={{ flex: 1, minWidth: 0 }}>
+                <strong style={{ display: 'block', color: 'white', fontSize: 13 }}>Afficher le simulateur de financement</strong>
+                <small style={{ display: 'block', marginTop: 4, color: 'rgba(255,255,255,.52)', fontSize: 11, lineHeight: 1.5 }}>
+                  {form.financing_enabled ? 'Le financement sera visible sur cette fiche uniquement.' : 'Le financement sera masqué sur cette fiche uniquement. Les autres véhicules ne changent pas.'}
+                </small>
+              </span>
+              <span style={{ color: form.financing_enabled ? '#7ddc9b' : '#c5b9a9', fontSize: 11, fontWeight: 800, whiteSpace: 'nowrap' }}>
+                {form.financing_enabled ? 'Activé' : 'Désactivé'}
+              </span>
+            </label>
           </div>
 
           {/* ── Statut ── */}

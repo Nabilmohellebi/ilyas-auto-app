@@ -42,8 +42,6 @@ function AdminSettings({ onLogout, onToast, onBrandNameChange }) {
   const [showPw, setShowPw] = useState(false)
   const [siteTheme, setSiteTheme] = useState('ivory')
   const [themeSaving, setThemeSaving] = useState(false)
-  const [financingEnabled, setFinancingEnabled] = useState(true)
-  const [financingToggleSaving, setFinancingToggleSaving] = useState(false)
   const [brandIdentity, setBrandIdentity] = useState(DEFAULT_BRAND_IDENTITY)
   const [brandSaving, setBrandSaving] = useState(false)
   const [logoUploading, setLogoUploading] = useState(false)
@@ -60,7 +58,6 @@ function AdminSettings({ onLogout, onToast, onBrandNameChange }) {
     getSettings().then(s => {
       setTradeMarginPercent(String(s.trade_margin_percent ?? '5'))
       setSiteTheme(s.site_theme === 'dark' ? 'dark' : 'ivory')
-      setFinancingEnabled(s.show_financing_calculator !== 'false')
       const savedBrand = parseBrandIdentity(s.brand_identity)
       setBrandIdentity(savedBrand)
       initialLogoPath.current = savedBrand.logoPath
@@ -348,24 +345,6 @@ function AdminSettings({ onLogout, onToast, onBrandNameChange }) {
     }
   }
 
-  async function saveFinancingToggle(nextEnabled) {
-    const previousEnabled = financingEnabled
-    setFinancingEnabled(nextEnabled)
-    setFinancingToggleSaving(true)
-    try {
-      await saveSetting('show_financing_calculator', nextEnabled ? 'true' : 'false')
-      onToast && onToast(
-        nextEnabled ? '✅ Simulateur de financement activé sur les fiches véhicules' : '✅ Simulateur de financement masqué sur les fiches véhicules',
-        'default'
-      )
-    } catch (e) {
-      setFinancingEnabled(previousEnabled)
-      onToast && onToast('❌ Impossible de modifier cette fonctionnalité : ' + e.message, 'error')
-    } finally {
-      setFinancingToggleSaving(false)
-    }
-  }
-
   async function changePw() {
     if (pwForm.new1.length < 12) { onToast && onToast('❌ Utilise au moins 12 caractères', 'error'); return }
     if (pwForm.new1 !== pwForm.new2) { onToast && onToast('❌ Les deux mots de passe ne correspondent pas', 'error'); return }
@@ -412,31 +391,6 @@ function AdminSettings({ onLogout, onToast, onBrandNameChange }) {
             </button>
           ))}
         </div>
-      </div>
-
-      <div className="pf-section" style={{ marginBottom: 14 }}>
-        <h3>🧩 Fonctionnalités du site</h3>
-        <p style={{ fontSize: 12, color: 'rgba(255,255,255,.55)', lineHeight: 1.6, marginBottom: 14 }}>
-          Active ou masque certaines fonctionnalités sur les fiches publiques, sans supprimer leurs réglages ni les données des véhicules.
-        </p>
-        <label style={{ display: 'flex', alignItems: 'center', gap: 13, padding: 13, borderRadius: 11, border: '1px solid rgba(255,255,255,.12)', background: 'rgba(255,255,255,.035)', cursor: financingToggleSaving ? 'wait' : 'pointer', opacity: financingToggleSaving ? .7 : 1 }}>
-          <input
-            type="checkbox"
-            checked={financingEnabled}
-            disabled={financingToggleSaving}
-            onChange={event => saveFinancingToggle(event.target.checked)}
-            style={{ width: 19, height: 19, accentColor: '#c58b3d', flexShrink: 0, cursor: 'inherit' }}
-          />
-          <span style={{ flex: 1, minWidth: 0 }}>
-            <strong style={{ display: 'block', color: 'white', fontSize: 13 }}>Simulateur de financement</strong>
-            <small style={{ display: 'block', marginTop: 4, color: 'rgba(255,255,255,.5)', fontSize: 11, lineHeight: 1.5 }}>
-              {financingEnabled ? 'Visible sur les fiches véhicules.' : 'Masqué sur les fiches véhicules.'}
-            </small>
-          </span>
-          <span style={{ color: financingEnabled ? '#7ddc9b' : '#c5b9a9', fontSize: 11, fontWeight: 800, whiteSpace: 'nowrap' }}>
-            {financingToggleSaving ? 'Enregistrement…' : financingEnabled ? 'Activé' : 'Désactivé'}
-          </span>
-        </label>
       </div>
 
       <div className="pf-section brand-identity-settings" style={{ marginBottom: 14 }}>

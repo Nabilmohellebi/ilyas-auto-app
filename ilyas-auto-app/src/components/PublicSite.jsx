@@ -768,7 +768,6 @@ function PublicSiteInner() {
         <Suspense fallback={<div className="spinner" role="status">Chargement de la fiche…</div>}>
           <VehicleDetail
             shopName={s.nom}
-            showFinancingCalculator={settings.show_financing_calculator !== 'false'}
             vehicle={openVehicle}
             onClose={closeVehicleDetail}
             onReserve={v => { setOpenVehicle(null); setReserveVehicle(v) }}
