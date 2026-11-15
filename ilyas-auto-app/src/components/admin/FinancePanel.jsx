@@ -92,7 +92,8 @@ export default function FinancePanel({ vehicles = [], onToast }) {
   const monthSales = soldRows.filter(row => row.sale_date?.slice(0, 7) === currentMonth)
   const monthProfit = monthSales.reduce((sum, row) => sum + num(row.sale_price) - totalCost(row), 0)
 
-  // Les véhicules masqués ou déjà vendus restent sélectionnables pour saisir leur comptabilité.\n  const availableVehicles = vehicles
+  // Les véhicules masqués ou déjà vendus restent sélectionnables pour saisir leur comptabilité.
+  const availableVehicles = vehicles
 
   const filteredRows = rows.filter(row => {
     const sold = row.sale_price !== null && row.sale_price !== ''
