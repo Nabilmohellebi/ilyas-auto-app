@@ -4,6 +4,7 @@ import { ORIGINS, flagURI, PLACEHOLDER_IMG } from '../data/vehicles-data'
 import { statutLabel } from '../i18n/translations'
 import { useLang } from '../i18n/LangContext'
 import FinancingCalculator from './FinancingCalculator'
+import { sortEquipment, sortTechnicalSpecs } from '../utils/vehicleSpecifications'
 
 function escapePrintHtml(value) {
   return String(value ?? '').replace(/[&<>"']/g, char => ({
@@ -21,8 +22,8 @@ function safePrintImageUrl(value) {
 }
 
 function printVehicleSheet(v, images, shopName = 'Nabil Auto') {
-  const specs = Array.isArray(v.specs) ? v.specs : []
-  const technicalSpecs = Array.isArray(v.technical_specs) ? v.technical_specs.filter(item => item && item.label && item.value) : []
+  const specs = sortEquipment(v.specs)
+  const technicalSpecs = sortTechnicalSpecs(v.technical_specs)
   const name = escapePrintHtml(`${v.marque} ${v.modele}`)
   const safeShopName = escapePrintHtml(shopName)
   const description = escapePrintHtml(v.description)
@@ -136,8 +137,8 @@ export default function VehicleDetail({ vehicle: v, onClose, onReserve, shopName
   const disc = v.prix_old && v.prix_old > v.prix ? Math.round(100 - (v.prix / v.prix_old) * 100) : 0
   const disabled = v.statut === 'vendu'
   const shouldShowFinancing = v.financing_enabled !== false && !disabled
-  const specs = Array.isArray(v.specs) ? v.specs : []
-  const technicalSpecs = Array.isArray(v.technical_specs) ? v.technical_specs.filter(item => item && String(item.label || '').trim() && String(item.value || '').trim()) : []
+  const specs = sortEquipment(v.specs)
+  const technicalSpecs = sortTechnicalSpecs(v.technical_specs)
   const vehicleCondition = v.etat_vehicule || (Number(v.km || 0) > 0 ? 'occasion' : 'neuf')
 
   function next() { setIdx(i => (i + 1) % images.length) }
