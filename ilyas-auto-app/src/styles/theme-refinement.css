@@ -320,3 +320,49 @@
     padding-inline: 16px !important;
   }
 }
+
+
+/* Hero secondary action — make the showroom CTA read as a real button
+   on the warm ivory hero, with a clear edge and a confident hover state. */
+.app[data-theme="ivory"] .hero-cta .btn-hero-secondary {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-height: 52px !important;
+  padding: 14px 30px !important;
+  border: 1.5px solid #9a805f !important;
+  border-radius: 7px !important;
+  background: linear-gradient(145deg, #e4d8c7, #d8cab6) !important;
+  color: #3f3428 !important;
+  -webkit-text-fill-color: #3f3428 !important;
+  font-size: 14px !important;
+  font-weight: 800 !important;
+  letter-spacing: .01em !important;
+  line-height: 1.25 !important;
+  text-align: center !important;
+  text-decoration: none !important;
+  box-shadow: 0 4px 12px rgba(65, 48, 27, .08), inset 0 1px 0 rgba(255,255,255,.42) !important;
+  transition: background .2s ease, border-color .2s ease, color .2s ease, box-shadow .2s ease, transform .2s ease !important;
+}
+.app[data-theme="ivory"] .hero-cta .btn-hero-secondary:hover {
+  background: linear-gradient(145deg, #514333, #3c3227) !important;
+  border-color: #514333 !important;
+  color: #fff7e9 !important;
+  -webkit-text-fill-color: #fff7e9 !important;
+  box-shadow: 0 7px 18px rgba(55, 42, 27, .18) !important;
+  transform: translateY(-2px) !important;
+}
+.app[data-theme="ivory"] .hero-cta .btn-hero-secondary:focus-visible {
+  outline: 3px solid #98703d !important;
+  outline-offset: 3px !important;
+}
+.app[data-theme="ivory"] .hero-cta .btn-hero-secondary:active {
+  transform: translateY(0) !important;
+  box-shadow: 0 2px 7px rgba(55, 42, 27, .12) !important;
+}
+@media (max-width: 560px) {
+  .app[data-theme="ivory"] .hero-cta .btn-hero-secondary {
+    min-height: 48px !important;
+    padding-inline: 22px !important;
+  }
+}
