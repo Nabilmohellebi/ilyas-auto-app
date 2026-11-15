@@ -81,7 +81,7 @@ function printVehicleSheet(v, images, shopName = 'Nabil Auto') {
 }
 
 function technicalSpecIcon(label) {
-  const value = String(label || '').normalize('NFD').replace(/[\\u0300-\\u036f]/g, '').toLowerCase()
+  const value = String(label || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
   if (/moteur|engine|cylindre/.test(value)) return '⚙️'
   if (/puissance|power/.test(value)) return '⚡'
   if (/couple|torque/.test(value)) return '↗'
@@ -90,10 +90,9 @@ function technicalSpecIcon(label) {
   if (/dimension|taille|empattement/.test(value)) return '📐'
   if (/place|siege/.test(value)) return '💺'
   if (/carburant|fuel/.test(value)) return '⛽'
-  if (/transmission|boite|lecteur|drive/.test(value)) return '⚙️'
+  if (/transmission|boite|traction|drive/.test(value)) return '⚙️'
   return '◆'
 }
-
 function statutColor(key) {
   return key === 'disponible' ? '#22c55e' : key === 'reserve' ? '#f59e0b' : '#6b7280'
 }
