@@ -422,7 +422,7 @@ export default function VehicleForm({ vehicle, onClose, onSave }) {
               </div>
             ))}
             <datalist id="vehicle-technical-labels">
-              {['Moteur', 'Puissance maximale', 'Couple maximal (Nm)', 'Vitesse maximale (km/h)', 'Transmission', 'Type de lecteur', 'Batterie', 'Autonomie (km)', 'Dimensions (mm)', 'Empattement (mm)', 'Nombre de portes', 'Nombre de places', 'Poids (kg)', 'Consommation (L/100 km)'].map(label => <option key={label} value={label} />)}
+              {['Moteur', 'Puissance maximale', 'Couple maximal (Nm)', 'Vitesse maximale (km/h)', 'Transmission', 'Type de traction', 'Batterie', 'Autonomie (km)', 'Dimensions (mm)', 'Empattement (mm)', 'Nombre de portes', 'Nombre de places', 'Poids (kg)', 'Consommation (L/100 km)'].map(label => <option key={label} value={label} />)}
             </datalist>
             <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr) minmax(0,1fr) auto', gap: 8, marginTop: 10 }}>
               <input list="vehicle-technical-labels" aria-label="Nom de la caractéristique" value={newTechLabel} onChange={e => setNewTechLabel(e.target.value)} placeholder="Ex. : Puissance maximale" style={{ minWidth: 0, background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.1)', borderRadius: 8, padding: '9px 10px', color: 'white', fontSize: 12 }} />
