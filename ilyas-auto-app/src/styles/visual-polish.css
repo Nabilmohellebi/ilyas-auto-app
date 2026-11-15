@@ -907,7 +907,8 @@
 
 /* Vehicle detail: editorial sections displayed after the complete photo gallery. */
 .app[data-theme] .vd-detail-sections {
-  width: min(100% - 36px, 1120px);
+  width: calc(100% - 36px);
+  max-width: 1120px;
   margin: 0 auto;
   padding: 4px 0 48px;
   display: grid;
