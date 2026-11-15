@@ -102,9 +102,25 @@ function PublicSiteInner() {
         const savedTheme = window.localStorage.getItem('hbr_public_theme')
         if (savedTheme === 'light') {
           window.localStorage.setItem('hbr_public_theme', 'ivory')
-          setPublicTheme('ivory')
         } else if (!savedTheme && ['light', 'dark', 'ivory'].includes(data.site_theme)) {
-          setPublicTheme(data.site_theme === 'dark' ? 'dark' : 'ivory')
+          const resolvedTheme = data.site_theme === 'dark' ? 'dark' : 'ivory'
+          // Respect a theme manually selected while showroom settings were loading.
+          if (!window.localStorage.getItem('hbr_public_theme')) {
+            window.localStorage.setItem('hbr_public_theme', resolvedTheme)
+            const app = document.querySelector('.app')
+            if (app) {
+              app.dataset.theme = resolvedTheme
+              app.querySelectorAll('.theme-toggle').forEach(button => {
+                const icon = button.querySelector('[aria-hidden="true"]')
+                const label = button.querySelector('.theme-toggle-label')
+                if (icon) icon.textContent = resolvedTheme === 'dark' ? '☀️' : '🌙'
+                if (label) label.textContent = resolvedTheme === 'dark' ? 'Ivoire' : 'Sombre'
+                button.setAttribute('aria-pressed', String(resolvedTheme === 'dark'))
+                button.setAttribute('aria-label', resolvedTheme === 'dark' ? 'Activer le thème ivoire' : 'Activer le mode sombre')
+                button.setAttribute('title', resolvedTheme === 'dark' ? 'Thème ivoire' : 'Mode sombre')
+              })
+            }
+          }
         }
       } catch {}
     }).catch(error => {
