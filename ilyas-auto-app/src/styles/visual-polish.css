@@ -872,3 +872,34 @@
     animation-duration: .01ms !important;
   }
 }
+
+
+/* Keep WhatsApp confirmation actions green even when they also use the
+   shared primary-button class. Success headings retain full emphasis. */
+.app[data-theme] .whatsapp-action-btn {
+  background: linear-gradient(135deg, #25D366 0%, #1fbd63 48%, #128C7E 100%) !important;
+  border-color: #25D366 !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  box-shadow: 0 7px 22px rgba(18, 140, 126, .2) !important;
+}
+.app[data-theme] .whatsapp-action-btn:hover {
+  background: linear-gradient(135deg, #2be477 0%, #25D366 48%, #1FBD5B 100%) !important;
+  border-color: #1FBD5B !important;
+}
+.app[data-theme] .res-success h2 {
+  color: var(--theme-text) !important;
+  -webkit-text-fill-color: currentColor !important;
+}
+.app[data-theme="dark"] .btn-hero-primary:not(.whatsapp-action-btn),
+.app[data-theme="dark"] .btn-save,
+.app[data-theme="dark"] .btn-veh-reserve {
+  color: #20180d !important;
+  -webkit-text-fill-color: currentColor !important;
+}
+.app[data-theme="ivory"] .btn-hero-primary:not(.whatsapp-action-btn),
+.app[data-theme="ivory"] .btn-save,
+.app[data-theme="ivory"] .btn-veh-reserve {
+  color: #ffffff !important;
+  -webkit-text-fill-color: currentColor !important;
+}
