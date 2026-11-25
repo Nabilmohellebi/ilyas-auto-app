@@ -14,6 +14,7 @@ const VehicleCompare = lazy(() => import('./VehicleCompare'))
 import EditorialSelection from './EditorialSelection'
 import TestimonialsSection from './TestimonialsSection'
 const SellVehicleModal = lazy(() => import('./SellVehicleModal'))
+const VehicleSearchModal = lazy(() => import('./VehicleSearchModal'))
 import CONFIG from '../config'
 import WhatsAppIcon from './WhatsAppIcon'
 import WhatsAppFloatingButton from './WhatsAppFloatingButton'
@@ -58,6 +59,7 @@ function PublicSiteInner() {
   const [shareFeedback, setShareFeedback] = useState('')
   const [sharedFavoritesStatus, setSharedFavoritesStatus] = useState('')
   const [sellOpen, setSellOpen] = useState(false)
+  const [searchRequestOpen, setSearchRequestOpen] = useState(false)
   const [tradeTargetVehicle, setTradeTargetVehicle] = useState(null)
   const [vehicleCondition, setVehicleCondition] = useState('all')
   const publicTheme = (() => { try { return window.localStorage.getItem('hbr_public_theme') === 'dark' ? 'dark' : 'ivory' } catch { return 'ivory' } })()
@@ -677,6 +679,23 @@ function PublicSiteInner() {
         )}
       </section>
 
+      {/* ── Recherche personnalisée ── */}
+      <section className="section vehicle-search-cta-wrap">
+        <div className="vehicle-search-cta" dir={rtl ? 'rtl' : 'ltr'}>
+          <div className="vehicle-search-cta-copy">
+            <span className="vehicle-search-cta-eyebrow">{lang === 'ar' ? 'طلب خاص' : 'RECHERCHE PERSONNALISÉE'}</span>
+            <h2>{lang === 'ar' ? 'لم تجد السيارة التي تبحث عنها؟' : 'Vous recherchez un modèle précis ?'}</h2>
+            <p>{lang === 'ar'
+              ? 'أخبرنا بالعلامة التجارية والميزانية والمواصفات المطلوبة. سنتواصل معك عندما نجد سيارة مناسبة.'
+              : 'Indiquez-nous le modèle, votre budget et vos critères. Nous vous recontactons dès qu’un véhicule correspondant arrive.'}</p>
+          </div>
+          <button type="button" className="vehicle-search-cta-button" onClick={() => setSearchRequestOpen(true)}>
+            {lang === 'ar' ? '🔎 أرسل طلب البحث' : '🔎 Décrire ma recherche'}
+            <span aria-hidden="true">↗</span>
+          </button>
+        </div>
+      </section>
+
       {/* ── Témoignages ── */}
       <TestimonialsSection supabase={supabase} lang={lang} />
 
@@ -785,6 +804,9 @@ function PublicSiteInner() {
 
       {/* ── Vendre mon véhicule ── */}
       {sellOpen && <Suspense fallback={<div className="spinner" role="status">Chargement…</div>}><SellVehicleModal onClose={() => { setSellOpen(false); setTradeTargetVehicle(null) }} vehicles={vehicles} tradeMarginPercent={settings.trade_margin_percent ?? 5} whatsapp={s.whatsapp} shopName={s.nom} initialTargetVehicle={tradeTargetVehicle} requestSource="site" /></Suspense>}
+
+      {/* ── Recherche de véhicule ── */}
+      {searchRequestOpen && <Suspense fallback={<div className="spinner" role="status">Chargement…</div>}><VehicleSearchModal lang={lang} onClose={() => setSearchRequestOpen(false)} /></Suspense>}
     </div>
   )
 }
