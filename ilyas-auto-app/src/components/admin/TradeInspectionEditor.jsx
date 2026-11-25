@@ -4,6 +4,7 @@ import { fmt } from '../../utils/notify'
 import { TRANSMISSIONS, FUELS, BODY_TYPES } from '../../data/vehicles-data'
 
 const CONDITION_OPTIONS = [
+  { value: 'a_verifier', label: 'À vérifier' },
   { value: 'bon', label: 'Bon état' },
   { value: 'moyen', label: 'À surveiller' },
   { value: 'mauvais', label: 'Réparations nécessaires' },
@@ -36,13 +37,13 @@ export default function TradeInspectionEditor({ request, details = {}, onClose, 
   const savedOffer = details.finalOffer || {}
   const savedDraft = details.finalizationDraft || {}
   const [inspection, setInspection] = useState({
-    exterieur: 'bon',
-    interieur: 'bon',
-    mecanique: 'bon',
-    boite: 'bon',
-    pneus: 'bon',
-    electronique: 'bon',
-    documents: 'complets',
+    exterieur: 'a_verifier',
+    interieur: 'a_verifier',
+    mecanique: 'a_verifier',
+    boite: 'a_verifier',
+    pneus: 'a_verifier',
+    electronique: 'a_verifier',
+    documents: 'verifier',
     essai: 'non_effectue',
     notes: '',
     ...savedInspection,
