@@ -7,6 +7,7 @@ import VehicleForm from './VehicleForm'
 import CRMPanel from './CRMPanel'
 import FinancePanel from './FinancePanel'
 import TradeInspectionEditor from './TradeInspectionEditor'
+import VehicleSearchRequestsPanel from './VehicleSearchRequestsPanel'
 import ImageCropper from './ImageCropper'
 import '../../styles/admin-dashboard.css'
 
@@ -34,6 +35,7 @@ const ADMIN_NAV_GROUPS = [
     { key: 'reservations', label: 'Réservations', glyph: '▤' },
     { key: 'crm', label: 'CRM clients', glyph: '◎' },
     { key: 'reprises', label: 'Ventes & échanges', glyph: '⇄' },
+    { key: 'recherches', label: 'Recherches clients', glyph: '⌕' },
   ] },
   { label: 'PILOTAGE', items: [
     { key: 'finances', label: 'Finances', glyph: '◒' },
@@ -1656,6 +1658,10 @@ export default function AdminPanel({ onLogout, onToast }) {
             onSetReservationStatus={setResStatus}
             onSetSellRequestStatus={setSellStatus}
           />
+        )}
+
+        {tab === 'recherches' && (
+          <VehicleSearchRequestsPanel vehicles={vehicles} shopName={shopName} onToast={onToast} />
         )}
 
         {/* ── TAB TÉMOIGNAGES ── */}
