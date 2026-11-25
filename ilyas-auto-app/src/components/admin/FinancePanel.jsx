@@ -21,12 +21,12 @@ function num(value) {
 }
 
 function visibleFinanceNotes(value) {
-  return String(value || '').replace(/(^|\\n)ORIGINE-REPRISE-ID-[A-Za-z0-9-]+\\s*/g, '').trim()
+  return String(value || '').replace(/(^|\n)ORIGINE-REPRISE-ID-[A-Za-z0-9-]+\s*/g, '').trim()
 }
 
 function preserveFinanceMarker(value, current) {
-  const marker = String(current || '').match(/(?:^|\\n)(ORIGINE-REPRISE-ID-[A-Za-z0-9-]+)/)?.[1]
-  return [marker, value].filter(Boolean).join('\\n')
+  const marker = String(current || '').match(/(?:^|\n)(ORIGINE-REPRISE-ID-[A-Za-z0-9-]+)/)?.[1]
+  return [marker, value].filter(Boolean).join('\n')
 }
 
 function csvCell(value) {
