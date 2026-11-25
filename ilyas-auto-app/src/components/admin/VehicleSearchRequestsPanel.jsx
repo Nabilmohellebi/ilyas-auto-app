@@ -90,7 +90,7 @@ function matchingVehicles(request, vehicles) {
     .map(item => item.vehicle)
 }
 
-export default function VehicleSearchRequestsPanel({ vehicles = [], shopName = 'Nabil Auto', onToast }) {
+export default function VehicleSearchRequestsPanel({ vehicles = [], shopName = 'Nabil Auto', onToast, onRequestsChanged }) {
   const [requests, setRequests] = useState([])
   const [loading, setLoading] = useState(true)
   const [loadError, setLoadError] = useState('')
@@ -150,6 +150,7 @@ export default function VehicleSearchRequestsPanel({ vehicles = [], shopName = '
       onToast?.('Impossible de mettre à jour la recherche : ' + error.message, 'error')
     } else {
       setRequests(current => current.map(request => request.id === id ? data : request))
+      await onRequestsChanged?.()
       onToast?.('Recherche client mise à jour.')
     }
     setSavingId(null)
@@ -208,6 +209,7 @@ export default function VehicleSearchRequestsPanel({ vehicles = [], shopName = '
       onToast?.('Impossible d’enregistrer la recherche : ' + error.message, 'error')
     } else {
       setRequests(current => [data, ...current])
+      await onRequestsChanged?.()
       setForm(EMPTY_FORM)
       setShowForm(false)
       onToast?.('Recherche client enregistrée.')
