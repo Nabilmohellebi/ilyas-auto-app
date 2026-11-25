@@ -7,12 +7,36 @@ import VehicleForm from './VehicleForm'
 import CRMPanel from './CRMPanel'
 import FinancePanel from './FinancePanel'
 import ImageCropper from './ImageCropper'
+import '../../styles/admin-dashboard.css'
 
 const RES_STATUTS = [
   { key: 'nouvelle',  label: '🆕 Nouvelle' },
   { key: 'contactee', label: '📞 Contactée' },
   { key: 'vendue',    label: '✅ Traitée / vendue' },
   { key: 'annulee',   label: '❌ Annulée' },
+]
+
+const ADMIN_NAV_GROUPS = [
+  { label: 'GÉNÉRAL', items: [
+    { key: 'dashboard', label: 'Vue d’ensemble', glyph: '◫' },
+  ] },
+  { label: 'INVENTAIRE', items: [
+    { key: 'vehicules-neufs', label: 'Véhicules neufs', glyph: '▣' },
+    { key: 'vehicules-occasion', label: 'Véhicules d’occasion', glyph: '↻' },
+  ] },
+  { label: 'CLIENTS & VENTES', items: [
+    { key: 'reservations', label: 'Réservations', glyph: '▤' },
+    { key: 'crm', label: 'CRM clients', glyph: '◎' },
+    { key: 'reprises', label: 'Ventes & échanges', glyph: '⇄' },
+  ] },
+  { label: 'PILOTAGE', items: [
+    { key: 'finances', label: 'Finances', glyph: '◒' },
+  ] },
+  { label: 'CONTENU DU SITE', items: [
+    { key: 'temoignages', label: 'Témoignages', glyph: '☆' },
+    { key: 'banniere', label: 'Bannière', glyph: '≋' },
+    { key: 'settings', label: 'Paramètres', glyph: '⚙' },
+  ] },
 ]
 
 function statutOf(key) { return STATUTS.find(s => s.key === key) || STATUTS[0] }
@@ -587,6 +611,8 @@ function AdminSettings({ onLogout, onToast, onBrandNameChange }) {
 // ═══════════════════════════════════════════════
 export default function AdminPanel({ onLogout, onToast }) {
   const [tab, setTab] = useState('dashboard')
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
+  const [mobileNavOpen, setMobileNavOpen] = useState(false)
   const [shopName, setShopName] = useState('Nabil Auto')
 
   useEffect(() => {
@@ -847,85 +873,240 @@ export default function AdminPanel({ onLogout, onToast }) {
     .sort((a, b) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime())
     .slice(0, 5)
 
+  const now = new Date()
+  const currentDateLabel = now.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
+  const monthlyActivity = Array.from({ length: 6 }, (_, index) => {
+    const monthDate = new Date(now.getFullYear(), now.getMonth() - (5 - index), 1)
+    const nextMonth = new Date(monthDate.getFullYear(), monthDate.getMonth() + 1, 1)
+    const countForMonth = rows => rows.filter(row => {
+      const createdAt = new Date(row.created_at || 0)
+      return Number.isFinite(createdAt.getTime()) && createdAt >= monthDate && createdAt < nextMonth
+    }).length
+    return {
+      label: monthDate.toLocaleDateString('fr-FR', { month: 'short' }).replace('.', ''),
+      reservations: countForMonth(reservations),
+      reprises: countForMonth(sellRequests),
+    }
+  })
+  const chartMax = Math.max(1, ...monthlyActivity.flatMap(item => [item.reservations, item.reprises]))
+  const chartX = index => 42 + index * 128
+  const chartY = value => 146 - (value / chartMax) * 108
+  const reservationPath = monthlyActivity.map((item, index) => chartX(index) + ' ' + chartY(item.reservations)).join(' L ')
+  const reprisePath = monthlyActivity.map((item, index) => chartX(index) + ' ' + chartY(item.reprises)).join(' L ')
+  const reservationArea = 'M 42 150 L ' + reservationPath + ' L 682 150 Z'
+  const activeNav = ADMIN_NAV_GROUPS
+    .flatMap(group => group.items.map(item => ({ ...item, group: group.label })))
+    .find(item => item.key === tab) || { label: 'Administration', group: 'ESPACE' }
+
   const brandWords = (shopName || 'Nabil Auto').trim().split(/\s+/).filter(Boolean)
   const brandAccent = brandWords.pop() || 'Auto'
   const brandPrefix = brandWords.join(' ')
 
 
   return (
-    <div className="adm">
-      <div className="adm-top">
-        <div className="adm-logo">{brandPrefix && brandPrefix + ' '}<em>{brandAccent}</em> <span className="adm-badge">ADMIN</span></div>
-        <div className="adm-tabs">
-          {[
-            ['dashboard', '📊 Vue d’ensemble'],
-            ['vehicules-neufs', '🚘 Véhicules neufs'],
-            ['vehicules-occasion', '🔄 Véhicules d’occasion'],
-            ['reservations', '📩 Réservations'],
-            ['crm', '👥 CRM clients'],
-            ['finances', '💰 Finances'],
-            ['reprises', '🔄 Ventes & échanges'],
-            ['temoignages', '⭐ Témoignages'],
-            ['banniere', '📢 Bannière'],
-            ['settings', '⚙️ Paramètres'],
-          ].map(([k, l]) => (
-            <button key={k} className={`adm-tab ${tab === k ? 'active' : ''}`} onClick={() => setTab(k)}>{l}</button>
-          ))}
+    <div className={"adm adm-modern" + (sidebarCollapsed ? ' is-collapsed' : '') + (mobileNavOpen ? ' mobile-nav-open' : '')}>
+      <aside className="adm-sidebar" aria-label="Navigation principale">
+        <div className="adm-sidebar-head">
+          <div className="adm-sidebar-mark">NA</div>
+          <div className="adm-sidebar-brand-copy">
+            <strong>{brandPrefix && brandPrefix + ' '}<em>{brandAccent}</em></strong>
+            <span>ESPACE ADMINISTRATEUR</span>
+          </div>
         </div>
-        <button className="adm-refresh" onClick={refreshAll} disabled={refreshing} title="Recharger les données">
-          {refreshing ? '↻ Actualisation…' : '↻ Actualiser'}
-        </button>
-        <button className="adm-logout" onClick={onLogout}>Déconnexion</button>
-      </div>
+
+        <nav className="adm-sidebar-nav">
+          {ADMIN_NAV_GROUPS.map(group => (
+            <div className="adm-sidebar-group" key={group.label}>
+              <div className="adm-sidebar-group-label">{group.label}</div>
+              {group.items.map(item => (
+                <button
+                  type="button"
+                  key={item.key}
+                  title={item.label}
+                  aria-current={tab === item.key ? 'page' : undefined}
+                  className={"adm-nav-item" + (tab === item.key ? ' active' : '')}
+                  onClick={() => { setTab(item.key); setMobileNavOpen(false) }}
+                >
+                  <span className="adm-nav-glyph" aria-hidden="true">{item.glyph}</span>
+                  <span className="adm-nav-label">{item.label}</span>
+                  {item.key === 'reservations' && stats.resNouvelles > 0 && (
+                    <span className="adm-nav-count">{stats.resNouvelles}</span>
+                  )}
+                  {item.key === 'reprises' && stats.reprisesNouvelles > 0 && (
+                    <span className="adm-nav-count">{stats.reprisesNouvelles}</span>
+                  )}
+                </button>
+              ))}
+            </div>
+          ))}
+        </nav>
+
+        <div className="adm-sidebar-footer">
+          <div className="adm-sidebar-secure"><span className="adm-secure-dot" /> Session sécurisée</div>
+          <button type="button" className="adm-sidebar-logout" onClick={onLogout}>
+            <span aria-hidden="true">⇥</span><span className="adm-nav-label">Déconnexion</span>
+          </button>
+        </div>
+      </aside>
+
+      <button
+        type="button"
+        className="adm-mobile-overlay"
+        aria-label="Fermer le menu"
+        onClick={() => setMobileNavOpen(false)}
+      />
+
+      <div className="adm-main">
+        <header className="adm-top adm-topbar">
+          <div className="adm-topbar-left">
+            <button
+              type="button"
+              className="adm-menu-toggle"
+              aria-label="Réduire ou ouvrir le menu"
+              onClick={() => {
+                if (window.innerWidth <= 920) setMobileNavOpen(open => !open)
+                else setSidebarCollapsed(open => !open)
+              }}
+            >☰</button>
+            <div className="adm-topbar-heading">
+              <span>ADMINISTRATION <i>/</i> {activeNav.group}</span>
+              <strong>{activeNav.label}</strong>
+            </div>
+          </div>
+          <div className="adm-topbar-actions">
+            <span className="adm-online-indicator"><i /> Connecté</span>
+            <button className="adm-refresh" onClick={refreshAll} disabled={refreshing} title="Recharger les données">
+              <span aria-hidden="true">↻</span><span>{refreshing ? 'Actualisation…' : 'Actualiser'}</span>
+            </button>
+            <button type="button" className="adm-profile-button" onClick={onLogout} title="Déconnexion">
+              <span className="adm-profile-avatar">A</span>
+              <span className="adm-profile-copy"><strong>Administrateur</strong><small>Session active</small></span>
+              <span className="adm-profile-chevron">⌄</span>
+            </button>
+          </div>
+        </header>
 
       <div className="adm-body">
-        {/* Stats */}
-        <div className="adm-stats">
-          <div className="stat-card"><div className="label">Véhicules en stock</div><div className="value">{stats.total}</div></div>
-          <div className="stat-card"><div className="label">✅ Disponibles</div><div className="value" style={{ color: '#86efac' }}>{stats.disponibles}</div></div>
-          <div className="stat-card"><div className="label">💰 Valeur du stock</div><div className="value red">{fmt(stats.valeurStock)}</div></div>
-          <div className="stat-card"><div className="label">📩 Réservations nouvelles</div><div className="value red">{stats.resNouvelles}</div></div>
-        </div>
-
         {/* ── TABLEAU DE BORD ── */}
         {tab === 'dashboard' && (
           <section className="adm-dashboard">
-            <div className="adm-welcome">
-              <div>
-                <div className="adm-eyebrow">ESPACE DE PILOTAGE</div>
+            <div className="adm-dashboard-head">
+              <div className="adm-welcome">
+                <span className="adm-eyebrow">ESPACE DE PILOTAGE</span>
                 <h1>Bonjour, bienvenue dans ton showroom.</h1>
-                <p>Retrouve ici les chiffres essentiels et les demandes qui nécessitent ton attention.</p>
+                <p>Voici les chiffres essentiels et les demandes qui méritent ton attention.</p>
+                <div className="adm-dashboard-date"><span aria-hidden="true">◷</span>{currentDateLabel}</div>
               </div>
               <div className="adm-dashboard-add-actions">
                 <button className="act-btn primary adm-new-vehicle" onClick={() => { setTab('vehicules-neufs'); setEditVeh({ __new: true, etat_vehicule: 'neuf' }) }}>
-                  + Ajouter une voiture neuve
+                  <span aria-hidden="true">＋</span> Ajouter une voiture neuve
                 </button>
                 <button className="act-btn adm-new-vehicle" onClick={() => { setTab('vehicules-occasion'); setEditVeh({ __new: true, etat_vehicule: 'occasion' }) }}>
-                  + Ajouter une occasion
+                  <span aria-hidden="true">＋</span> Ajouter une occasion
                 </button>
               </div>
             </div>
-            <div className="adm-overview-grid">
-              <div className="adm-overview-card">
-                <div className="adm-overview-heading">
+
+            <div className="adm-kpis">
+              <button type="button" className="adm-kpi-card" onClick={() => setTab('vehicules-neufs')}>
+                <span className="adm-kpi-top"><span>PARC AUTOMOBILE</span><i>▣</i></span>
+                <strong>{stats.total}</strong>
+                <span className="adm-kpi-foot"><span>Véhicules référencés</span><b>Voir le stock ↗</b></span>
+              </button>
+              <button type="button" className="adm-kpi-card" onClick={() => { setTab('vehicules-neufs'); setFilterStatut('disponible') }}>
+                <span className="adm-kpi-top"><span>DISPONIBILITÉ</span><i className="green">✓</i></span>
+                <strong>{stats.disponibles}</strong>
+                <span className="adm-kpi-foot"><span>Prêts à la vente</span><b>Consulter ↗</b></span>
+              </button>
+              <div className="adm-kpi-card">
+                <span className="adm-kpi-top"><span>VALEUR DU STOCK</span><i className="gold">◈</i></span>
+                <strong className="adm-kpi-money">{fmt(stats.valeurStock)}</strong>
+                <span className="adm-kpi-foot"><span>Véhicules non vendus</span><b>Estimation du parc</b></span>
+              </div>
+              <button type="button" className="adm-kpi-card" onClick={() => { setResFilter('nouvelle'); setResSearch(''); setTab('reservations') }}>
+                <span className="adm-kpi-top"><span>RÉSERVATIONS</span><i className="amber">↗</i></span>
+                <strong>{stats.resNouvelles}</strong>
+                <span className="adm-kpi-foot"><span>Demandes à traiter</span><b>{stats.reprisesNouvelles} reprise(s) en attente</b></span>
+              </button>
+            </div>
+
+            <div className="adm-dashboard-main-grid">
+              <section className="adm-overview-card adm-chart-card">
+                <div className="adm-panel-heading">
+                  <div>
+                    <span className="adm-eyebrow">FLUX CLIENTS</span>
+                    <h3>Activité des demandes</h3>
+                    <p>Évolution des réservations et propositions de reprise sur 6 mois</p>
+                  </div>
+                  <span className="adm-panel-period">6 derniers mois</span>
+                </div>
+                <div className="adm-chart-legend">
+                  <span><i className="reservation" /> Réservations</span>
+                  <span><i className="trade" /> Ventes & échanges proposés</span>
+                </div>
+                <div className="adm-chart-wrap">
+                  <svg className="adm-activity-chart" viewBox="0 0 720 176" role="img" aria-label="Graphique mensuel des réservations et propositions de reprise">
+                    <defs>
+                      <linearGradient id="adm-reservation-fill" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#77c6a0" stopOpacity=".24" />
+                        <stop offset="100%" stopColor="#77c6a0" stopOpacity="0" />
+                      </linearGradient>
+                    </defs>
+                    {[38, 92, 146].map(y => <line key={y} x1="42" x2="682" y1={y} y2={y} className="adm-chart-gridline" />)}
+                    <path d={reservationArea} fill="url(#adm-reservation-fill)" />
+                    <path d={'M ' + reservationPath} className="adm-chart-line reservation" />
+                    <path d={'M ' + reprisePath} className="adm-chart-line trade" />
+                    {monthlyActivity.map((item, index) => (
+                      <g key={item.label + index}>
+                        <circle cx={chartX(index)} cy={chartY(item.reservations)} r="4" className="adm-chart-point reservation">
+                          <title>{item.label} : {item.reservations} réservation(s)</title>
+                        </circle>
+                        <circle cx={chartX(index)} cy={chartY(item.reprises)} r="3.5" className="adm-chart-point trade">
+                          <title>{item.label} : {item.reprises} proposition(s)</title>
+                        </circle>
+                      </g>
+                    ))}
+                  </svg>
+                  <div className="adm-chart-months">
+                    {monthlyActivity.map((item, index) => <span key={item.label + index}>{item.label}</span>)}
+                  </div>
+                </div>
+                <div className="adm-chart-summary">
+                  <span><strong>{reservations.length}</strong> réservations enregistrées</span>
+                  <span><strong>{sellRequests.length}</strong> propositions de reprise enregistrées</span>
+                </div>
+              </section>
+
+              <section className="adm-overview-card adm-pending-card">
+                <div className="adm-panel-heading">
                   <div><span className="adm-eyebrow">À TRAITER</span><h3>Demandes en attente</h3></div>
-                  <span className="adm-overview-icon">📬</span>
+                  <span className="adm-overview-icon">⌁</span>
                 </div>
                 <button className="adm-queue-row" onClick={() => { setResFilter('nouvelle'); setResSearch(''); setTab('reservations') }}>
                   <span className="adm-queue-count">{stats.resNouvelles}</span>
-                  <span><strong>Nouvelles réservations</strong><small>Demandes de rendez-vous clients</small></span>
+                  <span><strong>Nouvelles réservations</strong><small>Rendez-vous et demandes clients</small></span>
                   <span className="adm-queue-arrow">›</span>
                 </button>
                 <button className="adm-queue-row" onClick={() => setTab('reprises')}>
                   <span className="adm-queue-count">{stats.reprisesNouvelles}</span>
-                  <span><strong>Nouvelles ventes & échanges</strong><small>Propositions d’achat et d’échange de véhicules</small></span>
+                  <span><strong>Ventes & échanges</strong><small>Propositions de reprise à examiner</small></span>
                   <span className="adm-queue-arrow">›</span>
                 </button>
-              </div>
-              <div className="adm-overview-card">
-                <div className="adm-overview-heading">
-                  <div><span className="adm-eyebrow">INVENTAIRE</span><h3>Répartition du stock</h3></div>
-                  <span className="adm-overview-icon">🚘</span>
+                {(stats.resNouvelles + stats.reprisesNouvelles) === 0 && (
+                  <div className="adm-all-clear"><span>✓</span><strong>Tout est à jour</strong><small>Aucune nouvelle demande en attente.</small></div>
+                )}
+                <div className="adm-pending-footer">
+                  <span>Demandes nécessitant une action</span>
+                  <strong>{stats.resNouvelles + stats.reprisesNouvelles}</strong>
+                </div>
+              </section>
+            </div>
+
+            <div className="adm-dashboard-lower-grid">
+              <section className="adm-overview-card adm-stock-card">
+                <div className="adm-panel-heading">
+                  <div><span className="adm-eyebrow">INVENTAIRE</span><h3>État du parc automobile</h3><p>Répartition de tous les véhicules enregistrés</p></div>
+                  <span className="adm-overview-icon">▤</span>
                 </div>
                 {stockBreakdown.map(item => (
                   <div className="adm-stock-item" key={item.key}>
@@ -933,32 +1114,33 @@ export default function AdminPanel({ onLogout, onToast }) {
                     <div className="adm-stock-track"><span style={{ width: item.percent + '%', background: item.color || 'var(--br)' }} /></div>
                   </div>
                 ))}
-                <button className="adm-text-link" onClick={() => { setFilterStatut('all'); setTab('vehicules-neufs') }}>Gérer tous les véhicules →</button>
-              </div>
-            </div>
-            <div className="adm-overview-card adm-recent-card">
-              <div className="adm-overview-heading">
-                <div><span className="adm-eyebrow">DERNIÈRE ACTIVITÉ</span><h3>Réservations récentes</h3></div>
-                <button className="adm-text-link" onClick={() => setTab('reservations')}>Voir toutes →</button>
-              </div>
-              {recentReservations.length === 0 ? (
-                <div className="adm-empty-inline">Aucune réservation pour le moment. Les nouvelles demandes apparaîtront ici.</div>
-              ) : (
-                <div className="adm-recent-list">
-                  {recentReservations.map(r => (
-                    <div className="adm-recent-row" key={r.id}>
-                      <div className="adm-recent-avatar">{(r.nom_client || 'C').trim().charAt(0).toUpperCase()}</div>
-                      <div className="adm-recent-main">
-                        <strong>{r.nom_client || 'Client'}</strong>
-                        <span>{r.vehicule_nom || 'Véhicule non précisé'}</span>
-                        <small>{r.created_at ? new Date(r.created_at).toLocaleString('fr-FR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }) : 'Date inconnue'}</small>
-                      </div>
-                      <span className={'res-badge ' + (r.statut || 'nouvelle')}>{RES_STATUTS.find(s => s.key === r.statut)?.label || r.statut || 'Nouvelle'}</span>
-                      <button className="act-btn wa adm-recent-contact" onClick={() => openWA(r, shopName)}>WhatsApp</button>
-                    </div>
-                  ))}
+                <button className="adm-text-link" onClick={() => { setFilterStatut('all'); setTab('vehicules-neufs') }}>Gérer le stock complet <span>→</span></button>
+              </section>
+
+              <section className="adm-overview-card adm-recent-card">
+                <div className="adm-panel-heading">
+                  <div><span className="adm-eyebrow">DERNIÈRE ACTIVITÉ</span><h3>Réservations récentes</h3></div>
+                  <button className="adm-text-link" onClick={() => setTab('reservations')}>Tout voir <span>→</span></button>
                 </div>
-              )}
+                {recentReservations.length === 0 ? (
+                  <div className="adm-empty-inline">Aucune réservation pour le moment. Les nouvelles demandes apparaîtront ici.</div>
+                ) : (
+                  <div className="adm-recent-list">
+                    {recentReservations.map(r => (
+                      <div className="adm-recent-row" key={r.id}>
+                        <div className="adm-recent-avatar">{(r.nom_client || 'C').trim().charAt(0).toUpperCase()}</div>
+                        <div className="adm-recent-main">
+                          <strong>{r.nom_client || 'Client'}</strong>
+                          <span>{r.vehicule_nom || 'Véhicule non précisé'}</span>
+                          <small>{r.created_at ? new Date(r.created_at).toLocaleString('fr-FR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }) : 'Date inconnue'}</small>
+                        </div>
+                        <span className={'res-badge ' + (r.statut || 'nouvelle')}>{RES_STATUTS.find(s => s.key === r.statut)?.label || r.statut || 'Nouvelle'}</span>
+                        <button className="act-btn wa adm-recent-contact" onClick={() => openWA(r, shopName)}>WhatsApp</button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </section>
             </div>
           </section>
         )}
@@ -1238,6 +1420,8 @@ export default function AdminPanel({ onLogout, onToast }) {
           }}
         />
       )}
+      </div>
+      </div>
     </div>
   )
 }
