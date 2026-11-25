@@ -657,6 +657,7 @@ export default function AdminPanel({ onLogout, onToast }) {
   const [bannerMsgs, setBannerMsgs] = useState([])
   const [testimonials, setTestimonials] = useState([])
   const [sellRequests, setSellRequests] = useState([])
+  const [vehicleSearchRequests, setVehicleSearchRequests] = useState([])
   const [newTesti, setNewTesti] = useState({ nom: '', role: '', texte: '', note: 5, photo_url: '' })
   const [testiUploading, setTestiUploading] = useState(false)
   const [testiCropFile, setTestiCropFile] = useState(null)
@@ -678,7 +679,7 @@ export default function AdminPanel({ onLogout, onToast }) {
     setReservations(data || [])
   }, [])
 
-  useEffect(() => { loadVehicles(); loadReservations(); loadBanner(); loadTestimonials(); loadSellRequests() }, [])
+  useEffect(() => { loadVehicles(); loadReservations(); loadBanner(); loadTestimonials(); loadSellRequests(); loadVehicleSearchRequests() }, [])
 
   async function loadTestimonials() {
     const { data } = await supabase.from('testimonials').select('*').order('position', { ascending: true })
@@ -713,6 +714,19 @@ export default function AdminPanel({ onLogout, onToast }) {
   async function loadSellRequests() {
     const { data } = await supabase.from('sell_requests').select('*').order('created_at', { ascending: false })
     setSellRequests(data || [])
+  }
+
+  async function loadVehicleSearchRequests() {
+    const { data, error } = await supabase
+      .from('vehicle_search_requests')
+      .select('id, statut, created_at')
+      .order('created_at', { ascending: false })
+    if (error) {
+      console.warn('Impossible de charger les recherches clients pour le tableau de bord :', error)
+      setVehicleSearchRequests([])
+      return
+    }
+    setVehicleSearchRequests(data || [])
   }
   async function setSellStatus(id, statut) {
     await supabase.from('sell_requests').update({ statut }).eq('id', id)
@@ -1089,7 +1103,7 @@ export default function AdminPanel({ onLogout, onToast }) {
   async function refreshAll() {
     setRefreshing(true)
     try {
-      await Promise.all([loadVehicles(), loadReservations(), loadBanner(), loadTestimonials(), loadSellRequests()])
+      await Promise.all([loadVehicles(), loadReservations(), loadBanner(), loadTestimonials(), loadSellRequests(), loadVehicleSearchRequests()])
       onToast('✅ Données actualisées')
     } catch (error) {
       onToast('❌ Actualisation impossible : ' + error.message, 'error')
@@ -1160,6 +1174,7 @@ export default function AdminPanel({ onLogout, onToast }) {
     valeurStock: vehicles.filter(v => v.statut !== 'vendu').reduce((s, v) => s + Number(v.prix || 0), 0),
     resNouvelles: reservations.filter(r => r.statut === 'nouvelle').length,
     reprisesNouvelles: sellRequests.filter(r => r.statut === 'nouvelle').length,
+    recherchesNouvelles: vehicleSearchRequests.filter(r => r.statut === 'nouvelle').length,
   }
   const stockBreakdown = STATUTS.map(status => {
     const count = vehicles.filter(v => v.statut === status.key).length
@@ -1182,16 +1197,19 @@ export default function AdminPanel({ onLogout, onToast }) {
       label: monthDate.toLocaleDateString('fr-FR', { month: 'short' }).replace('.', ''),
       reservations: countForMonth(reservations),
       reprises: countForMonth(sellRequests),
+      recherches: countForMonth(vehicleSearchRequests),
     }
   })
-  const chartMax = Math.max(1, ...monthlyActivity.flatMap(item => [item.reservations, item.reprises]))
+  const chartMax = Math.max(1, ...monthlyActivity.flatMap(item => [item.reservations, item.reprises, item.recherches]))
   const chartX = index => 42 + index * 128
   const chartY = value => 146 - (value / chartMax) * 108
   const reservationPath = monthlyActivity.map((item, index) => chartX(index) + ' ' + chartY(item.reservations)).join(' L ')
   const reprisePath = monthlyActivity.map((item, index) => chartX(index) + ' ' + chartY(item.reprises)).join(' L ')
+  const recherchePath = monthlyActivity.map((item, index) => chartX(index) + ' ' + chartY(item.recherches)).join(' L ')
   const reservationArea = 'M 42 150 L ' + reservationPath + ' L 682 150 Z'
   const lastSixReservations = monthlyActivity.reduce((sum, item) => sum + item.reservations, 0)
   const lastSixReprises = monthlyActivity.reduce((sum, item) => sum + item.reprises, 0)
+  const lastSixRecherches = monthlyActivity.reduce((sum, item) => sum + item.recherches, 0)
   const activeNav = ADMIN_NAV_GROUPS
     .flatMap(group => group.items.map(item => ({ ...item, group: group.label })))
     .find(item => item.key === tab) || { label: 'Administration', group: 'ESPACE' }
@@ -1232,6 +1250,9 @@ export default function AdminPanel({ onLogout, onToast }) {
                   )}
                   {item.key === 'reprises' && stats.reprisesNouvelles > 0 && (
                     <span className="adm-nav-count">{stats.reprisesNouvelles}</span>
+                  )}
+                  {item.key === 'recherches' && stats.recherchesNouvelles > 0 && (
+                    <span className="adm-nav-count">{stats.recherchesNouvelles}</span>
                   )}
                 </button>
               ))}
@@ -1324,7 +1345,7 @@ export default function AdminPanel({ onLogout, onToast }) {
               <button type="button" className="adm-kpi-card" onClick={() => { setResFilter('nouvelle'); setResSearch(''); setTab('reservations') }}>
                 <span className="adm-kpi-top"><span>RÉSERVATIONS</span><i className="amber">↗</i></span>
                 <strong>{stats.resNouvelles}</strong>
-                <span className="adm-kpi-foot"><span>Demandes à traiter</span><b>{stats.reprisesNouvelles} reprise(s) en attente</b></span>
+                <span className="adm-kpi-foot"><span>Demandes à traiter</span><b>{stats.reprisesNouvelles} reprise(s) · {stats.recherchesNouvelles} recherche(s)</b></span>
               </button>
             </div>
 
@@ -1334,16 +1355,17 @@ export default function AdminPanel({ onLogout, onToast }) {
                   <div>
                     <span className="adm-eyebrow">FLUX CLIENTS</span>
                     <h3>Activité des demandes</h3>
-                    <p>Évolution des réservations et propositions de reprise sur 6 mois</p>
+                    <p>Évolution des réservations, reprises et recherches clients sur 6 mois</p>
                   </div>
                   <span className="adm-panel-period">6 derniers mois</span>
                 </div>
                 <div className="adm-chart-legend">
                   <span><i className="reservation" /> Réservations</span>
                   <span><i className="trade" /> Ventes & échanges proposés</span>
+                  <span><i className="search" /> Recherches clients</span>
                 </div>
                 <div className="adm-chart-wrap">
-                  <svg className="adm-activity-chart" viewBox="0 0 720 176" role="img" aria-label="Graphique mensuel des réservations et propositions de reprise">
+                  <svg className="adm-activity-chart" viewBox="0 0 720 176" role="img" aria-label="Graphique mensuel des réservations, propositions de reprise et recherches clients">
                     <defs>
                       <linearGradient id="adm-reservation-fill" x1="0" y1="0" x2="0" y2="1">
                         <stop offset="0%" stopColor="#77c6a0" stopOpacity=".24" />
@@ -1354,6 +1376,7 @@ export default function AdminPanel({ onLogout, onToast }) {
                     <path d={reservationArea} fill="url(#adm-reservation-fill)" />
                     <path d={'M ' + reservationPath} className="adm-chart-line reservation" />
                     <path d={'M ' + reprisePath} className="adm-chart-line trade" />
+                    <path d={'M ' + recherchePath} className="adm-chart-line search" />
                     {monthlyActivity.map((item, index) => (
                       <g key={item.label + index}>
                         <circle cx={chartX(index)} cy={chartY(item.reservations)} r="4" className="adm-chart-point reservation">
@@ -1361,6 +1384,9 @@ export default function AdminPanel({ onLogout, onToast }) {
                         </circle>
                         <circle cx={chartX(index)} cy={chartY(item.reprises)} r="3.5" className="adm-chart-point trade">
                           <title>{item.label} : {item.reprises} proposition(s)</title>
+                        </circle>
+                        <circle cx={chartX(index)} cy={chartY(item.recherches)} r="3" className="adm-chart-point search">
+                          <title>{item.label} : {item.recherches} recherche(s) client</title>
                         </circle>
                       </g>
                     ))}
@@ -1372,6 +1398,7 @@ export default function AdminPanel({ onLogout, onToast }) {
                 <div className="adm-chart-summary">
                   <span><strong>{lastSixReservations}</strong> réservations sur la période</span>
                   <span><strong>{lastSixReprises}</strong> propositions de reprise sur la période</span>
+                  <span><strong>{lastSixRecherches}</strong> recherches clients sur la période</span>
                 </div>
               </section>
 
@@ -1390,12 +1417,17 @@ export default function AdminPanel({ onLogout, onToast }) {
                   <span><strong>Ventes & échanges</strong><small>Propositions de reprise à examiner</small></span>
                   <span className="adm-queue-arrow">›</span>
                 </button>
-                {(stats.resNouvelles + stats.reprisesNouvelles) === 0 && (
+                <button className="adm-queue-row" onClick={() => setTab('recherches')}>
+                  <span className="adm-queue-count">{stats.recherchesNouvelles}</span>
+                  <span><strong>Recherches de véhicules</strong><small>Clients en attente d’une voiture correspondant à leurs critères</small></span>
+                  <span className="adm-queue-arrow">›</span>
+                </button>
+                {(stats.resNouvelles + stats.reprisesNouvelles + stats.recherchesNouvelles) === 0 && (
                   <div className="adm-all-clear"><span>✓</span><strong>Tout est à jour</strong><small>Aucune nouvelle demande en attente.</small></div>
                 )}
                 <div className="adm-pending-footer">
                   <span>Demandes nécessitant une action</span>
-                  <strong>{stats.resNouvelles + stats.reprisesNouvelles}</strong>
+                  <strong>{stats.resNouvelles + stats.reprisesNouvelles + stats.recherchesNouvelles}</strong>
                 </div>
               </section>
             </div>
