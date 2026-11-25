@@ -175,14 +175,15 @@ export default function SellVehicleModal({ onClose, vehicles = [], tradeMarginPe
               <div className="trade-form-section">
                 <div className="trade-section-title">2. Le véhicule que vous souhaitez recevoir</div>
                 {availableVehicles.length > 0 ? (
-                  {initialTargetVehicle && (
-                    <div className="trade-preset-vehicle">
-                      <span>Véhicule choisi depuis le stock</span>
-                      <strong>{initialTargetVehicle.marque} {initialTargetVehicle.modele}</strong>
-                      <small>{money(initialTargetVehicle.prix)} · {initialTargetVehicle.etat_vehicule === 'occasion' || Number(initialTargetVehicle.km || 0) > 0 ? 'Occasion' : 'Neuf'}</small>
-                    </div>
-                  )}
-                  <div className="form-field">
+                  <>
+                    {initialTargetVehicle && (
+                      <div className="trade-preset-vehicle">
+                        <span>Véhicule choisi depuis le stock</span>
+                        <strong>{initialTargetVehicle.marque} {initialTargetVehicle.modele}</strong>
+                        <small>{money(initialTargetVehicle.prix)} · {initialTargetVehicle.etat_vehicule === 'occasion' || Number(initialTargetVehicle.km || 0) > 0 ? 'Occasion' : 'Neuf'}</small>
+                      </div>
+                    )}
+                    <div className="form-field">
                     <label>Choisir dans le stock {shopName} *</label>
                     <select value={form.targetVehicleId} onChange={e => set('targetVehicleId', e.target.value)}>
                       <option value="">Sélectionner un véhicule…</option>
@@ -192,7 +193,8 @@ export default function SellVehicleModal({ onClose, vehicles = [], tradeMarginPe
                         </option>
                       ))}
                     </select>
-                  </div>
+                    </div>
+                  </>
                 ) : (
                   <p className="trade-muted">Aucun véhicule disponible dans le stock pour le moment. Contactez-nous pour un échange personnalisé.</p>
                 )}
