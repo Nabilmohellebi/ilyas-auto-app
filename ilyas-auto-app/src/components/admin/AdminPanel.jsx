@@ -1693,7 +1693,7 @@ export default function AdminPanel({ onLogout, onToast }) {
         )}
 
         {tab === 'recherches' && (
-          <VehicleSearchRequestsPanel vehicles={vehicles} shopName={shopName} onToast={onToast} />
+          <VehicleSearchRequestsPanel vehicles={vehicles} shopName={shopName} onToast={onToast} onRequestsChanged={loadVehicleSearchRequests} />
         )}
 
         {/* ── TAB TÉMOIGNAGES ── */}
