@@ -5,6 +5,7 @@ import { ORIGINS, flagURI, PLACEHOLDER_IMG, BODY_TYPES } from '../data/vehicles-
 import { getSettings, parseBrandIdentity, parseShowroomHeroImages } from '../utils/useSettings'
 import { statutLabel } from '../i18n/translations'
 import { LangProvider, useLang } from '../i18n/LangContext'
+import '../styles/vehicle-search.css'
 const ReservationModal = lazy(() => import('./ReservationModal'))
 const VehicleDetail = lazy(() => import('./VehicleDetail'))
 import AnnouncementBar from './AnnouncementBar'
