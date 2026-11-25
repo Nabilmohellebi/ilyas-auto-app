@@ -58,6 +58,7 @@ function PublicSiteInner() {
   const [shareFeedback, setShareFeedback] = useState('')
   const [sharedFavoritesStatus, setSharedFavoritesStatus] = useState('')
   const [sellOpen, setSellOpen] = useState(false)
+  const [tradeTargetVehicle, setTradeTargetVehicle] = useState(null)
   const [vehicleCondition, setVehicleCondition] = useState('all')
   const publicTheme = (() => { try { return window.localStorage.getItem('hbr_public_theme') === 'dark' ? 'dark' : 'ivory' } catch { return 'ivory' } })()
 
@@ -771,6 +772,7 @@ function PublicSiteInner() {
             vehicle={openVehicle}
             onClose={closeVehicleDetail}
             onReserve={v => { setOpenVehicle(null); setReserveVehicle(v) }}
+            onExchange={v => { setOpenVehicle(null); setTradeTargetVehicle(v); setSellOpen(true) }}
           />
         </Suspense>
       )}
@@ -782,7 +784,7 @@ function PublicSiteInner() {
       {trackingOpen && <Suspense fallback={<div className="spinner" role="status">Chargement…</div>}><TrackingPage onClose={() => setTrackingOpen(false)} /></Suspense>}
 
       {/* ── Vendre mon véhicule ── */}
-      {sellOpen && <Suspense fallback={<div className="spinner" role="status">Chargement…</div>}><SellVehicleModal onClose={() => setSellOpen(false)} vehicles={vehicles} tradeMarginPercent={settings.trade_margin_percent ?? 5} whatsapp={s.whatsapp} shopName={s.nom} /></Suspense>}
+      {sellOpen && <Suspense fallback={<div className="spinner" role="status">Chargement…</div>}><SellVehicleModal onClose={() => { setSellOpen(false); setTradeTargetVehicle(null) }} vehicles={vehicles} tradeMarginPercent={settings.trade_margin_percent ?? 5} whatsapp={s.whatsapp} shopName={s.nom} initialTargetVehicle={tradeTargetVehicle} requestSource="site" /></Suspense>}
     </div>
   )
 }

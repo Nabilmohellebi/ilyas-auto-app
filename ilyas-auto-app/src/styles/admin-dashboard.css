@@ -784,3 +784,62 @@ button.adm-kpi-card { cursor: pointer; }
 @media (prefers-reduced-motion: reduce) {
   .adm-modern *, .adm-modern *::before, .adm-modern *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; }
 }
+
+
+/* Trade-in workflow: manual showroom entry and stock vehicle preselection */
+.trade-admin-toolbar {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+.trade-admin-toolbar > div { min-width: 220px; }
+.trade-admin-form {
+  margin: 0 0 22px;
+  padding: 18px;
+  border: 1px solid rgba(215,177,95,.22);
+  border-radius: 15px;
+  background: linear-gradient(145deg, rgba(215,177,95,.07), rgba(255,255,255,.025));
+}
+.trade-admin-form-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+.trade-admin-form-heading h3 { margin: 0 0 6px; color: #f0d28c; font-size: 15px; }
+.trade-admin-form-heading p { margin: 0; color: rgba(230,236,228,.56); font-size: 12px; line-height: 1.6; }
+.trade-admin-type-switch { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+.trade-admin-fields { margin-bottom: 14px; }
+.trade-admin-field-wide { grid-column: 1 / -1; }
+.trade-admin-form-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding-top: 13px;
+  border-top: 1px solid rgba(255,255,255,.08);
+}
+.trade-admin-form-footer > span { max-width: 460px; color: rgba(230,236,228,.48); font-size: 11px; line-height: 1.6; }
+.trade-preset-vehicle {
+  display: grid;
+  gap: 4px;
+  margin-bottom: 11px;
+  padding: 11px 13px;
+  border: 1px solid rgba(34,197,94,.25);
+  border-radius: 10px;
+  background: rgba(34,197,94,.07);
+}
+.trade-preset-vehicle span { color: rgba(230,236,228,.55); font-size: 10px; text-transform: uppercase; letter-spacing: .08em; }
+.trade-preset-vehicle strong { color: #e4f4e8; font-size: 13px; }
+.trade-preset-vehicle small { color: #72d39a; font-size: 11px; }
+@media (max-width: 620px) {
+  .trade-admin-form { padding: 13px; }
+  .trade-admin-field-wide { grid-column: auto; }
+  .trade-admin-form-footer { align-items: stretch; }
+  .trade-admin-form-footer .btn-save { width: 100%; }
+}

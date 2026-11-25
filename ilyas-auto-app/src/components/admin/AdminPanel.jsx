@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { supabase } from '../../supabase'
 import { saveSetting, getSettings, parseBrandIdentity, parseShowroomHeroImages, DEFAULT_BRAND_IDENTITY } from '../../utils/useSettings'
-import { openWA, fmt } from '../../utils/notify'
+import { openWA, fmt, genId } from '../../utils/notify'
 import { STATUTS, PLACEHOLDER_IMG, flagURI } from '../../data/vehicles-data'
 import VehicleForm from './VehicleForm'
 import CRMPanel from './CRMPanel'
@@ -42,6 +42,17 @@ const ADMIN_NAV_GROUPS = [
 function statutOf(key) { return STATUTS.find(s => s.key === key) || STATUTS[0] }
 
 const SELL_DETAILS_PREFIX = 'HBR_REQUEST_V2:'
+const SELL_SOURCE_LABELS = {
+  site: 'Site internet',
+  showroom: 'Showroom',
+  telephone: 'Téléphone',
+  whatsapp: 'WhatsApp',
+  autre: 'Autre',
+}
+const EMPTY_MANUAL_SELL_FORM = {
+  type: 'exchange', source: 'showroom', marque: '', modele: '', annee: '', km: '', prix: '',
+  nom_client: '', telephone: '', targetVehicleId: '', note: '',
+}
 function parseSellRequestDetails(request) {
   const raw = request?.message || ''
   if (!raw.startsWith(SELL_DETAILS_PREFIX)) return { type: 'sell', note: raw, version: 1 }
@@ -614,11 +625,19 @@ export default function AdminPanel({ onLogout, onToast }) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
   const [shopName, setShopName] = useState('Nabil Auto')
+  const [tradeMarginPercent, setTradeMarginPercent] = useState(5)
+  const [showManualSellForm, setShowManualSellForm] = useState(false)
+  const [manualSellSaving, setManualSellSaving] = useState(false)
+  const [manualSellForm, setManualSellForm] = useState(EMPTY_MANUAL_SELL_FORM)
 
   useEffect(() => {
     let active = true
     getSettings().then(settings => {
-      if (active) setShopName((settings.shop_name || 'Nabil Auto').trim() || 'Nabil Auto')
+      if (active) {
+        setShopName((settings.shop_name || 'Nabil Auto').trim() || 'Nabil Auto')
+        const margin = Number(settings.trade_margin_percent ?? 5)
+        setTradeMarginPercent(Number.isFinite(margin) ? Math.min(30, Math.max(0, margin)) : 5)
+      }
     })
     return () => { active = false }
   }, [])
@@ -693,6 +712,93 @@ export default function AdminPanel({ onLogout, onToast }) {
   async function deleteSellRequest(id) {
     await supabase.from('sell_requests').delete().eq('id', id)
     setSellRequests(prev => prev.filter(r => r.id !== id))
+  }
+
+  async function addManualSellRequest() {
+    const phoneDigits = manualSellForm.telephone.replace(/\D/g, '')
+    const year = manualSellForm.annee === '' ? null : Number(manualSellForm.annee)
+    const km = manualSellForm.km === '' ? null : Number(manualSellForm.km)
+    const declaredValue = manualSellForm.prix === '' ? null : Number(manualSellForm.prix)
+    const maxYear = new Date().getFullYear() + 1
+    const targetVehicle = vehicles.find(vehicle => String(vehicle.id) === String(manualSellForm.targetVehicleId) && vehicle.is_active !== false && vehicle.statut === 'disponible') || null
+
+    if (!manualSellForm.nom_client.trim() || !manualSellForm.telephone.trim() || !manualSellForm.marque.trim() || !manualSellForm.modele.trim()) {
+      onToast('❌ Renseigne le nom, le téléphone, la marque et le modèle.', 'error')
+      return
+    }
+    if (phoneDigits.length < 8 || phoneDigits.length > 15) {
+      onToast('❌ Vérifie le numéro de téléphone (8 à 15 chiffres).', 'error')
+      return
+    }
+    if (year !== null && (!Number.isInteger(year) || year < 1950 || year > maxYear)) {
+      onToast(`❌ L’année doit être comprise entre 1950 et ${maxYear}.`, 'error')
+      return
+    }
+    if (km !== null && (!Number.isFinite(km) || km < 0)) {
+      onToast('❌ Le kilométrage doit être positif ou nul.', 'error')
+      return
+    }
+    if (declaredValue !== null && (!Number.isFinite(declaredValue) || declaredValue <= 0)) {
+      onToast('❌ La valeur annoncée doit être supérieure à zéro.', 'error')
+      return
+    }
+    if (manualSellForm.type === 'exchange' && !targetVehicle) {
+      onToast('❌ Choisis le véhicule du stock que le client souhaite recevoir.', 'error')
+      return
+    }
+
+    setManualSellSaving(true)
+    const margin = Math.min(30, Math.max(0, Number(tradeMarginPercent) || 0))
+    const targetPrice = Number(targetVehicle?.prix || 0)
+    const offer = declaredValue ? Math.round(declaredValue * (1 - margin / 100)) : null
+    const balance = offer === null || !targetVehicle ? null : targetPrice - offer
+    const details = {
+      version: 3,
+      type: manualSellForm.type,
+      source: manualSellForm.source,
+      sourceLabel: SELL_SOURCE_LABELS[manualSellForm.source] || SELL_SOURCE_LABELS.autre,
+      createdFromAdmin: true,
+      note: manualSellForm.note.trim(),
+      targetVehicle: targetVehicle ? {
+        id: targetVehicle.id,
+        label: `${targetVehicle.marque} ${targetVehicle.modele}`,
+        price: targetPrice,
+        condition: targetVehicle.etat_vehicule || (Number(targetVehicle.km || 0) > 0 ? 'occasion' : 'neuf'),
+      } : null,
+      trade: manualSellForm.type === 'exchange' && offer !== null ? {
+        declaredValue,
+        marginPercent: margin,
+        offer,
+        targetPrice,
+        balance,
+        balanceDirection: balance > 0 ? 'client_to_hbr' : balance < 0 ? 'hbr_to_client' : 'equal',
+      } : null,
+    }
+    const request = {
+      id: genId(),
+      marque: manualSellForm.marque.trim(),
+      modele: manualSellForm.modele.trim(),
+      annee: year,
+      km,
+      prix_souhaite: declaredValue,
+      nom_client: manualSellForm.nom_client.trim(),
+      telephone: manualSellForm.telephone.trim(),
+      message: SELL_DETAILS_PREFIX + JSON.stringify(details),
+      statut: 'nouvelle',
+    }
+
+    try {
+      const { error } = await supabase.from('sell_requests').insert(request)
+      if (error) throw error
+      setSellRequests(prev => [{ ...request, created_at: new Date().toISOString() }, ...prev])
+      setManualSellForm(EMPTY_MANUAL_SELL_FORM)
+      setShowManualSellForm(false)
+      onToast('✅ Proposition enregistrée dans Ventes & échanges')
+    } catch (error) {
+      onToast('❌ Impossible d’enregistrer la proposition : ' + error.message, 'error')
+    } finally {
+      setManualSellSaving(false)
+    }
   }
 
   async function loadBanner() {
@@ -1250,8 +1356,59 @@ export default function AdminPanel({ onLogout, onToast }) {
         {/* ── TAB REPRISES ── */}
         {tab === 'reprises' && (
           <div>
-            <h3 style={{ color: 'white', fontSize: 16, fontWeight: 800, marginBottom: 8 }}>🔄 Propositions de vente et d’échange</h3>
-            <p style={{ color: 'rgba(255,255,255,.4)', fontSize: 12, marginBottom: 20 }}>Retrouve ici les véhicules proposés à l’achat par les clients et leurs demandes d’échange.</p>
+            <div className="trade-admin-toolbar">
+              <div>
+                <h3 style={{ color: 'white', fontSize: 16, fontWeight: 800, marginBottom: 8 }}>🔄 Propositions de vente et d’échange</h3>
+                <p style={{ color: 'rgba(255,255,255,.4)', fontSize: 12, marginBottom: 0 }}>Toutes les demandes du site, du showroom, des appels et de WhatsApp sont regroupées ici.</p>
+              </div>
+              <button className="act-btn wa" type="button" onClick={() => setShowManualSellForm(value => !value)}>
+                {showManualSellForm ? '✕ Fermer le formulaire' : '+ Enregistrer un client reçu directement'}
+              </button>
+            </div>
+            {showManualSellForm && (
+              <section className="pf-section trade-admin-form">
+                <div className="trade-admin-form-heading">
+                  <div>
+                    <h3>Enregistrer une proposition reçue directement</h3>
+                    <p>Pour un client venu au showroom ou contacté par téléphone / WhatsApp. Aucun véhicule n’est ajouté au stock à cette étape.</p>
+                  </div>
+                  <button type="button" className="act-btn" onClick={() => setShowManualSellForm(false)} aria-label="Fermer le formulaire">✕</button>
+                </div>
+                <div className="trade-admin-type-switch">
+                  <button type="button" className={`filter-btn ${manualSellForm.type === 'exchange' ? 'active' : ''}`} onClick={() => setManualSellForm(form => ({ ...form, type: 'exchange' }))}>🔁 Échange contre une voiture du stock</button>
+                  <button type="button" className={`filter-btn ${manualSellForm.type === 'sell' ? 'active' : ''}`} onClick={() => setManualSellForm(form => ({ ...form, type: 'sell', targetVehicleId: '' }))}>💰 Le client souhaite vendre sa voiture</button>
+                </div>
+                <div className="pf-grid trade-admin-fields">
+                  <div className="form-field">
+                    <label>Origine du contact *</label>
+                    <select value={manualSellForm.source} onChange={event => setManualSellForm(form => ({ ...form, source: event.target.value }))}>
+                      {Object.entries(SELL_SOURCE_LABELS).filter(([key]) => key !== 'site').map(([key, label]) => <option key={key} value={key}>{label}</option>)}
+                    </select>
+                  </div>
+                  <div className="form-field"><label>Nom du client *</label><input value={manualSellForm.nom_client} onChange={event => setManualSellForm(form => ({ ...form, nom_client: event.target.value }))} placeholder="Nom et prénom" /></div>
+                  <div className="form-field"><label>Téléphone *</label><input type="tel" value={manualSellForm.telephone} onChange={event => setManualSellForm(form => ({ ...form, telephone: event.target.value }))} placeholder="05 50 12 34 56" /></div>
+                  <div className="form-field"><label>Marque du véhicule du client *</label><input value={manualSellForm.marque} onChange={event => setManualSellForm(form => ({ ...form, marque: event.target.value }))} placeholder="Ex. Volkswagen" /></div>
+                  <div className="form-field"><label>Modèle *</label><input value={manualSellForm.modele} onChange={event => setManualSellForm(form => ({ ...form, modele: event.target.value }))} placeholder="Ex. Golf 7" /></div>
+                  <div className="form-field"><label>Année</label><input type="number" min="1950" max={new Date().getFullYear() + 1} value={manualSellForm.annee} onChange={event => setManualSellForm(form => ({ ...form, annee: event.target.value }))} placeholder="2019" /></div>
+                  <div className="form-field"><label>Kilométrage</label><input type="number" min="0" value={manualSellForm.km} onChange={event => setManualSellForm(form => ({ ...form, km: event.target.value }))} placeholder="85000" /></div>
+                  <div className="form-field"><label>Valeur annoncée par le client (DA)</label><input type="number" min="1" value={manualSellForm.prix} onChange={event => setManualSellForm(form => ({ ...form, prix: event.target.value }))} placeholder="Facultatif, à négocier" /></div>
+                  {manualSellForm.type === 'exchange' && (
+                    <div className="form-field trade-admin-field-wide">
+                      <label>Véhicule de votre stock souhaité par le client *</label>
+                      <select value={manualSellForm.targetVehicleId} onChange={event => setManualSellForm(form => ({ ...form, targetVehicleId: event.target.value }))}>
+                        <option value="">Choisir un véhicule disponible…</option>
+                        {vehicles.filter(vehicle => vehicle.is_active !== false && vehicle.statut === 'disponible').map(vehicle => <option key={vehicle.id} value={vehicle.id}>{vehicle.marque} {vehicle.modele} · {fmt(vehicle.prix)}</option>)}
+                      </select>
+                    </div>
+                  )}
+                  <div className="form-field trade-admin-field-wide"><label>Note / état du véhicule / détails de la discussion</label><textarea rows={3} value={manualSellForm.note} onChange={event => setManualSellForm(form => ({ ...form, note: event.target.value }))} placeholder="État général, entretien, réparations, disponibilité du client…" /></div>
+                </div>
+                <div className="trade-admin-form-footer">
+                  <span>La valeur de reprise reste indicative. L’inspection et l’accord final se font séparément.</span>
+                  <button className="btn-save" type="button" onClick={addManualSellRequest} disabled={manualSellSaving}>{manualSellSaving ? '⏳ Enregistrement…' : '💾 Enregistrer la proposition'}</button>
+                </div>
+              </section>
+            )}
             {sellRequests.length === 0 ? (
               <div className="empty"><div style={{ fontSize: 40 }}>🔄</div><p>Aucune demande pour le moment.</p></div>
             ) : sellRequests.map(r => {
@@ -1274,6 +1431,8 @@ export default function AdminPanel({ onLogout, onToast }) {
                     {r.km && <span>🛣️ {Number(r.km).toLocaleString('fr-FR')} km</span>}
                     {r.prix_souhaite && <span>💰 Valeur estimée par le client : {fmt(r.prix_souhaite)}</span>}
                     {isExchange && details.targetVehicle && <span>🚗 Véhicule souhaité : {details.targetVehicle.label} — {fmt(details.targetVehicle.price)}</span>}
+                    {details.source && <span>📍 Origine : {details.sourceLabel || SELL_SOURCE_LABELS[details.source] || 'Autre'}</span>}
+                    {details.createdFromAdmin && <span>🧾 Enregistrée directement par le showroom</span>}
                     {trade && <span>🏷️ Offre de reprise simulée : {fmt(trade.offer)} (marge {trade.marginPercent} %)</span>}
                     {trade && trade.balance > 0 && <span>↗️ Complément estimé à payer par le client : {fmt(trade.balance)}</span>}
                     {trade && trade.balance < 0 && <span>↙️ Complément estimé à verser par {shopName} : {fmt(Math.abs(trade.balance))}</span>}
