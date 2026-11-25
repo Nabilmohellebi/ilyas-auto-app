@@ -490,15 +490,18 @@ button.adm-kpi-card { cursor: pointer; }
 .adm-chart-legend span { display: inline-flex; align-items: center; gap: 7px; color: rgba(222,231,220,.57); font-size: 8.5px; font-weight: 650; }
 .adm-chart-legend i { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #82c39a; }
 .adm-chart-legend i.trade { background: #d7b777; }
+.adm-chart-legend i.search { background: #8dbbcb; }
 .adm-chart-wrap { width: 100%; padding-top: 6px; }
 .adm-activity-chart { display: block; width: 100%; height: 163px; overflow: visible; }
 .adm-chart-gridline { stroke: rgba(222,232,221,.09); stroke-width: 1; stroke-dasharray: 4 6; }
 .adm-chart-line { fill: none; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
 .adm-chart-line.reservation { stroke: #82c39a; }
 .adm-chart-line.trade { stroke: #d7b777; stroke-width: 2.5; stroke-dasharray: 5 5; }
+.adm-chart-line.search { stroke: #8dbbcb; stroke-width: 2.5; stroke-dasharray: 2 5; }
 .adm-chart-point { stroke: #17201a; stroke-width: 2; }
 .adm-chart-point.reservation { fill: #9bd5ad; }
 .adm-chart-point.trade { fill: #e7c982; }
+.adm-chart-point.search { fill: #a8d1df; }
 .adm-chart-months { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 4px; margin: -1px 4px 0; color: rgba(222,231,220,.4); font-size: 8px; font-weight: 700; text-align: center; text-transform: capitalize; }
 .adm-chart-summary {
   display: flex;
