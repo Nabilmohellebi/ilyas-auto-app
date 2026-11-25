@@ -843,3 +843,58 @@ button.adm-kpi-card { cursor: pointer; }
   .trade-admin-form-footer { align-items: stretch; }
   .trade-admin-form-footer .btn-save { width: 100%; }
 }
+
+
+/* Fiche d’inspection et finalisation des reprises */
+.trade-inspection-overlay { position: fixed; inset: 0; z-index: 500; display: flex; align-items: center; justify-content: center; padding: 16px; background: rgba(4,8,6,.82); backdrop-filter: blur(10px); }
+.trade-inspection-dialog { display: flex; flex-direction: column; width: min(100%,980px); max-height: min(94vh,980px); overflow: hidden; border: 1px solid rgba(215,177,95,.25); border-radius: 19px; color: #f3f5ef; background: linear-gradient(145deg,#1b241e,#111713); box-shadow: 0 28px 90px rgba(0,0,0,.5); }
+.trade-inspection-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; padding: 20px 22px; border-bottom: 1px solid rgba(255,255,255,.08); }
+.trade-inspection-header h2 { margin: 5px 0; color: #f4e4be; font-size: 20px; font-weight: 850; letter-spacing: -.03em; }
+.trade-inspection-header p { margin: 0; color: rgba(226,235,225,.55); font-size: 11px; line-height: 1.6; }
+.trade-inspection-header .adm-eyebrow { color: #d8b979; }
+.trade-inspection-close { display: grid; place-items: center; width: 35px; height: 35px; flex: 0 0 35px; border: 1px solid rgba(255,255,255,.1); border-radius: 10px; color: rgba(240,245,238,.75); background: rgba(255,255,255,.045); font-size: 17px; cursor: pointer; }
+.trade-inspection-body { overflow-y: auto; padding: 20px 22px 24px; }
+.trade-inspection-client { display: flex; flex-wrap: wrap; gap: 8px 18px; margin-bottom: 17px; padding: 12px 14px; border: 1px solid rgba(255,255,255,.08); border-radius: 12px; color: rgba(234,240,232,.72); background: rgba(255,255,255,.035); font-size: 11px; }
+.trade-inspection-client strong { color: #f4f5ef; }
+.trade-inspection-section { margin-top: 14px; padding: 17px; border: 1px solid rgba(255,255,255,.075); border-radius: 14px; background: rgba(255,255,255,.025); }
+.trade-inspection-section h3 { margin: 0 0 5px; color: #e7c982; font-size: 14px; font-weight: 850; }
+.trade-inspection-section > p { margin: 0 0 14px; color: rgba(223,232,220,.47); font-size: 10px; line-height: 1.6; }
+.trade-inspection-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; }
+.trade-inspection-grid .form-field { min-width: 0; }
+.trade-inspection-grid .form-field label { display: block; margin-bottom: 6px; color: rgba(228,236,226,.72); font-size: 10px; font-weight: 750; }
+.trade-inspection-grid input,.trade-inspection-grid select,.trade-inspection-grid textarea { width: 100%; min-height: 40px; box-sizing: border-box; border: 1px solid rgba(255,255,255,.12); border-radius: 9px; outline: none; padding: 9px 11px; color: #f0f3ed; background: #151d18; font: inherit; font-size: 11px; }
+.trade-inspection-grid textarea { min-height: 82px; resize: vertical; }
+.trade-inspection-grid input:focus,.trade-inspection-grid select:focus,.trade-inspection-grid textarea:focus { border-color: rgba(215,177,95,.5); box-shadow: 0 0 0 3px rgba(215,177,95,.08); }
+.trade-inspection-grid select option { color: #f0f3ed; background: #151d18; }
+.trade-inspection-wide { grid-column: 1 / -1; }
+.trade-inspection-photos { display: grid; grid-template-columns: repeat(auto-fill,minmax(112px,1fr)); gap: 9px; margin-top: 12px; }
+.trade-inspection-photo { position: relative; overflow: hidden; aspect-ratio: 4/3; border: 1px solid rgba(255,255,255,.12); border-radius: 10px; background: rgba(255,255,255,.04); }
+.trade-inspection-photo img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.trade-inspection-photo button { position: absolute; top: 5px; right: 5px; display: grid; place-items: center; width: 25px; height: 25px; border: 1px solid rgba(255,255,255,.2); border-radius: 7px; color: white; background: rgba(10,14,11,.78); cursor: pointer; }
+.trade-inspection-upload { display: inline-flex; align-items: center; gap: 8px; min-height: 37px; margin-top: 10px; padding: 0 12px; border: 1px dashed rgba(215,177,95,.36); border-radius: 9px; color: #e8ca88; background: rgba(215,177,95,.06); font-size: 10px; font-weight: 800; cursor: pointer; }
+.trade-inspection-upload input { display: none; }
+.trade-inspection-hint { display: block; margin-top: 8px; color: rgba(222,232,220,.4); font-size: 9px; line-height: 1.5; }
+.trade-inspection-balance { display: flex; align-items: flex-start; gap: 10px; margin-top: 13px; padding: 11px 12px; border: 1px solid rgba(215,177,95,.2); border-radius: 10px; color: rgba(236,238,230,.66); background: rgba(215,177,95,.055); font-size: 10px; line-height: 1.55; }
+.trade-inspection-balance strong { color: #f0d28c; }
+.trade-inspection-footer { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; padding: 14px 22px; border-top: 1px solid rgba(255,255,255,.08); background: rgba(8,13,10,.72); }
+.trade-inspection-footer-note { flex: 1 1 200px; color: rgba(225,233,222,.43); font-size: 9px; line-height: 1.5; }
+.trade-inspection-footer-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 7px; }
+.trade-inspection-footer .act-btn,.trade-inspection-footer .btn-save { min-height: 38px; padding: 0 12px; font-size: 10px; }
+.trade-inspection-status { display: inline-flex; align-items: center; gap: 6px; min-height: 26px; padding: 0 9px; border: 1px solid rgba(215,177,95,.25); border-radius: 8px; color: #ebce8e; background: rgba(215,177,95,.08); font-size: 9px; font-weight: 800; }
+.adm-modern .res-badge.inspection,.adm-modern .res-badge.offre_proposee,.adm-modern .res-badge.acceptee { border-color: rgba(215,177,95,.3); color: #f0d28c; background: rgba(215,177,95,.1); }
+.adm-modern .res-badge.refusee { border-color: rgba(230,95,95,.25); color: #ffb2b7; background: rgba(230,95,95,.08); }
+.adm-modern .res-badge.finalisee { border-color: rgba(113,187,135,.25); color: #9bd9ad; background: rgba(113,187,135,.08); }
+@media (max-width:640px) {
+  .trade-inspection-overlay { align-items: flex-end; padding: 0; }
+  .trade-inspection-dialog { width: 100%; max-height: 96vh; border-radius: 17px 17px 0 0; }
+  .trade-inspection-header { padding: 16px; }
+  .trade-inspection-header h2 { font-size: 17px; }
+  .trade-inspection-body { padding: 14px; }
+  .trade-inspection-section { padding: 13px; }
+  .trade-inspection-grid { grid-template-columns: 1fr; }
+  .trade-inspection-wide { grid-column: auto; }
+  .trade-inspection-footer { padding: 12px 14px; align-items: stretch; }
+  .trade-inspection-footer-note { flex-basis: 100%; }
+  .trade-inspection-footer-actions { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .trade-inspection-footer .act-btn,.trade-inspection-footer .btn-save { width: 100%; }
+}
