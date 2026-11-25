@@ -125,7 +125,7 @@ function getEmbedUrl(url) {
   return { type: 'external', src: url }
 }
 
-export default function VehicleDetail({ vehicle: v, onClose, onReserve, shopName = 'Nabil Auto' }) {
+export default function VehicleDetail({ vehicle: v, onClose, onReserve, onExchange, shopName = 'Nabil Auto' }) {
   const { lang, t } = useLang()
   const images = Array.isArray(v.images) && v.images.length > 0 ? v.images : (v.img ? [{ url: v.img }] : [])
   const gallery = Array.isArray(v.images_gallery) ? v.images_gallery : []
@@ -236,6 +236,16 @@ export default function VehicleDetail({ vehicle: v, onClose, onReserve, shopName
             <button className="btn-hero-primary vd-reserve-desktop" disabled={disabled} onClick={() => !disabled && onReserve(v)}>
               {disabled ? t.detail.vendu : vehicleCondition === 'occasion' ? t.detail.acheterOccasion : t.detail.reserver}
             </button>
+            {!disabled && v.statut === 'disponible' && (
+              <button
+                type="button"
+                className="vd-share-btn"
+                onClick={() => onExchange?.(v)}
+                style={{ width: '100%', marginTop: 9, padding: '13px 15px', borderColor: 'rgba(34,197,94,.42)', color: '#22c55e', background: 'rgba(34,197,94,.08)', fontWeight: 800 }}
+              >
+                🔄 J’ai un véhicule à échanger contre celui-ci
+              </button>
+            )}
 
             <button className="vd-print-btn" onClick={() => printVehicleSheet(v, images, shopName)}>🖨️ Fiche PDF / Imprimer</button>
             <button className="vd-share-btn" onClick={shareVehicle}>↗️ {shareStatus || "Partager la fiche"}</button>
