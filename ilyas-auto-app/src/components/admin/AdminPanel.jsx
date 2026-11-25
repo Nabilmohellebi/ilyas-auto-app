@@ -715,7 +715,7 @@ export default function AdminPanel({ onLogout, onToast }) {
   }
 
   async function addManualSellRequest() {
-    const phoneDigits = manualSellForm.telephone.replace(/\\D/g, '')
+    const phoneDigits = manualSellForm.telephone.replace(/\D/g, '')
     const year = manualSellForm.annee === '' ? null : Number(manualSellForm.annee)
     const km = manualSellForm.km === '' ? null : Number(manualSellForm.km)
     const declaredValue = manualSellForm.prix === '' ? null : Number(manualSellForm.prix)
