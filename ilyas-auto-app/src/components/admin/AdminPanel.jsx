@@ -1423,7 +1423,6 @@ export default function AdminPanel({ onLogout, onToast }) {
         />
       )}
       </div>
-      </div>
     </div>
   )
 }
