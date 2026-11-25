@@ -9,13 +9,13 @@ function money(value) {
   return `${Math.round(Number(value) || 0).toLocaleString('fr-FR')} DA`
 }
 
-export default function SellVehicleModal({ onClose, vehicles = [], tradeMarginPercent = 5, whatsapp, shopName = 'Nabil Auto' }) {
+export default function SellVehicleModal({ onClose, vehicles = [], tradeMarginPercent = 5, whatsapp, shopName = 'Nabil Auto', initialTargetVehicle = null, requestSource = 'site' }) {
   const marginValue = Number(tradeMarginPercent)
   const margin = Number.isFinite(marginValue) ? Math.min(30, Math.max(0, marginValue)) : 5
-  const [type, setType] = useState('sell')
+  const [type, setType] = useState(initialTargetVehicle ? 'exchange' : 'sell')
   const [form, setForm] = useState({
     marque: '', modele: '', annee: '', km: '', prix: '',
-    targetVehicleId: '', nom: '', tel: '', message: '',
+    targetVehicleId: initialTargetVehicle?.id != null ? String(initialTargetVehicle.id) : '', nom: '', tel: '', message: '',
   })
   const [sending, setSending] = useState(false)
   const [sent, setSent] = useState(false)
@@ -84,8 +84,9 @@ export default function SellVehicleModal({ onClose, vehicles = [], tradeMarginPe
     setError('')
 
     const details = {
-      version: 2,
+      version: 3,
       type,
+      source: requestSource,
       note: form.message.trim(),
       targetVehicle: targetVehicle ? {
         id: targetVehicle.id,
@@ -174,6 +175,13 @@ export default function SellVehicleModal({ onClose, vehicles = [], tradeMarginPe
               <div className="trade-form-section">
                 <div className="trade-section-title">2. Le véhicule que vous souhaitez recevoir</div>
                 {availableVehicles.length > 0 ? (
+                  {initialTargetVehicle && (
+                    <div className="trade-preset-vehicle">
+                      <span>Véhicule choisi depuis le stock</span>
+                      <strong>{initialTargetVehicle.marque} {initialTargetVehicle.modele}</strong>
+                      <small>{money(initialTargetVehicle.prix)} · {initialTargetVehicle.etat_vehicule === 'occasion' || Number(initialTargetVehicle.km || 0) > 0 ? 'Occasion' : 'Neuf'}</small>
+                    </div>
+                  )}
                   <div className="form-field">
                     <label>Choisir dans le stock {shopName} *</label>
                     <select value={form.targetVehicleId} onChange={e => set('targetVehicleId', e.target.value)}>
