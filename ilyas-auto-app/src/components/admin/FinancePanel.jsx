@@ -20,6 +20,15 @@ function num(value) {
   return Number.isFinite(result) && result >= 0 ? result : 0
 }
 
+function visibleFinanceNotes(value) {
+  return String(value || '').replace(/(^|\n)ORIGINE-REPRISE-ID-[A-Za-z0-9-]+\s*/g, '').trim()
+}
+
+function preserveFinanceMarker(value, current) {
+  const marker = String(current || '').match(/(?:^|\n)(ORIGINE-REPRISE-ID-[A-Za-z0-9-]+)/)?.[1]
+  return [marker, value].filter(Boolean).join('\n')
+}
+
 function csvCell(value) {
   let text = String(value ?? '')
   if (/^[=+@-]/.test(text)) text = "'" + text
@@ -39,7 +48,7 @@ function downloadCsv(rows) {
     return [
       row.vehicle_label, row.purchase_date, row.purchase_price, row.transport_cost,
       row.preparation_cost, row.other_costs, cost, sold ?? '', row.sale_date,
-      sold === null ? '' : sold - cost, row.notes,
+      sold === null ? '' : sold - cost, visibleFinanceNotes(row.notes),
     ]
   })
   const csv = '\uFEFF' + [headers, ...body].map(line => line.map(csvCell).join(';')).join('\r\n')
@@ -265,7 +274,7 @@ export default function FinancePanel({ vehicles = [], onToast }) {
           </div>
           <div className="form-field finance-field-wide">
             <label>Notes internes</label>
-            <textarea rows={2} value={form.notes} onChange={event => setField('notes', event.target.value)} placeholder="Ex. frais de carte grise, pièces, négociation…" />
+            <textarea rows={2} value={visibleFinanceNotes(form.notes)} onChange={event => setField('notes', preserveFinanceMarker(event.target.value, form.notes))} placeholder="Ex. frais de carte grise, pièces, négociation…" />
           </div>
         </div>
         <div className="finance-live-result">
@@ -311,7 +320,7 @@ export default function FinancePanel({ vehicles = [], onToast }) {
                   <div><span>Prix de vente</span><strong>{hasSale ? fmt(row.sale_price) : '—'}</strong></div>
                   <div><span>Bénéfice</span><strong className={profit === null ? '' : profit >= 0 ? 'positive' : 'negative'}>{profit === null ? 'En attente' : fmt(profit)}</strong></div>
                 </div>
-                {row.notes && <p className="finance-record-notes">{row.notes}</p>}
+                {visibleFinanceNotes(row.notes) && <p className="finance-record-notes">{visibleFinanceNotes(row.notes)}</p>}
                 <div className="finance-record-actions"><button className="act-btn" onClick={() => editRow(row)}>✏️ Modifier</button></div>
               </article>
             )
