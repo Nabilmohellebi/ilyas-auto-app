@@ -6,12 +6,18 @@ import { STATUTS, PLACEHOLDER_IMG, flagURI } from '../../data/vehicles-data'
 import VehicleForm from './VehicleForm'
 import CRMPanel from './CRMPanel'
 import FinancePanel from './FinancePanel'
+import TradeInspectionEditor from './TradeInspectionEditor'
 import ImageCropper from './ImageCropper'
 import '../../styles/admin-dashboard.css'
 
 const RES_STATUTS = [
   { key: 'nouvelle',  label: '🆕 Nouvelle' },
   { key: 'contactee', label: '📞 Contactée' },
+  { key: 'inspection', label: '🔎 Inspection' },
+  { key: 'offre_proposee', label: '💬 Offre proposée' },
+  { key: 'acceptee', label: '🤝 Accord client' },
+  { key: 'refusee', label: '↩️ Refusée' },
+  { key: 'finalisee', label: '✅ Reprise finalisée' },
   { key: 'vendue',    label: '✅ Traitée / vendue' },
   { key: 'annulee',   label: '❌ Annulée' },
 ]
@@ -629,6 +635,7 @@ export default function AdminPanel({ onLogout, onToast }) {
   const [showManualSellForm, setShowManualSellForm] = useState(false)
   const [manualSellSaving, setManualSellSaving] = useState(false)
   const [manualSellForm, setManualSellForm] = useState(EMPTY_MANUAL_SELL_FORM)
+  const [editingSellRequest, setEditingSellRequest] = useState(null)
 
   useEffect(() => {
     let active = true
@@ -712,6 +719,187 @@ export default function AdminPanel({ onLogout, onToast }) {
   async function deleteSellRequest(id) {
     await supabase.from('sell_requests').delete().eq('id', id)
     setSellRequests(prev => prev.filter(r => r.id !== id))
+  }
+
+  async function saveSellWorkflow(request, nextDetails, statut) {
+    const message = SELL_DETAILS_PREFIX + JSON.stringify({ ...nextDetails, version: 3 })
+    const { data, error } = await supabase
+      .from('sell_requests')
+      .update({ message, statut })
+      .eq('id', request.id)
+      .select('*')
+      .single()
+    if (error) {
+      onToast('❌ Impossible d’enregistrer la fiche de reprise : ' + error.message, 'error')
+      return false
+    }
+    const updated = data || { ...request, message, statut }
+    setSellRequests(previous => previous.map(item => item.id === request.id ? updated : item))
+    onToast('✅ Fiche de reprise mise à jour')
+    return true
+  }
+
+  async function finalizeTradeIn(request, nextDetails) {
+    const previousDetails = parseSellRequestDetails(request)
+    if (previousDetails.finalization?.vehicleId) {
+      onToast('Cette reprise a déjà été ajoutée au stock.', 'error')
+      return false
+    }
+
+    const draft = nextDetails.finalizationDraft || {}
+    const year = Number(draft.year || request.annee)
+    const km = draft.km === '' || draft.km == null ? Number(request.km || 0) : Number(draft.km)
+    const purchasePrice = Number(nextDetails.finalOffer?.amount)
+    const stockSalePrice = Number(draft.stockSalePrice)
+    const costs = {
+      transport_cost: Number(draft.transportCost || 0),
+      preparation_cost: Number(draft.preparationCost || 0),
+      other_costs: Number(draft.otherCosts || 0),
+    }
+    const maxYear = new Date().getFullYear() + 1
+
+    if (!Number.isInteger(year) || year < 1950 || year > maxYear) {
+      onToast(`❌ Indique une année valide entre 1950 et ${maxYear}.`, 'error')
+      return false
+    }
+    if (!Number.isFinite(km) || km < 0) {
+      onToast('❌ Le kilométrage doit être positif ou nul.', 'error')
+      return false
+    }
+    if (!Number.isFinite(purchasePrice) || purchasePrice <= 0) {
+      onToast('❌ Renseigne le prix définitif de reprise.', 'error')
+      return false
+    }
+    if (!Number.isFinite(stockSalePrice) || stockSalePrice <= 0) {
+      onToast('❌ Renseigne le prix auquel tu souhaites proposer cette voiture.', 'error')
+      return false
+    }
+    if (Object.values(costs).some(value => !Number.isFinite(value) || value < 0)) {
+      onToast('❌ Vérifie les frais de transport et de préparation.', 'error')
+      return false
+    }
+    if (nextDetails.finalOffer?.decision !== 'accepted') {
+      onToast('❌ Le client doit d’abord confirmer son accord sur l’offre.', 'error')
+      return false
+    }
+
+    const safeId = String(request.id).replace(/[^a-zA-Z0-9-]/g, '').slice(0, 80)
+    const sourceMarker = 'ORIGINE-REPRISE-ID-' + (safeId || 'demande')
+    const vehicleLabel = `${request.marque} ${request.modele} (${year})`
+    const today = new Date()
+    const purchaseDate = new Date(today.getTime() - today.getTimezoneOffset() * 60000).toISOString().slice(0, 10)
+
+    try {
+      // Récupère une éventuelle création précédente si la mise à jour de la demande avait échoué.
+      const { data: existingFinance, error: lookupError } = await supabase
+        .from('vehicle_finances')
+        .select('vehicle_id')
+        .ilike('notes', `%${sourceMarker}%`)
+        .maybeSingle()
+      if (lookupError) throw lookupError
+
+      let vehicle = null
+      if (existingFinance?.vehicle_id) {
+        const { data, error } = await supabase
+          .from('vehicles')
+          .select('*')
+          .eq('id', existingFinance.vehicle_id)
+          .maybeSingle()
+        if (error) throw error
+        if (!data) throw new Error('La fiche financière existe, mais le véhicule associé est introuvable. Contacte le support avant de recommencer.')
+        vehicle = data
+      } else {
+        const vehiclePayload = {
+          marque: String(request.marque || '').trim(),
+          modele: String(request.modele || '').trim(),
+          annee: year,
+          prix: stockSalePrice,
+          km,
+          etat_vehicule: 'occasion',
+          transmission: draft.transmission || 'Automatique',
+          carburant: draft.carburant || 'Diesel',
+          carrosserie: draft.carrosserie || 'Berline',
+          provenance: 'monde',
+          statut: 'disponible',
+          description: '',
+          specs: [],
+          technical_specs: [],
+          images: [],
+          images_gallery: [],
+          img: null,
+          video_url: null,
+          display_order: vehicles.length + 1,
+          financing_enabled: false,
+          is_active: false,
+        }
+        const { data: createdVehicle, error: vehicleError } = await supabase
+          .from('vehicles')
+          .insert(vehiclePayload)
+          .select('*')
+          .single()
+        if (vehicleError) throw vehicleError
+        vehicle = createdVehicle
+
+        const inspectionNote = nextDetails.inspection?.notes?.trim()
+        const financeRecord = {
+          vehicle_id: vehicle.id,
+          vehicle_label: vehicleLabel,
+          purchase_price: purchasePrice,
+          ...costs,
+          sale_price: null,
+          purchase_date: purchaseDate,
+          sale_date: null,
+          notes: [
+            sourceMarker,
+            `Reprise client — ${request.nom_client || 'Client'} · ${request.telephone || ''}`,
+            inspectionNote ? 'Inspection : ' + inspectionNote : '',
+          ].filter(Boolean).join('\n'),
+        }
+        const { error: financeError } = await supabase.from('vehicle_finances').insert(financeRecord)
+        if (financeError) {
+          const { error: rollbackError } = await supabase.from('vehicles').delete().eq('id', vehicle.id)
+          if (rollbackError) {
+            throw new Error('La fiche financière n’a pas été créée (' + financeError.message + ') et le véhicule brouillon n’a pas pu être supprimé (' + rollbackError.message + '). Vérifie le stock avant de réessayer.')
+          }
+          throw financeError
+        }
+      }
+
+      const completedDetails = {
+        ...nextDetails,
+        version: 3,
+        finalOffer: { ...nextDetails.finalOffer, decision: 'accepted' },
+        finalization: {
+          vehicleId: vehicle.id,
+          vehicleLabel,
+          finalizedAt: new Date().toISOString(),
+          published: false,
+          sourceMarker,
+        },
+      }
+      const message = SELL_DETAILS_PREFIX + JSON.stringify(completedDetails)
+      const { data: updatedRequest, error: requestError } = await supabase
+        .from('sell_requests')
+        .update({ message, statut: 'finalisee' })
+        .eq('id', request.id)
+        .select('*')
+        .single()
+      if (requestError) {
+        await loadVehicles()
+        onToast('⚠️ Le véhicule et sa fiche financière sont créés, mais la demande n’a pas pu être mise à jour. Rouvre la fiche et relance la finalisation : aucun doublon ne sera créé.', 'error')
+        return false
+      }
+
+      setSellRequests(previous => previous.map(item => item.id === request.id ? updatedRequest : item))
+      await loadVehicles()
+      setEditingSellRequest(null)
+      setTab('vehicules-occasion')
+      onToast('✅ Reprise finalisée : véhicule ajouté au stock en brouillon, fiche financière créée. Ajoute ses photos et publie-le quand il sera prêt.')
+      return true
+    } catch (error) {
+      onToast('❌ Impossible de finaliser la reprise : ' + (error?.message || 'erreur inconnue'), 'error')
+      return false
+    }
   }
 
   async function addManualSellRequest() {
@@ -1438,13 +1626,17 @@ export default function AdminPanel({ onLogout, onToast }) {
                     {trade && trade.balance < 0 && <span>↙️ Complément estimé à verser par {shopName} : {fmt(Math.abs(trade.balance))}</span>}
                     {trade && trade.balance === 0 && <span>⚖️ Valeurs équivalentes selon la simulation</span>}
                     {details.note && <span>📝 Message : {details.note}</span>}
+                    {details.inspection?.inspectedAt && <span>🔎 Inspection enregistrée le {new Date(details.inspection.inspectedAt).toLocaleDateString('fr-FR')}</span>}
+                    {Number(details.finalOffer?.amount) > 0 && <span>🤝 Offre définitive : {fmt(details.finalOffer.amount)}</span>}
+                    {details.finalization?.vehicleId && <span>📦 Véhicule ajouté au stock · Réf. #{details.finalization.vehicleId} (brouillon)</span>}
                     {!details.version && r.message && <span>📝 {r.message}</span>}
                   </div>
                   <div className="rescard-actions">
-                    <button className="act-btn wa" onClick={() => openWA({ nom_client: r.nom_client, telephone: r.telephone, vehicule_nom: contactVehicleName, vehicule_prix: trade?.offer || r.prix_souhaite || 0 }, shopName)}>💬 Contacter WhatsApp</button>
-                    {r.statut !== 'contactee' && <button className="act-btn" onClick={() => setSellStatus(r.id, 'contactee')}>📞 Marquer contactée</button>}
-                    {r.statut !== 'vendue' && <button className="act-btn" onClick={() => setSellStatus(r.id, 'vendue')}>✅ Marquer traitée</button>}
-                    {r.statut !== 'annulee' && <button className="act-btn" onClick={() => setSellStatus(r.id, 'annulee')}>❌ Annuler</button>}
+                    <button className="act-btn primary" onClick={() => setEditingSellRequest(r)}>🔎 Inspection & offre</button>
+                    <button className="act-btn wa" onClick={() => openWA({ nom_client: r.nom_client, telephone: r.telephone, vehicule_nom: contactVehicleName, vehicule_prix: details.finalOffer?.amount || trade?.offer || r.prix_souhaite || 0 }, shopName)}>💬 Contacter WhatsApp</button>
+                    {['nouvelle', 'annulee'].includes(r.statut) && <button className="act-btn" onClick={() => setSellStatus(r.id, 'contactee')}>📞 Marquer contactée</button>}
+                    {['nouvelle', 'contactee', 'annulee'].includes(r.statut) && <button className="act-btn" onClick={() => setSellStatus(r.id, 'vendue')}>✅ Marquer traitée</button>}
+                    {!['annulee', 'vendue', 'finalisee'].includes(r.statut) && <button className="act-btn" onClick={() => setSellStatus(r.id, 'annulee')}>❌ Annuler</button>}
                     <button className="act-btn danger" onClick={() => deleteSellRequest(r.id)}>🗑️ Supprimer</button>
                   </div>
                 </div>
@@ -1566,6 +1758,16 @@ export default function AdminPanel({ onLogout, onToast }) {
 
       {editVeh !== null && (
         <VehicleForm vehicle={editVeh || null} onClose={() => setEditVeh(null)} onSave={saveVehicle} />
+      )}
+      {editingSellRequest && (
+        <TradeInspectionEditor
+          request={editingSellRequest}
+          details={parseSellRequestDetails(editingSellRequest)}
+          onClose={() => setEditingSellRequest(null)}
+          onSave={(nextDetails, statut) => saveSellWorkflow(editingSellRequest, nextDetails, statut)}
+          onFinalize={nextDetails => finalizeTradeIn(editingSellRequest, nextDetails)}
+          onToast={onToast}
+        />
       )}
       {testiCropFile && (
         <ImageCropper
