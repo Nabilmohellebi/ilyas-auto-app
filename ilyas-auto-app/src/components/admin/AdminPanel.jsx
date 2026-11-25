@@ -894,6 +894,8 @@ export default function AdminPanel({ onLogout, onToast }) {
   const reservationPath = monthlyActivity.map((item, index) => chartX(index) + ' ' + chartY(item.reservations)).join(' L ')
   const reprisePath = monthlyActivity.map((item, index) => chartX(index) + ' ' + chartY(item.reprises)).join(' L ')
   const reservationArea = 'M 42 150 L ' + reservationPath + ' L 682 150 Z'
+  const lastSixReservations = monthlyActivity.reduce((sum, item) => sum + item.reservations, 0)
+  const lastSixReprises = monthlyActivity.reduce((sum, item) => sum + item.reprises, 0)
   const activeNav = ADMIN_NAV_GROUPS
     .flatMap(group => group.items.map(item => ({ ...item, group: group.label })))
     .find(item => item.key === tab) || { label: 'Administration', group: 'ESPACE' }
@@ -1008,16 +1010,16 @@ export default function AdminPanel({ onLogout, onToast }) {
             </div>
 
             <div className="adm-kpis">
-              <button type="button" className="adm-kpi-card" onClick={() => setTab('vehicules-neufs')}>
+              <div className="adm-kpi-card">
                 <span className="adm-kpi-top"><span>PARC AUTOMOBILE</span><i>▣</i></span>
                 <strong>{stats.total}</strong>
-                <span className="adm-kpi-foot"><span>Véhicules référencés</span><b>Voir le stock ↗</b></span>
-              </button>
-              <button type="button" className="adm-kpi-card" onClick={() => { setTab('vehicules-neufs'); setFilterStatut('disponible') }}>
+                <span className="adm-kpi-foot"><span>Véhicules référencés</span><b>Neuf & occasion</b></span>
+              </div>
+              <div className="adm-kpi-card">
                 <span className="adm-kpi-top"><span>DISPONIBILITÉ</span><i className="green">✓</i></span>
                 <strong>{stats.disponibles}</strong>
-                <span className="adm-kpi-foot"><span>Prêts à la vente</span><b>Consulter ↗</b></span>
-              </button>
+                <span className="adm-kpi-foot"><span>Statut disponible</span><b>Sur tout le parc</b></span>
+              </div>
               <div className="adm-kpi-card">
                 <span className="adm-kpi-top"><span>VALEUR DU STOCK</span><i className="gold">◈</i></span>
                 <strong className="adm-kpi-money">{fmt(stats.valeurStock)}</strong>
@@ -1072,8 +1074,8 @@ export default function AdminPanel({ onLogout, onToast }) {
                   </div>
                 </div>
                 <div className="adm-chart-summary">
-                  <span><strong>{reservations.length}</strong> réservations enregistrées</span>
-                  <span><strong>{sellRequests.length}</strong> propositions de reprise enregistrées</span>
+                  <span><strong>{lastSixReservations}</strong> réservations sur la période</span>
+                  <span><strong>{lastSixReprises}</strong> propositions de reprise sur la période</span>
                 </div>
               </section>
 
