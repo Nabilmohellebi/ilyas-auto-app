@@ -901,3 +901,64 @@ button.adm-kpi-card { cursor: pointer; }
   .trade-inspection-footer-actions { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); }
   .trade-inspection-footer .act-btn,.trade-inspection-footer .btn-save { width: 100%; }
 }
+
+
+/* Relances clients — rappels programmés dans l’administration */
+.followups-root { display: flex; flex-direction: column; gap: 16px; }
+.followups-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; flex-wrap: wrap; margin-bottom: 2px; }
+.followups-head h2 { margin: 7px 0 6px; color: #f4f6f1; font-size: clamp(19px,2vw,25px); font-weight: 900; letter-spacing: -.035em; }
+.followups-head p { max-width: 700px; margin: 0; color: rgba(225,233,223,.52); font-size: 11px; line-height: 1.65; }
+.followups-head-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.followups-stats { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 10px; }
+.followups-stat { display: flex; flex-direction: column; gap: 8px; min-width: 0; padding: 15px; border: 1px solid rgba(255,255,255,.075); border-radius: 13px; background: linear-gradient(145deg,rgba(31,42,34,.94),rgba(22,29,24,.98)); }
+.followups-stat span { color: rgba(225,233,223,.52); font-size: 9px; font-weight: 750; }
+.followups-stat strong { color: #f1f3ed; font-size: 25px; font-weight: 900; font-variant-numeric: tabular-nums; }
+.followups-stat.urgent strong { color: #ffaaa9; }
+.followups-stat.today strong { color: #f0d28c; }
+.followups-form { padding: 18px; border: 1px solid rgba(215,177,95,.24); border-radius: 15px; background: linear-gradient(145deg,rgba(215,177,95,.07),rgba(255,255,255,.025)); }
+.followups-form-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; margin-bottom: 16px; }
+.followups-form-head h3 { margin: 0 0 5px; color: #f0d28c; font-size: 15px; font-weight: 850; }
+.followups-form-head p { margin: 0; color: rgba(225,233,223,.47); font-size: 10px; line-height: 1.55; }
+.followups-form-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; }
+.followups-field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.followups-field > span { color: rgba(228,236,226,.7); font-size: 10px; font-weight: 750; }
+.followups-field input,.followups-field select,.followups-field textarea { width: 100%; min-height: 40px; box-sizing: border-box; border: 1px solid rgba(255,255,255,.12); border-radius: 9px; outline: none; padding: 9px 11px; color: #f0f3ed; background: #151d18; font: inherit; font-size: 11px; }
+.followups-field textarea { resize: vertical; }
+.followups-field input:focus,.followups-field select:focus,.followups-field textarea:focus { border-color: rgba(215,177,95,.5); box-shadow: 0 0 0 3px rgba(215,177,95,.08); }
+.followups-field select option { color: #f0f3ed; background: #151d18; }
+.followups-field-wide { grid-column: 1 / -1; }
+.followups-form-footer { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-top: 15px; padding-top: 13px; border-top: 1px solid rgba(255,255,255,.08); }
+.followups-form-footer > span { color: rgba(225,233,223,.43); font-size: 9px; line-height: 1.5; }
+.followups-toolbar { display: flex; flex-direction: column; gap: 10px; }
+.followups-toolbar .adm-search { width: min(100%,520px); }
+.followups-filters { display: flex; flex-wrap: wrap; gap: 7px; }
+.followups-error { padding: 12px; border: 1px solid rgba(230,95,95,.3); border-radius: 10px; color: #ffb9b9; background: rgba(230,95,95,.08); font-size: 11px; }
+.followups-list { display: grid; gap: 10px; }
+.followup-card { display: grid; grid-template-columns: minmax(0,1fr); gap: 12px; padding: 15px; border: 1px solid rgba(255,255,255,.075); border-radius: 14px; background: linear-gradient(145deg,rgba(28,37,31,.98),rgba(19,26,22,.98)); }
+.followup-card.overdue { border-color: rgba(230,95,95,.3); }
+.followup-card.today { border-color: rgba(215,177,95,.3); }
+.followup-card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; }
+.followup-source { display: inline-block; margin-bottom: 5px; color: rgba(220,230,218,.42); font-size: 8px; font-weight: 850; letter-spacing: .1em; text-transform: uppercase; }
+.followup-card-top h3 { margin: 0 0 5px; color: #f1f3ed; font-size: 13px; font-weight: 850; }
+.followup-card-top small { color: rgba(222,231,220,.5); font-size: 9px; text-transform: capitalize; }
+.followup-status { flex: 0 0 auto; padding: 6px 9px; border: 1px solid rgba(255,255,255,.1); border-radius: 20px; color: rgba(234,239,231,.72); background: rgba(255,255,255,.035); font-size: 8px; font-weight: 850; }
+.followup-status.overdue { border-color: rgba(230,95,95,.27); color: #ffaaa9; background: rgba(230,95,95,.08); }
+.followup-status.today { border-color: rgba(215,177,95,.28); color: #f0d28c; background: rgba(215,177,95,.08); }
+.followup-status.completed { border-color: rgba(113,187,135,.25); color: #9bd9ad; background: rgba(113,187,135,.07); }
+.followup-status.cancelled { opacity: .6; }
+.followup-card-info { display: flex; flex-wrap: wrap; gap: 7px 18px; margin-top: 10px; color: rgba(232,238,230,.67); font-size: 10px; }
+.followup-card-info p { flex-basis: 100%; margin: 0; color: rgba(222,231,220,.48); line-height: 1.6; white-space: pre-wrap; }
+.followup-actions { display: flex; flex-wrap: wrap; gap: 7px; padding-top: 11px; border-top: 1px solid rgba(255,255,255,.065); }
+.followups-empty { display: flex; flex-direction: column; align-items: center; gap: 7px; padding: 28px 16px; border: 1px dashed rgba(255,255,255,.1); border-radius: 13px; color: rgba(225,233,223,.6); background: rgba(255,255,255,.02); text-align: center; }
+.followups-empty > span { color: #d7b777; font-size: 28px; }
+.followups-empty strong { color: #edf1eb; font-size: 12px; }
+.followups-empty p { max-width: 440px; margin: 0 0 5px; color: rgba(225,233,223,.42); font-size: 10px; line-height: 1.6; }
+.followups-footnote { margin: 0; color: rgba(225,233,223,.36); font-size: 9px; line-height: 1.55; }
+@media (max-width: 720px) {
+  .followups-stats { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .followups-form-grid { grid-template-columns: 1fr; }
+  .followups-field-wide { grid-column: auto; }
+  .followups-form-footer { align-items: stretch; }
+  .followups-form-footer .btn-save { width: 100%; }
+  .followup-card-top { flex-direction: column; }
+}
