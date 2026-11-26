@@ -56,6 +56,7 @@ export default function CRMPanel({
   sellRequests = [],
   onSetReservationStatus,
   onSetSellRequestStatus,
+  onScheduleFollowUp,
 }) {
   const [search, setSearch] = useState('')
   const [filter, setFilter] = useState('all')
@@ -191,6 +192,7 @@ export default function CRMPanel({
                     vehicule_nom: client.interactions[0]?.vehicle || 'Votre demande',
                     vehicule_prix: client.interactions[0]?.price || 0,
                   })}>WhatsApp</button>
+                  <button className="act-btn" disabled={!client.phone} onClick={() => onScheduleFollowUp?.({ nom_client: client.name, telephone: client.phone, objet: 'Faire le point avec ' + client.name, source: 'crm', source_reference: String(client.id) })}>⏰ Relancer</button>
                   <button className="act-btn" onClick={() => setExpanded(value => value === client.id ? null : client.id)}>
                     {expanded === client.id ? 'Masquer' : 'Historique'}
                   </button>
