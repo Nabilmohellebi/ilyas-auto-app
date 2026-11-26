@@ -8,6 +8,7 @@ import CRMPanel from './CRMPanel'
 import FinancePanel from './FinancePanel'
 import TradeInspectionEditor from './TradeInspectionEditor'
 import VehicleSearchRequestsPanel from './VehicleSearchRequestsPanel'
+import CustomerFollowUpsPanel from './CustomerFollowUpsPanel'
 import ImageCropper from './ImageCropper'
 import '../../styles/admin-dashboard.css'
 
@@ -36,6 +37,7 @@ const ADMIN_NAV_GROUPS = [
     { key: 'crm', label: 'CRM clients', glyph: '◎' },
     { key: 'reprises', label: 'Ventes & échanges', glyph: '⇄' },
     { key: 'recherches', label: 'Recherches clients', glyph: '⌕' },
+    { key: 'relances', label: 'Relances clients', glyph: '◷' },
   ] },
   { label: 'PILOTAGE', items: [
     { key: 'finances', label: 'Finances', glyph: '◒' },
@@ -658,6 +660,8 @@ export default function AdminPanel({ onLogout, onToast }) {
   const [testimonials, setTestimonials] = useState([])
   const [sellRequests, setSellRequests] = useState([])
   const [vehicleSearchRequests, setVehicleSearchRequests] = useState([])
+  const [followUpSummary, setFollowUpSummary] = useState([])
+  const [followUpPrefill, setFollowUpPrefill] = useState(null)
   const [newTesti, setNewTesti] = useState({ nom: '', role: '', texte: '', note: 5, photo_url: '' })
   const [testiUploading, setTestiUploading] = useState(false)
   const [testiCropFile, setTestiCropFile] = useState(null)
@@ -679,7 +683,7 @@ export default function AdminPanel({ onLogout, onToast }) {
     setReservations(data || [])
   }, [])
 
-  useEffect(() => { loadVehicles(); loadReservations(); loadBanner(); loadTestimonials(); loadSellRequests(); loadVehicleSearchRequests() }, [])
+  useEffect(() => { loadVehicles(); loadReservations(); loadBanner(); loadTestimonials(); loadSellRequests(); loadVehicleSearchRequests(); loadFollowUpSummary() }, [])
 
   async function loadTestimonials() {
     const { data } = await supabase.from('testimonials').select('*').order('position', { ascending: true })
@@ -728,6 +732,26 @@ export default function AdminPanel({ onLogout, onToast }) {
     }
     setVehicleSearchRequests(data || [])
   }
+
+  async function loadFollowUpSummary() {
+    const { data, error } = await supabase
+      .from('customer_follow_ups')
+      .select('id, due_at, statut')
+      .order('due_at', { ascending: true })
+    if (error) {
+      console.warn('Impossible de charger les relances clients pour le tableau de bord :', error)
+      setFollowUpSummary([])
+      return
+    }
+    setFollowUpSummary(data || [])
+  }
+
+  function openFollowUp(prefill) {
+    setFollowUpPrefill({ ...prefill })
+    setTab('relances')
+    setMobileNavOpen(false)
+  }
+
   async function setSellStatus(id, statut) {
     await supabase.from('sell_requests').update({ statut }).eq('id', id)
     setSellRequests(prev => prev.map(r => r.id === id ? { ...r, statut } : r))
@@ -1103,7 +1127,7 @@ export default function AdminPanel({ onLogout, onToast }) {
   async function refreshAll() {
     setRefreshing(true)
     try {
-      await Promise.all([loadVehicles(), loadReservations(), loadBanner(), loadTestimonials(), loadSellRequests(), loadVehicleSearchRequests()])
+      await Promise.all([loadVehicles(), loadReservations(), loadBanner(), loadTestimonials(), loadSellRequests(), loadVehicleSearchRequests(), loadFollowUpSummary()])
       onToast('✅ Données actualisées')
     } catch (error) {
       onToast('❌ Actualisation impossible : ' + error.message, 'error')
@@ -1168,6 +1192,10 @@ export default function AdminPanel({ onLogout, onToast }) {
     return [r.nom_client, r.telephone, r.vehicule_nom, r.message, r.id].join(' ').toLowerCase().includes(q)
   })
 
+  const followUpNow = new Date()
+  const followUpDayEnd = new Date(followUpNow)
+  followUpDayEnd.setHours(23, 59, 59, 999)
+  const activeFollowUps = followUpSummary.filter(item => item.statut === 'a_faire')
   const stats = {
     total: vehicles.length,
     disponibles: vehicles.filter(v => v.statut === 'disponible').length,
@@ -1175,6 +1203,9 @@ export default function AdminPanel({ onLogout, onToast }) {
     resNouvelles: reservations.filter(r => r.statut === 'nouvelle').length,
     reprisesNouvelles: sellRequests.filter(r => r.statut === 'nouvelle').length,
     recherchesNouvelles: vehicleSearchRequests.filter(r => r.statut === 'nouvelle').length,
+    relancesEnRetard: activeFollowUps.filter(item => new Date(item.due_at) < followUpNow).length,
+    relancesAujourdhui: activeFollowUps.filter(item => new Date(item.due_at) >= followUpNow && new Date(item.due_at) <= followUpDayEnd).length,
+    relancesUrgentes: activeFollowUps.filter(item => new Date(item.due_at) <= followUpDayEnd).length,
   }
   const stockBreakdown = STATUTS.map(status => {
     const count = vehicles.filter(v => v.statut === status.key).length
@@ -1253,6 +1284,9 @@ export default function AdminPanel({ onLogout, onToast }) {
                   )}
                   {item.key === 'recherches' && stats.recherchesNouvelles > 0 && (
                     <span className="adm-nav-count">{stats.recherchesNouvelles}</span>
+                  )}
+                  {item.key === 'relances' && stats.relancesUrgentes > 0 && (
+                    <span className="adm-nav-count">{stats.relancesUrgentes}</span>
                   )}
                 </button>
               ))}
@@ -1422,12 +1456,17 @@ export default function AdminPanel({ onLogout, onToast }) {
                   <span><strong>Recherches de véhicules</strong><small>Clients en attente d’une voiture correspondant à leurs critères</small></span>
                   <span className="adm-queue-arrow">›</span>
                 </button>
-                {(stats.resNouvelles + stats.reprisesNouvelles + stats.recherchesNouvelles) === 0 && (
-                  <div className="adm-all-clear"><span>✓</span><strong>Tout est à jour</strong><small>Aucune nouvelle demande en attente.</small></div>
+                <button className="adm-queue-row" onClick={() => setTab('relances')}>
+                  <span className="adm-queue-count">{stats.relancesUrgentes}</span>
+                  <span><strong>Relances clients</strong><small>{stats.relancesEnRetard} en retard · {stats.relancesAujourdhui} prévue(s) aujourd’hui</small></span>
+                  <span className="adm-queue-arrow">›</span>
+                </button>
+                {(stats.resNouvelles + stats.reprisesNouvelles + stats.recherchesNouvelles + stats.relancesUrgentes) === 0 && (
+                  <div className="adm-all-clear"><span>✓</span><strong>Tout est à jour</strong><small>Aucune nouvelle demande ni relance urgente.</small></div>
                 )}
                 <div className="adm-pending-footer">
                   <span>Demandes nécessitant une action</span>
-                  <strong>{stats.resNouvelles + stats.reprisesNouvelles + stats.recherchesNouvelles}</strong>
+                  <strong>{stats.resNouvelles + stats.reprisesNouvelles + stats.recherchesNouvelles + stats.relancesUrgentes}</strong>
                 </div>
               </section>
             </div>
@@ -1565,6 +1604,7 @@ export default function AdminPanel({ onLogout, onToast }) {
                 </div>
                 <div className="rescard-actions">
                   <button className="act-btn wa" onClick={() => openWA(r, shopName)}>💬 Contacter WhatsApp</button>
+                  <button className="act-btn" onClick={() => openFollowUp({ nom_client: r.nom_client, telephone: r.telephone, objet: 'Faire le point sur la réservation : ' + (r.vehicule_nom || 'véhicule'), source: 'reservation', source_reference: String(r.id) })}>⏰ Programmer une relance</button>
                   {r.statut !== 'contactee' && <button className="act-btn" onClick={() => setResStatus(r.id, 'contactee')}>📞 Marquer contactée</button>}
                   {r.statut !== 'vendue' && <button className="act-btn" onClick={() => setResStatus(r.id, 'vendue')}>✅ Marquer vendue</button>}
                   {r.statut !== 'annulee' && <button className="act-btn" onClick={() => setResStatus(r.id, 'annulee')}>❌ Annuler</button>}
@@ -1668,6 +1708,7 @@ export default function AdminPanel({ onLogout, onToast }) {
                   <div className="rescard-actions">
                     <button className="act-btn primary" onClick={() => setEditingSellRequest(r)}>🔎 Inspection & offre</button>
                     <button className="act-btn wa" onClick={() => openWA({ nom_client: r.nom_client, telephone: r.telephone, vehicule_nom: contactVehicleName, vehicule_prix: details.finalOffer?.amount || trade?.offer || r.prix_souhaite || 0 }, shopName)}>💬 Contacter WhatsApp</button>
+                    <button className="act-btn" onClick={() => openFollowUp({ nom_client: r.nom_client, telephone: r.telephone, objet: 'Faire le point sur la proposition : ' + contactVehicleName, notes: details.note || '', source: 'reprise', source_reference: String(r.id) })}>⏰ Programmer une relance</button>
                     {['nouvelle', 'annulee'].includes(r.statut) && <button className="act-btn" onClick={() => setSellStatus(r.id, 'contactee')}>📞 Marquer contactée</button>}
                     {['nouvelle', 'contactee', 'annulee'].includes(r.statut) && <button className="act-btn" onClick={() => setSellStatus(r.id, 'vendue')}>✅ Marquer traitée</button>}
                     {!['annulee', 'vendue', 'finalisee'].includes(r.statut) && <button className="act-btn" onClick={() => setSellStatus(r.id, 'annulee')}>❌ Annuler</button>}
@@ -1689,11 +1730,22 @@ export default function AdminPanel({ onLogout, onToast }) {
             sellRequests={sellRequests}
             onSetReservationStatus={setResStatus}
             onSetSellRequestStatus={setSellStatus}
+            onScheduleFollowUp={openFollowUp}
           />
         )}
 
         {tab === 'recherches' && (
-          <VehicleSearchRequestsPanel vehicles={vehicles} shopName={shopName} onToast={onToast} onRequestsChanged={loadVehicleSearchRequests} />
+          <VehicleSearchRequestsPanel vehicles={vehicles} shopName={shopName} onToast={onToast} onRequestsChanged={loadVehicleSearchRequests} onScheduleFollowUp={openFollowUp} />
+        )}
+
+        {tab === 'relances' && (
+          <CustomerFollowUpsPanel
+            shopName={shopName}
+            onToast={onToast}
+            onChanged={loadFollowUpSummary}
+            prefill={followUpPrefill}
+            onPrefillConsumed={() => setFollowUpPrefill(null)}
+          />
         )}
 
         {/* ── TAB TÉMOIGNAGES ── */}
