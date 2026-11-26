@@ -127,6 +127,7 @@ export default function CustomerFollowUpsPanel({
       source_reference: prefill.source_reference == null ? '' : String(prefill.source_reference),
     })
     setEditingId(null)
+    setFilter('a_faire')
     setShowForm(true)
     onPrefillConsumed?.()
   }, [prefill])
@@ -176,6 +177,7 @@ export default function CustomerFollowUpsPanel({
   function openNewForm() {
     setEditingId(null)
     setForm(emptyForm())
+    setFilter('a_faire')
     setShowForm(true)
   }
 
