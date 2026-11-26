@@ -962,3 +962,113 @@ button.adm-kpi-card { cursor: pointer; }
   .followups-form-footer .btn-save { width: 100%; }
   .followup-card-top { flex-direction: column; }
 }
+
+
+/* Fiche d'inspection automobile — contrôle détaillé et impression A4 */
+.trade-inspection-header-actions { display: flex; align-items: center; gap: 8px; flex: 0 0 auto; }
+.trade-inspection-header-actions .act-btn { min-height: 35px; padding: 0 11px; font-size: 10px; }
+.trade-inspection-checklist-summary { display: flex; flex-wrap: wrap; gap: 7px; margin: 5px 0 14px; }
+.trade-inspection-checklist-summary .check-count { display: inline-flex; align-items: center; gap: 6px; min-height: 27px; padding: 0 9px; border: 1px solid rgba(255,255,255,.09); border-radius: 8px; color: rgba(235,240,232,.7); background: rgba(255,255,255,.035); font-size: 9px; }
+.trade-inspection-checklist-summary .check-count strong { color: #f4f5ef; font-size: 11px; font-variant-numeric: tabular-nums; }
+.trade-inspection-checklist-summary .check-count.good { border-color: rgba(113,187,135,.22); }
+.trade-inspection-checklist-summary .check-count.good strong { color: #9bd9ad; }
+.trade-inspection-checklist-summary .check-count.planned { border-color: rgba(215,177,95,.22); }
+.trade-inspection-checklist-summary .check-count.planned strong { color: #f0d28c; }
+.trade-inspection-checklist-summary .check-count.defect { border-color: rgba(230,95,95,.22); }
+.trade-inspection-checklist-summary .check-count.defect strong { color: #ffaaa9; }
+.trade-inspection-checklist { display: grid; gap: 10px; }
+.trade-inspection-check-group { overflow: hidden; border: 1px solid rgba(255,255,255,.075); border-radius: 11px; background: rgba(0,0,0,.12); }
+.trade-inspection-check-group h4 { margin: 0; padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,.07); color: #e7c982; background: rgba(255,255,255,.025); font-size: 10px; font-weight: 850; }
+.trade-inspection-check-items { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); }
+.trade-inspection-check-item { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-width: 0; min-height: 43px; padding: 6px 10px; border-bottom: 1px solid rgba(255,255,255,.045); }
+.trade-inspection-check-item:nth-child(odd) { border-right: 1px solid rgba(255,255,255,.045); }
+.trade-inspection-check-item label { min-width: 0; color: rgba(231,238,228,.72); font-size: 9px; line-height: 1.45; }
+.trade-inspection-check-item select { width: 116px; min-width: 100px; min-height: 31px; padding: 5px 7px; border: 1px solid rgba(255,255,255,.12); border-radius: 7px; color: #f0f3ed; background: #151d18; font: inherit; font-size: 9px; }
+.trade-inspection-print { display: none; }
+@media (max-width:640px) {
+  .trade-inspection-header-actions { gap: 6px; }
+  .trade-inspection-header-actions .act-btn { min-height: 33px; padding: 0 8px; font-size: 9px; }
+  .trade-inspection-check-items { grid-template-columns: 1fr; }
+  .trade-inspection-check-item:nth-child(odd) { border-right: 0; }
+  .trade-inspection-check-item select { width: 112px; }
+}
+@media print {
+  @page { size: A4; margin: 11mm; }
+  html, body { min-width: 0 !important; width: 100% !important; background: #fff !important; }
+  body { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+  body * { visibility: hidden !important; }
+  .trade-inspection-print, .trade-inspection-print * { visibility: visible !important; }
+  .trade-inspection-print {
+    display: block !important; position: fixed !important; inset: 0 !important; z-index: 999999 !important;
+    width: 100% !important; height: auto !important; max-height: none !important; overflow: visible !important;
+    box-sizing: border-box !important; padding: 0 !important; color: #18211b !important; background: #fff !important;
+    font-family: Arial, Helvetica, sans-serif !important; font-size: 8.5pt !important; line-height: 1.35 !important;
+  }
+  .tip-print-top { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding-bottom: 10px; border-bottom: 2px solid #253a2c; }
+  .tip-print-brand { display: flex; align-items: center; gap: 9px; }
+  .tip-print-mark { display: grid; place-items: center; width: 35px; height: 35px; border: 1.5px solid #b58c43; color: #213a2a; font-size: 12pt; font-weight: 900; }
+  .tip-print-brand > span:last-child { display: flex; flex-direction: column; gap: 2px; }
+  .tip-print-brand strong { color: #203728; font-size: 13pt; letter-spacing: .04em; }
+  .tip-print-brand small { color: #8b713f; font-size: 7pt; font-weight: 800; letter-spacing: .1em; }
+  .tip-print-reference { display: flex; flex-direction: column; gap: 3px; color: #4e5c51; text-align: right; font-size: 7.5pt; }
+  .tip-print-reference strong { color: #203728; font-size: 9pt; }
+  .tip-print-title { margin: 12px 0 10px; text-align: center; }
+  .tip-print-title h1 { margin: 0 0 3px; color: #203728; font-size: 17pt; font-weight: 900; }
+  .tip-print-title p { margin: 0; color: #657168; font-size: 8pt; }
+  .tip-print-meta { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 0; border-top: 1px solid #cbd3cc; border-left: 1px solid #cbd3cc; }
+  .tip-print-meta > div { min-height: 39px; padding: 6px 8px; border-right: 1px solid #cbd3cc; border-bottom: 1px solid #cbd3cc; }
+  .tip-print-meta small { display: block; margin-bottom: 2px; color: #6a756d; font-size: 6.5pt; font-weight: 800; letter-spacing: .06em; }
+  .tip-print-meta strong { display: block; overflow-wrap: anywhere; color: #18211b; font-size: 8pt; }
+  .tip-print-summary { display: flex; flex-wrap: wrap; gap: 7px; margin: 9px 0 10px; padding: 7px 8px; border: 1px solid #d3d9d4; background: #f4f6f4; }
+  .tip-print-summary span { flex: 1 1 20%; color: #4b584e; text-align: center; font-size: 7.5pt; }
+  .tip-print-summary b { color: #1d3424; font-size: 10pt; }
+  .tip-print-checks { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px 10px; align-items: start; }
+  .tip-print-group { break-inside: avoid; page-break-inside: avoid; }
+  .tip-print-group h2,.tip-print-general h2,.tip-print-notes-section h2,.tip-print-photo-section h2 { margin: 0 0 4px; padding: 5px 7px; color: #fff; background: #294331; font-size: 8pt; font-weight: 800; }
+  .tip-print-table { width: 100%; border-collapse: collapse; font-size: 7pt; }
+  .tip-print-table td { padding: 3px 5px; border: 1px solid #d8ded9; vertical-align: middle; }
+  .tip-print-table td:last-child { width: 29%; color: #25352a; text-align: right; font-weight: 700; }
+  .tip-print-state { font-size: 6.5pt; font-weight: 800; }
+  .tip-state-bon { color: #20703b; }
+  .tip-state-a_prevoir { color: #946713; }
+  .tip-state-defaut { color: #b12e2b; }
+  .tip-state-non_verifie { color: #647067; }
+  .tip-print-general { margin-top: 9px; break-inside: avoid; }
+  .tip-print-general .tip-print-table td:last-child { width: 40%; }
+  .tip-print-notes-section,.tip-print-photo-section { margin-top: 9px; break-inside: avoid; }
+  .tip-print-notes { min-height: 40px; padding: 7px; border: 1px solid #d8ded9; color: #26342a; white-space: pre-wrap; overflow-wrap: anywhere; }
+  .tip-print-photos { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 7px; }
+  .tip-print-photos figure { margin: 0; break-inside: avoid; }
+  .tip-print-photos img { display: block; width: 100%; height: 82px; object-fit: cover; border: 1px solid #d8ded9; }
+  .tip-print-photos figcaption { overflow: hidden; margin-top: 2px; color: #657168; font-size: 6pt; text-overflow: ellipsis; white-space: nowrap; }
+  .tip-print-signatures { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; margin-top: 20px; break-inside: avoid; }
+  .tip-print-signatures > div { display: flex; flex-direction: column; gap: 30px; color: #35443a; font-size: 7.5pt; }
+  .tip-print-signatures span { border-bottom: 1px solid #7b867d; }
+  .tip-print-disclaimer { margin: 10px 0 0; padding-top: 6px; border-top: 1px solid #d8ded9; color: #788179; font-size: 6.5pt; line-height: 1.4; }
+}
+
+
+@media print {
+  .trade-inspection-overlay,
+  .trade-inspection-dialog {
+    position: static !important;
+    display: block !important;
+    width: auto !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow: visible !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: #fff !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+  }
+  .trade-inspection-print {
+    position: static !important;
+    inset: auto !important;
+    break-after: auto !important;
+  }
+}

@@ -28,6 +28,53 @@ const INSPECTION_FIELDS = [
   ['electronique', 'Électronique / équipements'],
 ]
 
+const CHECKLIST_STATUS_OPTIONS = [
+  { value: 'bon', label: 'Bon' },
+  { value: 'a_prevoir', label: 'À prévoir' },
+  { value: 'defaut', label: 'Défaut' },
+  { value: 'non_verifie', label: 'Non vérifié' },
+]
+const CHECKLIST_STATUS_LABELS = Object.fromEntries(CHECKLIST_STATUS_OPTIONS.map(option => [option.value, option.label]))
+const GENERAL_STATUS_LABELS = {
+  a_verifier: 'À vérifier', bon: 'Bon état', moyen: 'À surveiller', mauvais: 'Réparations nécessaires',
+  complets: 'Documents complets', incomplets: 'Documents incomplets', verifier: 'À vérifier',
+  concluant: 'Essai concluant', reserve: 'Anomalies à vérifier', non_effectue: 'Essai non effectué',
+}
+const CHECKLIST_GROUPS = [
+  { key: 'carrosserie', label: 'Carrosserie & vitrages', items: [
+    ['peinture', 'Peinture, différences de teinte et retouches'], ['corrosion', 'Rouille, corrosion et traces de réparation'],
+    ['capot', 'Capot et alignement des ouvrants'], ['portes', 'Portes, ailes et alignements'], ['parechocs', 'Pare-chocs et protections'],
+    ['toit', 'Toit et pavillon'], ['vitrage', 'Pare-brise et vitres'], ['eclairage', 'Phares, feux et clignotants'],
+  ] },
+  { key: 'habitacle', label: 'Habitacle & équipements', items: [
+    ['sieges', 'Sièges, sellerie et garnitures'], ['tableau_bord', 'Tableau de bord et voyants'],
+    ['climatisation', 'Climatisation et chauffage'], ['leve_vitres', 'Vitres électriques et verrouillage'],
+    ['ceintures', 'Ceintures et boucles de sécurité'], ['commandes', 'Commandes, éclairage et équipements'],
+  ] },
+  { key: 'moteur', label: 'Moteur & compartiment moteur', items: [
+    ['demarrage', 'Démarrage à froid et à chaud'], ['ralenti', 'Stabilité du ralenti et accélération'],
+    ['fumee', 'Fumées anormales à l’échappement'], ['bruits_moteur', 'Bruits ou vibrations moteur'],
+    ['fuite_huile', 'Fuites d’huile'], ['fuite_liquide', 'Fuites de liquide de refroidissement'],
+    ['niveaux', 'Niveaux des fluides et état apparent'], ['batterie', 'Batterie et charge'],
+  ] },
+  { key: 'transmission', label: 'Transmission, direction & liaisons au sol', items: [
+    ['embrayage', 'Embrayage et point de patinage'], ['boite', 'Passage des rapports / boîte automatique'],
+    ['direction', 'Direction et assistance'], ['suspension', 'Suspensions et amortisseurs'],
+    ['freinage', 'Freinage et frein à main'], ['pneus', 'Pneus, usure et dimensions'],
+    ['jantes', 'Jantes et roues'], ['dessous', 'Dessous de caisse et châssis visibles'],
+  ] },
+  { key: 'essai', label: 'Essai routier', items: [
+    ['essai_acceleration', 'Accélération et reprise'], ['essai_freinage', 'Freinage en ligne droite'],
+    ['essai_direction', 'Tenue de cap et direction'], ['essai_vibrations', 'Vibrations et bruits en roulage'],
+    ['essai_temperature', 'Température moteur'], ['essai_confort', 'Confort et comportement général'],
+  ] },
+  { key: 'documents_detail', label: 'Documents & accessoires remis', items: [
+    ['carte_grise', 'Carte grise / certificat d’immatriculation'], ['controle_technique', 'Contrôle technique, si applicable'],
+    ['assurance', 'Attestation d’assurance'], ['carnet_entretien', 'Carnet et factures d’entretien'],
+    ['double_cles', 'Double des clés'], ['kit_securite', 'Roue de secours / kit anti-crevaison et outils'],
+  ] },
+]
+
 function asText(value) {
   return value == null ? '' : String(value)
 }
@@ -47,6 +94,14 @@ export default function TradeInspectionEditor({ request, details = {}, onClose, 
     essai: 'non_effectue',
     notes: '',
     ...savedInspection,
+    immatriculation: savedInspection.immatriculation || '',
+    vin: savedInspection.vin || '',
+    couleur: savedInspection.couleur || '',
+    inspecteur: savedInspection.inspecteur || '',
+    checklist: {
+      ...Object.fromEntries(CHECKLIST_GROUPS.flatMap(group => group.items.map(([key]) => [key, 'non_verifie']))),
+      ...(savedInspection.checklist || {}),
+    },
     photos: Array.isArray(savedInspection.photos) ? savedInspection.photos : [],
   })
   const [finalOffer, setFinalOffer] = useState({
@@ -79,6 +134,9 @@ export default function TradeInspectionEditor({ request, details = {}, onClose, 
 
   function setInspectionField(key, value) {
     setInspection(current => ({ ...current, [key]: value }))
+  }
+  function setChecklistField(key, value) {
+    setInspection(current => ({ ...current, checklist: { ...(current.checklist || {}), [key]: value } }))
   }
   function setOfferField(key, value) {
     setFinalOffer(current => ({ ...current, [key]: value }))
@@ -209,17 +267,99 @@ export default function TradeInspectionEditor({ request, details = {}, onClose, 
 
   const title = `${request.marque || ''} ${request.modele || ''}`.trim()
   const offerStatusLabel = isFinalized ? 'Reprise finalisée' : isAccepted ? 'Accord client confirmé' : request.statut === 'offre_proposee' ? 'Offre en attente de réponse' : request.statut === 'refusee' ? 'Offre refusée' : 'Inspection en cours'
+  const inspectionDate = inspection.inspectedAt ? new Date(inspection.inspectedAt) : new Date()
+  const inspectionDateLabel = Number.isNaN(inspectionDate.getTime()) ? 'Non renseignée' : inspectionDate.toLocaleString('fr-FR')
+  const checklistItems = CHECKLIST_GROUPS.flatMap(group => group.items)
+  const checklistCounts = checklistItems.reduce((counts, [key]) => {
+    const value = inspection.checklist?.[key] || 'non_verifie'
+    counts[value] = (counts[value] || 0) + 1
+    return counts
+  }, { bon: 0, a_prevoir: 0, defaut: 0, non_verifie: 0 })
 
   return (
     <div className="trade-inspection-overlay" onClick={event => event.target === event.currentTarget && onClose()}>
       <section className="trade-inspection-dialog" role="dialog" aria-modal="true" aria-labelledby="trade-inspection-title">
+        <div className="trade-inspection-print">
+          <div className="tip-print-top">
+            <div className="tip-print-brand">
+              <span className="tip-print-mark">NA</span>
+              <span><strong>NABIL AUTO</strong><small>FICHE D’INSPECTION AUTOMOBILE</small></span>
+            </div>
+            <div className="tip-print-reference">
+              <strong>DOSSIER #{request.id}</strong>
+              <span>Établie le {inspectionDateLabel}</span>
+            </div>
+          </div>
+          <div className="tip-print-title">
+            <h1>Fiche d’inspection automobile</h1>
+            <p>État visuel et fonctionnel constaté lors de la visite du véhicule</p>
+          </div>
+          <div className="tip-print-meta">
+            <div><small>CLIENT</small><strong>{request.nom_client || 'Non renseigné'}</strong></div>
+            <div><small>TÉLÉPHONE</small><strong>{request.telephone || 'Non renseigné'}</strong></div>
+            <div><small>VÉHICULE</small><strong>{title || 'Non renseigné'}</strong></div>
+            <div><small>ANNÉE</small><strong>{stock.year || request.annee || '—'}</strong></div>
+            <div><small>KILOMÉTRAGE</small><strong>{stock.km || request.km ? Number(stock.km || request.km).toLocaleString('fr-FR') + ' km' : '—'}</strong></div>
+            <div><small>IMMATRICULATION</small><strong>{inspection.immatriculation || '—'}</strong></div>
+            <div><small>N° DE CHÂSSIS (VIN)</small><strong>{inspection.vin || '—'}</strong></div>
+            <div><small>COULEUR</small><strong>{inspection.couleur || '—'}</strong></div>
+            <div><small>INSPECTEUR</small><strong>{inspection.inspecteur || '—'}</strong></div>
+          </div>
+          <div className="tip-print-summary">
+            <span><b>{checklistCounts.bon}</b> Bon</span>
+            <span><b>{checklistCounts.a_prevoir}</b> À prévoir</span>
+            <span><b>{checklistCounts.defaut}</b> Défaut</span>
+            <span><b>{checklistCounts.non_verifie}</b> Non vérifié</span>
+          </div>
+          <div className="tip-print-checks">
+            {CHECKLIST_GROUPS.map(group => (
+              <section className="tip-print-group" key={group.key}>
+                <h2>{group.label}</h2>
+                <table className="tip-print-table"><tbody>
+                  {group.items.map(([key, label]) => {
+                    const value = inspection.checklist?.[key] || 'non_verifie'
+                    return <tr key={key}><td>{label}</td><td><span className={'tip-print-state tip-state-' + value}>{CHECKLIST_STATUS_LABELS[value] || 'Non vérifié'}</span></td></tr>
+                  })}
+                </tbody></table>
+              </section>
+            ))}
+          </div>
+          <section className="tip-print-general">
+            <h2>Évaluation générale</h2>
+            <table className="tip-print-table"><tbody>
+              {INSPECTION_FIELDS.map(([key, label]) => <tr key={key}><td>{label}</td><td>{GENERAL_STATUS_LABELS[inspection[key]] || 'À vérifier'}</td></tr>)}
+              <tr><td>Papiers / documents</td><td>{GENERAL_STATUS_LABELS[inspection.documents] || 'À vérifier'}</td></tr>
+              <tr><td>Essai routier</td><td>{GENERAL_STATUS_LABELS[inspection.essai] || 'Non effectué'}</td></tr>
+            </tbody></table>
+          </section>
+          <section className="tip-print-notes-section">
+            <h2>Observations et défauts constatés</h2>
+            <div className="tip-print-notes">{inspection.notes || 'Aucune observation complémentaire renseignée.'}</div>
+          </section>
+          {inspection.photos.length > 0 && (
+            <section className="tip-print-photo-section">
+              <h2>Photographies du véhicule</h2>
+              <div className="tip-print-photos">
+                {inspection.photos.map((photo, index) => <figure key={photo.path || photo.url || index}><img src={photo.url} alt={photo.name || 'Photo ' + (index + 1)} /><figcaption>{photo.name || 'Photo ' + (index + 1)}</figcaption></figure>)}
+              </div>
+            </section>
+          )}
+          <div className="tip-print-signatures">
+            <div><strong>Signature de l’inspecteur</strong><span /></div>
+            <div><strong>Signature du propriétaire</strong><span /></div>
+          </div>
+          <p className="tip-print-disclaimer">Document de constat établi par Nabil Auto. Cette fiche décrit les éléments contrôlés lors de la visite ; elle ne constitue pas un contrôle technique réglementaire ni une garantie mécanique.</p>
+        </div>
         <header className="trade-inspection-header">
           <div>
             <span className="adm-eyebrow">GESTION DES REPRISES · DOSSIER #{request.id}</span>
             <h2 id="trade-inspection-title">🔎 Inspection & finalisation</h2>
             <p>{title}{request.annee ? ` · ${request.annee}` : ''}{request.km ? ` · ${Number(request.km).toLocaleString('fr-FR')} km` : ''}</p>
           </div>
-          <button type="button" className="trade-inspection-close" onClick={onClose} aria-label="Fermer">✕</button>
+          <div className="trade-inspection-header-actions">
+            <button type="button" className="act-btn" onClick={() => window.print()}>🖨 Imprimer la fiche</button>
+            <button type="button" className="trade-inspection-close" onClick={onClose} aria-label="Fermer">✕</button>
+          </div>
         </header>
 
         <div className="trade-inspection-body">
@@ -231,7 +371,46 @@ export default function TradeInspectionEditor({ request, details = {}, onClose, 
           </div>
 
           <section className="trade-inspection-section">
-            <h3>1. Contrôle du véhicule</h3>
+            <h3>1. Identification du véhicule</h3>
+            <p>Complète ces informations pour retrouver et identifier précisément le véhicule sur la fiche imprimée.</p>
+            <div className="trade-inspection-grid">
+              <div className="form-field"><label htmlFor="inspection-registration">Immatriculation</label><input id="inspection-registration" value={inspection.immatriculation} onChange={event => setInspectionField('immatriculation', event.target.value)} placeholder="Ex. 12345-123-16" disabled={isFinalized} /></div>
+              <div className="form-field"><label htmlFor="inspection-vin">Numéro de châssis (VIN)</label><input id="inspection-vin" value={inspection.vin} onChange={event => setInspectionField('vin', event.target.value)} placeholder="Numéro de série du véhicule" disabled={isFinalized} /></div>
+              <div className="form-field"><label htmlFor="inspection-color">Couleur</label><input id="inspection-color" value={inspection.couleur} onChange={event => setInspectionField('couleur', event.target.value)} placeholder="Ex. Gris métallisé" disabled={isFinalized} /></div>
+              <div className="form-field"><label htmlFor="inspection-inspector">Inspecteur</label><input id="inspection-inspector" value={inspection.inspecteur} onChange={event => setInspectionField('inspecteur', event.target.value)} placeholder="Nom de la personne ayant effectué le contrôle" disabled={isFinalized} /></div>
+            </div>
+          </section>
+
+          <section className="trade-inspection-section">
+            <h3>2. Contrôle détaillé du véhicule</h3>
+            <p>Pour chaque point, indique l’état constaté. « Non vérifié » signifie que le point n’a pas pu être contrôlé pendant la visite.</p>
+            <div className="trade-inspection-checklist-summary">
+              <span className="check-count good"><strong>{checklistCounts.bon}</strong> Bon</span>
+              <span className="check-count planned"><strong>{checklistCounts.a_prevoir}</strong> À prévoir</span>
+              <span className="check-count defect"><strong>{checklistCounts.defaut}</strong> Défaut</span>
+              <span className="check-count unknown"><strong>{checklistCounts.non_verifie}</strong> Non vérifié</span>
+            </div>
+            <div className="trade-inspection-checklist">
+              {CHECKLIST_GROUPS.map(group => (
+                <div className="trade-inspection-check-group" key={group.key}>
+                  <h4>{group.label}</h4>
+                  <div className="trade-inspection-check-items">
+                    {group.items.map(([key, label]) => (
+                      <div className="trade-inspection-check-item" key={key}>
+                        <label htmlFor={'inspection-check-' + key}>{label}</label>
+                        <select id={'inspection-check-' + key} value={inspection.checklist?.[key] || 'non_verifie'} onChange={event => setChecklistField(key, event.target.value)} disabled={isFinalized}>
+                          {CHECKLIST_STATUS_OPTIONS.map(option => <option key={option.value} value={option.value}>{option.label}</option>)}
+                        </select>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <section className="trade-inspection-section">
+            <h3>3. Évaluation générale du véhicule</h3>
             <p>Note l’état constaté pendant la visite. Ces informations restent dans l’espace administrateur.</p>
             <div className="trade-inspection-grid">
               {INSPECTION_FIELDS.map(([key, label]) => (
@@ -279,7 +458,7 @@ export default function TradeInspectionEditor({ request, details = {}, onClose, 
           </section>
 
           <section className="trade-inspection-section">
-            <h3>2. Offre définitive au client</h3>
+            <h3>4. Offre définitive au client</h3>
             <p>Inscris le montant négocié après inspection. La valeur annoncée au départ reste conservée dans l’historique.</p>
             <div className="trade-inspection-grid">
               <div className="form-field">
@@ -304,7 +483,7 @@ export default function TradeInspectionEditor({ request, details = {}, onClose, 
           </section>
 
           <section className="trade-inspection-section">
-            <h3>3. Préparer l’entrée au stock</h3>
+            <h3>5. Préparer l’entrée au stock</h3>
             <p>Après accord du client, la voiture sera créée comme véhicule d’occasion et restera masquée du site jusqu’à sa publication manuelle.</p>
             <div className="trade-inspection-grid">
               <div className="form-field">
