@@ -6,6 +6,7 @@ import { STATUTS, PLACEHOLDER_IMG, flagURI } from '../../data/vehicles-data'
 import VehicleForm from './VehicleForm'
 import CRMPanel from './CRMPanel'
 import FinancePanel from './FinancePanel'
+import CommercialDashboardPanel from './CommercialDashboardPanel'
 import TradeInspectionEditor from './TradeInspectionEditor'
 import VehicleSearchRequestsPanel from './VehicleSearchRequestsPanel'
 import CustomerFollowUpsPanel from './CustomerFollowUpsPanel'
@@ -40,6 +41,7 @@ const ADMIN_NAV_GROUPS = [
     { key: 'relances', label: 'Relances clients', glyph: '◷' },
   ] },
   { label: 'PILOTAGE', items: [
+    { key: 'commercial', label: 'Tableau commercial', glyph: '↗' },
     { key: 'finances', label: 'Finances', glyph: '◒' },
   ] },
   { label: 'CONTENU DU SITE', items: [
@@ -1718,6 +1720,16 @@ export default function AdminPanel({ onLogout, onToast }) {
               )
             })}
           </div>
+        )}
+
+        {tab === 'commercial' && (
+          <CommercialDashboardPanel
+            vehicles={vehicles}
+            reservations={reservations}
+            sellRequests={sellRequests}
+            followUps={followUpSummary}
+            onToast={onToast}
+          />
         )}
 
         {tab === 'finances' && (
