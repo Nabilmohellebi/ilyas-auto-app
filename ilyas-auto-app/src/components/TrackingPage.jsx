@@ -3,7 +3,7 @@ import { supabase } from '../supabase'
 import { fmt } from '../utils/notify'
 import { useLang } from '../i18n/LangContext'
 
-const IDX = { nouvelle: 0, contactee: 1, vendue: 2 }
+const STATUS_INDEX = { nouvelle: 0, contactee: 1, inspection: 2, offre_proposee: 3, acceptee: 4, finalisee: 5, vendue: 6 }
 
 export default function TrackingPage({ onClose }) {
   const { t } = useLang()
@@ -32,8 +32,10 @@ export default function TrackingPage({ onClose }) {
   }
 
   const STEPS = t.tracking.steps
-  const curStep = res ? (IDX[res.statut] ?? 0) : -1
-  const cancelled = res?.statut === 'annulee'
+  const curStep = res ? (STATUS_INDEX[res.statut] ?? 0) : -1
+  const terminalMessage = res?.statut === 'annulee'
+    ? t.tracking.annulee
+    : res?.statut === 'refusee' ? t.tracking.refusee : ''
 
   return (
     <div className="res-ov" onClick={e => e.target === e.currentTarget && onClose()}>
@@ -56,9 +58,9 @@ export default function TrackingPage({ onClose }) {
               <div><span className="lbl">{t.tracking.prix}</span><strong style={{ color: 'var(--br3)' }}>{fmt(res.vehicule_prix)}</strong></div>
             </div>
 
-            {cancelled ? (
+            {terminalMessage ? (
               <div className="track-cancelled" style={{ background: 'rgba(255,255,255,.05)', border: '1px solid rgba(255,255,255,.1)', borderRadius: 10, padding: 14, textAlign: 'center', color: 'rgba(255,255,255,.5)', fontSize: 13 }}>
-                {t.tracking.annulee}
+                {terminalMessage}
               </div>
             ) : (
               <div className="track-steps">
