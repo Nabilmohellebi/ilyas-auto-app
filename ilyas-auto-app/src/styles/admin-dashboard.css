@@ -1046,3 +1046,29 @@ button.adm-kpi-card { cursor: pointer; }
   .tip-print-signatures span { border-bottom: 1px solid #7b867d; }
   .tip-print-disclaimer { margin: 10px 0 0; padding-top: 6px; border-top: 1px solid #d8ded9; color: #788179; font-size: 6.5pt; line-height: 1.4; }
 }
+
+
+@media print {
+  .trade-inspection-overlay,
+  .trade-inspection-dialog {
+    position: static !important;
+    display: block !important;
+    width: auto !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow: visible !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: #fff !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+  }
+  .trade-inspection-print {
+    position: static !important;
+    inset: auto !important;
+    break-after: auto !important;
+  }
+}
