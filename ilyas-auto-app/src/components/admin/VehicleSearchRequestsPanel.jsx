@@ -90,7 +90,7 @@ function matchingVehicles(request, vehicles) {
     .map(item => item.vehicle)
 }
 
-export default function VehicleSearchRequestsPanel({ vehicles = [], shopName = 'Nabil Auto', onToast, onRequestsChanged }) {
+export default function VehicleSearchRequestsPanel({ vehicles = [], shopName = 'Nabil Auto', onToast, onRequestsChanged, onScheduleFollowUp }) {
   const [requests, setRequests] = useState([])
   const [loading, setLoading] = useState(true)
   const [loadError, setLoadError] = useState('')
@@ -338,6 +338,7 @@ export default function VehicleSearchRequestsPanel({ vehicles = [], shopName = '
 
                 <div className="vehicle-search-request-actions">
                   <button type="button" className="act-btn wa" onClick={() => openWA({ nom_client: request.nom_client, telephone: request.telephone, vehicule_nom: desired || 'Votre recherche de véhicule', vehicule_prix: request.budget_max || 0 }, shopName)}>💬 Contacter WhatsApp</button>
+                  <button type="button" className="act-btn" onClick={() => onScheduleFollowUp?.({ nom_client: request.nom_client, telephone: request.telephone, objet: 'Faire le point sur la recherche : ' + (desired || 'véhicule souhaité'), notes: request.notes || '', source: 'recherche', source_reference: String(request.id) })}>⏰ Programmer une relance</button>
                   {request.statut === 'nouvelle' && <button type="button" className="act-btn" disabled={savingId === request.id} onClick={() => updateRequest(request.id, { statut: 'contactee' })}>📞 Marquer contactée</button>}
                   {request.statut !== 'cloturee' && request.statut !== 'annulee' && <button type="button" className="act-btn" disabled={savingId === request.id} onClick={() => updateRequest(request.id, { statut: 'cloturee' })}>✅ Clôturer</button>}
                   {request.statut === 'annulee' && <button type="button" className="act-btn" disabled={savingId === request.id} onClick={() => updateRequest(request.id, { statut: 'nouvelle' })}>↩️ Réactiver</button>}
