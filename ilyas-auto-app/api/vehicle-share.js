@@ -161,7 +161,9 @@ export default async function handler(req, res) {
     const name = cleanText(`${vehicle.marque} ${vehicle.modele}`, 120) || 'Véhicule'
     const year = Number(vehicle.annee) || ''
     const price = formatPrice(vehicle.prix)
-    const condition = vehicle.etat_vehicule === 'occasion' ? 'occasion' : 'neuf'
+    const conditionLabel = vehicle.etat_vehicule === 'occasion'
+      ? 'Véhicule d’occasion'
+      : 'Véhicule neuf'
     const mileage = Number(vehicle.km) > 0
       ? `${Number(vehicle.km).toLocaleString('fr-FR')} km`
       : ''
@@ -173,7 +175,7 @@ export default async function handler(req, res) {
         ? 'Réservé'
         : 'Disponible'
     const title = `${name}${year ? ` ${year}` : ''} · ${price || 'Voir le prix'} | Nabil Auto`
-    const details = [`Véhicule d’${condition}`, mileage, fuel, transmission, status].filter(Boolean).join(' · ')
+    const details = [conditionLabel, mileage, fuel, transmission, status].filter(Boolean).join(' · ')
     const customDescription = cleanText(vehicle.description, 150)
     const description = [details, customDescription].filter(Boolean).join(' — ').slice(0, 280)
     const canonicalUrl = new URL('/', SITE_ORIGIN)
