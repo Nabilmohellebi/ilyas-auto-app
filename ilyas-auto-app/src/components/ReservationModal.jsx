@@ -154,6 +154,7 @@ export default function ReservationModal({ vehicle, onClose, shopName = 'Nabil A
   const waConfirmText =
     `Bonjour, je suis ${form.nom}. Je confirme ma demande de réservation pour :\n` +
     `🚘 ${vehicle.marque} ${vehicle.modele} (${vehicle.annee}) — ${fmt(vehicle.prix)}` +
+    (selectedSlot ? `\n📅 ${formatSlotDate(selectedSlot.starts_at, lang)}` : form.date ? `\n📅 ${form.date}` : '') +
     (form.message ? `\n📝 ${form.message}` : '')
 
   return (
