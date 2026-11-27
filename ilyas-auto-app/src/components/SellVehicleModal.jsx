@@ -19,6 +19,7 @@ export default function SellVehicleModal({ onClose, vehicles = [], tradeMarginPe
   })
   const [sending, setSending] = useState(false)
   const [sent, setSent] = useState(false)
+  const [requestReference, setRequestReference] = useState('')
   const [error, setError] = useState('')
 
   const availableVehicles = useMemo(
@@ -120,6 +121,7 @@ export default function SellVehicleModal({ onClose, vehicles = [], tradeMarginPe
       const { error: insertError } = await supabase.from('sell_requests').insert(request)
       if (insertError) throw insertError
       notifyTelegramSellRequest(request, details)
+      setRequestReference(request.id)
       setSent(true)
     } catch (err) {
       console.error('HBR AUTO request:', err)
@@ -246,6 +248,11 @@ export default function SellVehicleModal({ onClose, vehicles = [], tradeMarginPe
             <p style={{ fontSize: 13, color: 'rgba(255,255,255,.55)', marginBottom: 20, lineHeight: 1.6 }}>
               Notre équipe va étudier votre véhicule et vous recontacter pour confirmer sa valeur et les conditions.
             </p>
+            <div className="customer-reference-box">
+              <span>Numéro de référence à conserver</span>
+              <strong>{requestReference}</strong>
+              <small>Conservez ce numéro et le téléphone utilisé pour retrouver toutes vos demandes dans « Mon dossier ».</small>
+            </div>
             {type === 'exchange' && targetVehicle && (
               <div className="trade-calculation" style={{ textAlign: 'left', marginBottom: 16 }}>
                 <div className="trade-calculation-row trade-offer"><span>Offre de reprise simulée</span><strong>{money(tradeOffer)}</strong></div>

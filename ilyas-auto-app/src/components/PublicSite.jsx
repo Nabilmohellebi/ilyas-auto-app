@@ -800,7 +800,7 @@ function PublicSiteInner() {
       {/* ── Modal réservation ── */}
       {reserveVehicle && <Suspense fallback={<div className="spinner" role="status">Chargement…</div>}><ReservationModal vehicle={reserveVehicle} shopName={s.nom} whatsapp={s.whatsapp} onClose={() => setReserveVehicle(null)} /></Suspense>}
 
-      {/* ── Suivi de réservation ── */}
+      {/* ── Espace client : historique des réservations et demandes ── */}
       {trackingOpen && <Suspense fallback={<div className="spinner" role="status">Chargement…</div>}><TrackingPage onClose={() => setTrackingOpen(false)} /></Suspense>}
 
       {/* ── Vendre mon véhicule ── */}

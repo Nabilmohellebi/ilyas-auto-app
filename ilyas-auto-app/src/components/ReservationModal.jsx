@@ -10,6 +10,7 @@ export default function ReservationModal({ vehicle, onClose, shopName = 'Nabil A
   const [form, setForm] = useState({ nom: '', tel: '', date: '', message: '' })
   const [sending, setSending] = useState(false)
   const [sent, setSent] = useState(false)
+  const [requestReference, setRequestReference] = useState('')
   const [error, setError] = useState('')
 
   function set(k, v) { setForm(f => ({ ...f, [k]: v })) }
@@ -41,6 +42,7 @@ export default function ReservationModal({ vehicle, onClose, shopName = 'Nabil A
       const { error: err } = await supabase.from('reservations').insert(res)
       if (err) throw err
       notifyTelegram(res)
+      setRequestReference(res.id)
       setSent(true)
     } catch (err) {
       console.error('HBR AUTO reservation:', err)
@@ -110,6 +112,11 @@ export default function ReservationModal({ vehicle, onClose, shopName = 'Nabil A
             <p style={{ fontSize: 13, color: 'rgba(255,255,255,.55)', marginBottom: 20, lineHeight: 1.6 }}>
               {t.reservation.merci}<br />{t.reservation.confirmerWA}
             </p>
+            <div className="customer-reference-box">
+              <span>{t.tracking.referenceSaved}</span>
+              <strong>{requestReference}</strong>
+              <small>{t.tracking.referenceHelp}</small>
+            </div>
             {waLink(`Bonjour ${shopName}, ${waConfirmText}`, whatsapp) && <a href={waLink(`Bonjour ${shopName}, ${waConfirmText}`, whatsapp)} target="_blank" rel="noreferrer" className="btn-hero-primary whatsapp-action-btn" style={{ width: '100%', justifyContent: 'center', marginBottom: 10 }}>
               <WhatsAppIcon size={19} /> {t.reservation.confirmerBtn}
             </a>}
