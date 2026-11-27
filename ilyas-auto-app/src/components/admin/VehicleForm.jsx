@@ -162,6 +162,7 @@ export default function VehicleForm({ vehicle, onClose, onSave }) {
         plateRect,
         brandingName: shopName,
         brandingLogoUrl: brandIdentity.logoUrl || '',
+        brandingAccentColor: brandIdentity.accentColor || '#d7b15f',
         brandingVersion: 1,
       }
       if (task.target === 'main') {
