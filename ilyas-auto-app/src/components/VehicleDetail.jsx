@@ -1,9 +1,10 @@
 import { useState, useRef } from 'react'
-import { fmt } from '../utils/notify'
+import { fmt, waLink } from '../utils/notify'
 import { ORIGINS, flagURI, PLACEHOLDER_IMG } from '../data/vehicles-data'
 import { statutLabel } from '../i18n/translations'
 import { useLang } from '../i18n/LangContext'
 import FinancingCalculator from './FinancingCalculator'
+import WhatsAppIcon from './WhatsAppIcon'
 import { sortEquipment, sortTechnicalSpecs } from '../utils/vehicleSpecifications'
 
 function escapePrintHtml(value) {
@@ -125,7 +126,7 @@ function getEmbedUrl(url) {
   return { type: 'external', src: url }
 }
 
-export default function VehicleDetail({ vehicle: v, onClose, onReserve, onExchange, shopName = 'Nabil Auto' }) {
+export default function VehicleDetail({ vehicle: v, onClose, onReserve, onExchange, shopName = 'Nabil Auto', whatsapp }) {
   const { lang, t } = useLang()
   const images = Array.isArray(v.images) && v.images.length > 0 ? v.images : (v.img ? [{ url: v.img }] : [])
   const gallery = Array.isArray(v.images_gallery) ? v.images_gallery : []
@@ -140,6 +141,17 @@ export default function VehicleDetail({ vehicle: v, onClose, onReserve, onExchan
   const specs = sortEquipment(v.specs)
   const technicalSpecs = sortTechnicalSpecs(v.technical_specs)
   const vehicleCondition = v.etat_vehicule || (Number(v.km || 0) > 0 ? 'occasion' : 'neuf')
+  const vehiclePageUrl = new URL(window.location.href)
+  vehiclePageUrl.searchParams.set('vehicule', String(v.id))
+  const vehicleUrl = vehiclePageUrl.href
+  const whatsappMessage = disabled
+    ? (lang === 'ar'
+        ? `مرحبًا ${shopName}، هذه السيارة ${v.marque} ${v.modele} موديل ${v.annee} تبدو مباعة. هل لديكم سيارة مشابهة؟\nرابط السيارة: ${vehicleUrl}`
+        : `Bonjour ${shopName}, la ${v.marque} ${v.modele} de ${v.annee} semble vendue. Avez-vous un modèle similaire à proposer ?\nFiche : ${vehicleUrl}`)
+    : (lang === 'ar'
+        ? `مرحبًا ${shopName}، أنا مهتم بسيارة ${v.marque} ${v.modele} موديل ${v.annee} بسعر ${fmt(v.prix)}. هل السيارة متوفرة؟ وهل يمكنكم تزويدي بمعلومات إضافية؟\nرابط السيارة: ${vehicleUrl}`
+        : `Bonjour ${shopName}, je suis intéressé(e) par la ${v.marque} ${v.modele} (${v.annee}) affichée à ${fmt(v.prix)}. Pouvez-vous me confirmer sa disponibilité et me donner plus d’informations ?\nFiche : ${vehicleUrl}`)
+  const whatsappHref = waLink(whatsappMessage, whatsapp)
 
   function next() { setIdx(i => (i + 1) % images.length) }
   function prev() { setIdx(i => (i - 1 + images.length) % images.length) }
@@ -236,6 +248,12 @@ export default function VehicleDetail({ vehicle: v, onClose, onReserve, onExchan
             <button className="btn-hero-primary vd-reserve-desktop" disabled={disabled} onClick={() => !disabled && onReserve(v)}>
               {disabled ? t.detail.vendu : vehicleCondition === 'occasion' ? t.detail.acheterOccasion : t.detail.reserver}
             </button>
+            {whatsappHref && (
+              <a className="vd-whatsapp-btn vd-whatsapp-desktop" href={whatsappHref} target="_blank" rel="noopener noreferrer">
+                <WhatsAppIcon size={19} />
+                <span>{disabled ? t.detail.whatsappSimilar : t.detail.whatsappQuestion}</span>
+              </a>
+            )}
             {!disabled && v.statut === 'disponible' && (
               <button
                 type="button"
@@ -341,6 +359,18 @@ export default function VehicleDetail({ vehicle: v, onClose, onReserve, onExchan
         <button className="btn-hero-primary" style={{ flex: 1, justifyContent: 'center' }} disabled={disabled} onClick={() => !disabled && onReserve(v)}>
           {disabled ? t.detail.vendu : vehicleCondition === 'occasion' ? t.detail.acheterOccasion : t.detail.reserver}
         </button>
+        {whatsappHref && (
+          <a
+            className="vd-whatsapp-btn vd-whatsapp-mobile"
+            href={whatsappHref}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={disabled ? t.detail.whatsappSimilar : t.detail.whatsappQuestion}
+            title={disabled ? t.detail.whatsappSimilar : t.detail.whatsappQuestion}
+          >
+            <WhatsAppIcon size={21} />
+          </a>
+        )}
       </div>
 
       {lb && images.length > 0 && (
