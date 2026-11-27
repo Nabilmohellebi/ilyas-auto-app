@@ -1,5 +1,5 @@
 create extension if not exists pg_cron;
-create extension if not exists pg_net;
+create extension if not exists pg_net with schema extensions;
 
 create table if not exists private.appointment_reminder_deliveries (
   id bigint generated always as identity primary key,
