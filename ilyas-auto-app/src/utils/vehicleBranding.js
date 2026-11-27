@@ -1,5 +1,10 @@
-const MIN_RECT_WIDTH = 10
+const MIN_RECT_WIDTH = 8
 const PLATE_ASPECT_RATIO = 4.6
+const DETECTOR_INPUT_SIZE = 640
+const DETECTOR_CONFIDENCE = 0.5
+const DETECTOR_MODEL_URL = 'https://huggingface.co/faisalthaheem/open-lpr-models/resolve/detector-2026.10.1/onnx/plate_yolox_tiny_640.onnx'
+
+let plateSessionPromise = null
 
 function clamp(value, min, max) {
   return Math.min(max, Math.max(min, value))
@@ -9,96 +14,187 @@ function toFile(blob, name) {
   return new File([blob], name, { type: 'image/jpeg', lastModified: Date.now() })
 }
 
+async function loadPlateDetector() {
+  if (!plateSessionPromise) {
+    plateSessionPromise = (async () => {
+      const ort = await import('onnxruntime-web')
+      // Keep the detector on the browser CPU/WASM backend. No photo is sent to an API.
+      ort.env.wasm.wasmPaths = 'https://cdn.jsdelivr.net/npm/onnxruntime-web@1.31.1/dist/'
+      ort.env.wasm.numThreads = 1
+      ort.env.wasm.proxy = false
+      return ort.InferenceSession.create(DETECTOR_MODEL_URL, {
+        executionProviders: ['wasm'],
+        graphOptimizationLevel: 'all',
+      })
+    })().catch(error => {
+      plateSessionPromise = null
+      throw new Error('Le détecteur de plaques n’a pas pu être chargé. Vérifie ta connexion internet puis réessaie.')
+    })
+  }
+  return plateSessionPromise
+}
+
+function makeLetterboxTensor(bitmap, maxScale = Infinity) {
+  const sourceWidth = bitmap.width
+  const sourceHeight = bitmap.height
+  const scale = Math.min(
+    DETECTOR_INPUT_SIZE / sourceWidth,
+    DETECTOR_INPUT_SIZE / sourceHeight,
+    maxScale,
+  )
+  const width = Math.max(1, Math.round(sourceWidth * scale))
+  const height = Math.max(1, Math.round(sourceHeight * scale))
+  const padX = (DETECTOR_INPUT_SIZE - width) / 2
+  const padY = (DETECTOR_INPUT_SIZE - height) / 2
+  const left = Math.round(padX)
+  const top = Math.round(padY)
+
+  const canvas = document.createElement('canvas')
+  canvas.width = DETECTOR_INPUT_SIZE
+  canvas.height = DETECTOR_INPUT_SIZE
+  const context = canvas.getContext('2d', { willReadFrequently: true })
+  if (!context) throw new Error('Le navigateur ne peut pas préparer la photo pour la détection.')
+  context.fillStyle = 'rgb(114, 114, 114)'
+  context.fillRect(0, 0, canvas.width, canvas.height)
+  context.drawImage(bitmap, left, top, width, height)
+
+  const pixels = context.getImageData(0, 0, canvas.width, canvas.height).data
+  const planeSize = DETECTOR_INPUT_SIZE * DETECTOR_INPUT_SIZE
+  const tensorData = new Float32Array(planeSize * 3)
+  for (let i = 0, p = 0; i < pixels.length; i += 4, p += 1) {
+    tensorData[p] = pixels[i]
+    tensorData[planeSize + p] = pixels[i + 1]
+    tensorData[planeSize * 2 + p] = pixels[i + 2]
+  }
+
+  return {
+    data: tensorData,
+    scale,
+    padX,
+    padY,
+    sourceWidth,
+    sourceHeight,
+  }
+}
+
+function intersectionOverUnion(a, b) {
+  const left = Math.max(a.x1, b.x1)
+  const top = Math.max(a.y1, b.y1)
+  const right = Math.min(a.x2, b.x2)
+  const bottom = Math.min(a.y2, b.y2)
+  const intersection = Math.max(0, right - left) * Math.max(0, bottom - top)
+  if (!intersection) return 0
+  const areaA = (a.x2 - a.x1) * (a.y2 - a.y1)
+  const areaB = (b.x2 - b.x1) * (b.y2 - b.y1)
+  const union = areaA + areaB - intersection
+  return union > 0 ? intersection / union : 0
+}
+
+function suppressPlateDuplicates(detections) {
+  const sorted = [...detections].sort((a, b) => b.confidence - a.confidence)
+  const kept = []
+  for (const candidate of sorted) {
+    if (kept.some(existing => intersectionOverUnion(candidate, existing) > 0.45)) continue
+    kept.push(candidate)
+  }
+  return kept
+}
+
+function decodePlatePredictions(output, transform) {
+  const dims = output.dims || []
+  const data = output.data
+  let rows
+  let features
+  if (dims.length === 3) {
+    rows = dims[1]
+    features = dims[2]
+  } else if (dims.length === 2) {
+    rows = dims[0]
+    features = dims[1]
+  } else {
+    throw new Error('Le modèle de détection a renvoyé un format inattendu.')
+  }
+  if (features < 6 || !rows) throw new Error('La sortie du détecteur de plaques est invalide.')
+
+  const expectedRows = (DETECTOR_INPUT_SIZE / 8) ** 2
+    + (DETECTOR_INPUT_SIZE / 16) ** 2
+    + (DETECTOR_INPUT_SIZE / 32) ** 2
+  if (rows !== expectedRows) {
+    throw new Error('La version du détecteur de plaques ne correspond pas à son format attendu.')
+  }
+
+  const detections = []
+  const { scale, padX, padY, sourceWidth, sourceHeight } = transform
+  for (let index = 0; index < rows; index += 1) {
+    const offset = index * features
+    const confidence = data[offset + 4] * data[offset + 5]
+    if (!Number.isFinite(confidence) || confidence < DETECTOR_CONFIDENCE) continue
+
+    const centerX = data[offset]
+    const centerY = data[offset + 1]
+    const width = data[offset + 2]
+    const height = data[offset + 3]
+    if (![centerX, centerY, width, height].every(Number.isFinite) || width <= 0 || height <= 0) continue
+
+    const x1 = clamp((centerX - width / 2 - padX) / scale, 0, sourceWidth)
+    const y1 = clamp((centerY - height / 2 - padY) / scale, 0, sourceHeight)
+    const x2 = clamp((centerX + width / 2 - padX) / scale, 0, sourceWidth)
+    const y2 = clamp((centerY + height / 2 - padY) / scale, 0, sourceHeight)
+    if (x2 - x1 < 8 || y2 - y1 < 5) continue
+    detections.push({ x1, y1, x2, y2, confidence })
+  }
+  return suppressPlateDuplicates(detections)
+}
+
+async function runPlateDetectorPass(session, ort, bitmap, maxScale = Infinity) {
+  const transform = makeLetterboxTensor(bitmap, maxScale)
+  const tensor = new ort.Tensor('float32', transform.data, [1, 3, DETECTOR_INPUT_SIZE, DETECTOR_INPUT_SIZE])
+  const outputs = await session.run({ [session.inputNames[0]]: tensor })
+  const output = outputs[session.outputNames[0]]
+  if (!output) throw new Error('Le détecteur de plaques n’a renvoyé aucun résultat.')
+  return decodePlatePredictions(output, transform)
+}
+
 export async function detectLicensePlate(file) {
   let bitmap
   try {
     bitmap = await createImageBitmap(file)
-    const scale = Math.min(1, 960 / Math.max(bitmap.width, bitmap.height))
-    const width = Math.max(1, Math.round(bitmap.width * scale))
-    const height = Math.max(1, Math.round(bitmap.height * scale))
-    const canvas = document.createElement('canvas')
-    canvas.width = width
-    canvas.height = height
-    const context = canvas.getContext('2d', { willReadFrequently: true })
-    if (!context) return null
-    context.drawImage(bitmap, 0, 0, width, height)
-    const pixels = context.getImageData(0, 0, width, height).data
-    const gray = new Uint8Array(width * height)
-    for (let i = 0, p = 0; i < pixels.length; i += 4, p += 1) {
-      gray[p] = Math.round(pixels[i] * 0.299 + pixels[i + 1] * 0.587 + pixels[i + 2] * 0.114)
+    const ort = await import('onnxruntime-web')
+    const session = await loadPlateDetector()
+    const primary = await runPlateDetectorPass(session, ort, bitmap)
+    let detections = primary
+
+    // Very small images need a second pass without upscaling, matching the model's
+    // training-time image scale and preserving tiny plates.
+    if (Math.max(bitmap.width, bitmap.height) < DETECTOR_INPUT_SIZE) {
+      const native = await runPlateDetectorPass(session, ort, bitmap, 1)
+      detections = suppressPlateDuplicates([...primary, ...native])
     }
 
-    let best = null
-    const minWidth = Math.max(70, Math.round(width * 0.13))
-    const maxWidth = Math.min(Math.round(width * 0.42), Math.round(height * 1.05))
-    const candidateWidths = []
-    for (let candidate = minWidth; candidate <= maxWidth; candidate += Math.max(12, Math.round(width * 0.025))) {
-      candidateWidths.push(candidate)
+    if (!detections.length) return null
+    // Vehicle photos generally contain a single car. The strongest plate match
+    // is selected; the user can still fine-tune the rectangle in the preview.
+    const best = detections[0]
+    const width = best.x2 - best.x1
+    const height = best.y2 - best.y1
+    const horizontalPadding = width * 0.025
+    const verticalPadding = height * 0.06
+    const x1 = clamp(best.x1 - horizontalPadding, 0, bitmap.width)
+    const y1 = clamp(best.y1 - verticalPadding, 0, bitmap.height)
+    const x2 = clamp(best.x2 + horizontalPadding, 0, bitmap.width)
+    const y2 = clamp(best.y2 + verticalPadding, 0, bitmap.height)
+
+    return {
+      x: x1 / bitmap.width * 100,
+      y: y1 / bitmap.height * 100,
+      w: (x2 - x1) / bitmap.width * 100,
+      h: (y2 - y1) / bitmap.height * 100,
+      angle: 0,
+      confidence: best.confidence,
     }
-
-    for (const boxWidth of candidateWidths) {
-      const boxHeight = Math.round(boxWidth / PLATE_ASPECT_RATIO)
-      if (boxHeight < 15 || boxHeight > height * 0.22) continue
-      const stepX = Math.max(5, Math.round(boxWidth * 0.12))
-      const stepY = Math.max(4, Math.round(boxHeight * 0.2))
-      const pixelStep = Math.max(3, Math.round(boxWidth / 45))
-
-      for (let y = Math.round(height * 0.22); y <= height - boxHeight - 2; y += stepY) {
-        for (let x = 0; x <= width - boxWidth; x += stepX) {
-          let sum = 0
-          let sumSq = 0
-          let dark = 0
-          let bright = 0
-          let count = 0
-          for (let py = y + 2; py < y + boxHeight - 2; py += pixelStep) {
-            for (let px = x + 2; px < x + boxWidth - 2; px += pixelStep) {
-              const value = gray[py * width + px]
-              sum += value
-              sumSq += value * value
-              if (value < 92) dark += 1
-              if (value > 155) bright += 1
-              count += 1
-            }
-          }
-          if (!count) continue
-          const mean = sum / count
-          const variance = Math.max(0, sumSq / count - mean * mean)
-          const deviation = Math.sqrt(variance)
-          const darkRatio = dark / count
-          const brightRatio = bright / count
-          if (mean < 88 || brightRatio < 0.2 || darkRatio < 0.025 || deviation < 22) continue
-
-          // A plate is generally a bright, fairly flat rectangle with dark characters.
-          // This is a local computer-vision suggestion, not a guaranteed recognition.
-          const contrastScore = clamp((deviation - 18) / 58, 0, 1)
-          const darkScore = clamp(darkRatio / 0.16, 0, 1)
-          const brightScore = clamp((brightRatio - 0.16) / 0.62, 0, 1)
-          const meanScore = clamp((mean - 85) / 130, 0, 1)
-          const centerX = (x + boxWidth / 2) / width
-          const centerY = (y + boxHeight / 2) / height
-          const centerScore = 1 - Math.min(1, Math.abs(centerX - 0.5) / 0.58)
-          const lowerScore = clamp((centerY - 0.34) / 0.5, 0, 1)
-          const score = contrastScore * 0.25 + darkScore * 0.28 + brightScore * 0.2
-            + meanScore * 0.08 + centerScore * 0.11 + lowerScore * 0.08
-
-          if (!best || score > best.score) {
-            best = {
-              score,
-              x: x / width * 100,
-              y: y / height * 100,
-              w: boxWidth / width * 100,
-              h: boxHeight / height * 100,
-            }
-          }
-        }
-      }
-    }
-
-    if (!best || best.score < 0.46) return null
-    return { x: best.x, y: best.y, w: best.w, h: best.h, confidence: best.score }
   } catch (error) {
-    console.warn('Détection de plaque indisponible :', error)
-    return null
+    console.warn('Détection de plaque :', error)
+    throw error
   } finally {
     bitmap?.close?.()
   }
@@ -137,17 +233,22 @@ export async function createBrandedVehicleImageBlob(source, plateRect, brand = {
   const y = clamp(Number(plateRect?.y) || 0, 0, 100) / 100 * canvas.height
   const width = clamp(Number(plateRect?.w) || 20, 4, 90) / 100 * canvas.width
   const height = clamp(Number(plateRect?.h) || 6, 1.5, 40) / 100 * canvas.height
+  const centerX = x + width / 2
+  const centerY = y + height / 2
   const radius = Math.min(height * 0.13, width * 0.035)
+  const angle = (Number(plateRect?.angle) || 0) * Math.PI / 180
   const brandName = String(brand.shopName || 'Votre showroom').trim().slice(0, 42)
   const accent = /^#[0-9a-f]{6}$/i.test(brand.accentColor || '') ? brand.accentColor : '#d7b15f'
 
   context.save()
-  context.shadowColor = 'rgba(0,0,0,.5)'
-  context.shadowBlur = Math.max(3, height * 0.12)
-  context.fillStyle = '#101820'
+  context.translate(centerX, centerY)
+  context.rotate(angle)
+  context.shadowColor = 'rgba(15, 23, 42, .22)'
+  context.shadowBlur = Math.max(3, height * 0.1)
+  context.fillStyle = '#ffffff'
   context.beginPath()
-  if (typeof context.roundRect === 'function') context.roundRect(x, y, width, height, radius)
-  else context.rect(x, y, width, height)
+  if (typeof context.roundRect === 'function') context.roundRect(-width / 2, -height / 2, width, height, radius)
+  else context.rect(-width / 2, -height / 2, width, height)
   context.fill()
   context.shadowBlur = 0
   context.lineWidth = Math.max(2, height * 0.035)
@@ -163,15 +264,15 @@ export async function createBrandedVehicleImageBlob(source, plateRect, brand = {
     const fit = Math.min(availableWidth / logo.naturalWidth, availableHeight / logo.naturalHeight)
     const drawWidth = logo.naturalWidth * fit
     const drawHeight = logo.naturalHeight * fit
-    context.drawImage(logo, x + (width - drawWidth) / 2, y + (height - drawHeight) / 2, drawWidth, drawHeight)
+    context.drawImage(logo, -drawWidth / 2, -drawHeight / 2, drawWidth, drawHeight)
   } else {
     let fontSize = Math.min(height * 0.5, width / Math.max(brandName.length * 0.62, 5))
     fontSize = Math.max(9, fontSize)
-    context.fillStyle = '#ffffff'
+    context.fillStyle = '#172033'
     context.textAlign = 'center'
     context.textBaseline = 'middle'
     context.font = `800 ${fontSize}px Arial, sans-serif`
-    context.fillText(brandName.toLocaleUpperCase('fr'), x + width / 2, y + height / 2, width - paddingX * 2)
+    context.fillText(brandName.toLocaleUpperCase('fr'), 0, 0, width - paddingX * 2)
   }
   context.restore()
   bitmap.close?.()
@@ -186,6 +287,13 @@ export async function createBrandedVehicleImageFile(sourceFile, plateRect, brand
   const blob = await createBrandedVehicleImageBlob(sourceFile, plateRect, brand)
   const baseName = String(sourceFile?.name || 'vehicule').replace(/\.[^.]+$/, '')
   return toFile(blob, baseName + '-showroom.jpg')
+}
+
+function parsePhotoList(value) {
+  if (typeof value === 'string') {
+    try { value = JSON.parse(value) } catch { return [] }
+  }
+  return Array.isArray(value) ? value : []
 }
 
 export async function rebrandStoredVehiclePhotos({ supabase, shopName, brandIdentity, onProgress } = {}) {
@@ -205,14 +313,22 @@ export async function rebrandStoredVehiclePhotos({ supabase, shopName, brandIden
   let errors = 0
 
   for (const vehicle of vehicles || []) {
-    const next = { images: Array.isArray(vehicle.images) ? [...vehicle.images] : [], images_gallery: Array.isArray(vehicle.images_gallery) ? [...vehicle.images_gallery] : [] }
+    const next = {
+      images: parsePhotoList(vehicle.images),
+      images_gallery: parsePhotoList(vehicle.images_gallery),
+    }
+    let nextMainImage = vehicle.img
     let changed = false
     for (const key of ['images', 'images_gallery']) {
       for (let index = 0; index < next[key].length; index += 1) {
         const item = next[key][index]
         if (!item?.originalUrl || !item?.plateRect) continue
         scanned += 1
-        if (item.brandingName === branding.shopName && item.brandingLogoUrl === branding.logoUrl && item.brandingAccentColor === branding.accentColor) continue
+        if (
+          item.brandingName === branding.shopName
+          && item.brandingLogoUrl === branding.logoUrl
+          && item.brandingAccentColor === branding.accentColor
+        ) continue
         try {
           const blob = await createBrandedVehicleImageBlob(item.originalUrl, item.plateRect, branding)
           const id = globalThis.crypto?.randomUUID?.() || (Date.now() + '-' + Math.random().toString(36).slice(2))
@@ -233,7 +349,7 @@ export async function rebrandStoredVehiclePhotos({ supabase, shopName, brandIden
             brandingLogoUrl: branding.logoUrl,
             brandingAccentColor: branding.accentColor,
           }
-          if (key === 'images' && vehicle.img === oldUrl) vehicle.img = data.publicUrl
+          if (key === 'images' && nextMainImage === oldUrl) nextMainImage = data.publicUrl
           changed = true
           updated += 1
         } catch (error) {
@@ -245,7 +361,7 @@ export async function rebrandStoredVehiclePhotos({ supabase, shopName, brandIden
     if (changed) {
       const { error: updateError } = await supabase
         .from('vehicles')
-        .update({ images: next.images, images_gallery: next.images_gallery, img: vehicle.img })
+        .update({ images: next.images, images_gallery: next.images_gallery, img: nextMainImage })
         .eq('id', vehicle.id)
       if (updateError) errors += 1
     }

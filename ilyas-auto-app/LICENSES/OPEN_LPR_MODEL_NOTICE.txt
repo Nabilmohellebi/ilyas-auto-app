@@ -1,0 +1,10 @@
+Copyright the open-lpr contributors
+
+This product includes the YOLOX-Tiny plate detector from the open-lpr-models project.
+The upstream project identifies the detector as trained by its contributors using
+YOLOX under the Apache License 2.0. No OCR weights or OCR dictionary are used here.
+
+Upstream source: https://huggingface.co/faisalthaheem/open-lpr-models
+Pinned model revision: detector-2026.10.1
+
+See the accompanying Apache License 2.0 file for license terms.
