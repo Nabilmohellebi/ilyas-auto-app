@@ -74,7 +74,12 @@ export default function AppointmentSlotsPanel({ shopName = 'Nabil Auto', onToast
   const reservationBySlot = useMemo(() => {
     const map = new Map()
     reservations.forEach(reservation => {
-      if (reservation.appointment_slot_id) map.set(reservation.appointment_slot_id, reservation)
+      if (
+        reservation.appointment_slot_id &&
+        !['annulee', 'refusee'].includes(reservation.statut)
+      ) {
+        map.set(reservation.appointment_slot_id, reservation)
+      }
     })
     return map
   }, [reservations])
