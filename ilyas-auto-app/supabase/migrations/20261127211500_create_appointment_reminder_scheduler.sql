@@ -64,7 +64,7 @@ begin
      set http_request_id = null,
          queued_at = null,
          last_error = pg_catalog.left(
-           pg_catalog.coalesce(response.error_msg, response.content, 'HTTP ' || response.status_code::text),
+           coalesce(response.error_msg, response.content, 'HTTP ' || response.status_code::text),
            500
          ),
          updated_at = pg_catalog.now()
