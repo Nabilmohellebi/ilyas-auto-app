@@ -536,6 +536,9 @@ export default function VehicleForm({ vehicle, onClose, onSave }) {
           {/* ── Photos carrousel ── */}
           <div className="pf-section">
             <h3>📸 Photos du véhicule</h3>
+            <p style={{ color: 'rgba(255,255,255,.58)', fontSize: 12, lineHeight: 1.6, marginBottom: 12 }}>
+              Après le recadrage, le site recherche la plaque et propose d’y placer le logo ou le nom actuel du showroom. Vérifie la position avant validation : tu peux déplacer et redimensionner le marquage. La photo originale est conservée pour permettre de changer l’identité plus tard.
+            </p>
             <label className="upload-zone"
               onDragOver={e => e.preventDefault()}
               onDrop={e => {
@@ -550,6 +553,7 @@ export default function VehicleForm({ vehicle, onClose, onSave }) {
               </div>
               <div style={{ fontSize: 11, color: 'rgba(255,255,255,.25)', marginTop: 3 }}>JPG, PNG, WebP, GIF — compression automatique</div>
             </label>
+            <small style={{ display: 'block', color: 'rgba(255,255,255,.34)', fontSize: 10, marginTop: 2 }}>Les photos fixes JPG, PNG et WebP sont personnalisées. Les GIF animés sont conservés sans modification.</small>
 
             {form.images.length > 0 && (
               <div style={{ marginTop: 10 }}>
