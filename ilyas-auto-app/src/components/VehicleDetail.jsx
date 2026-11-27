@@ -141,8 +141,8 @@ export default function VehicleDetail({ vehicle: v, onClose, onReserve, onExchan
   const specs = sortEquipment(v.specs)
   const technicalSpecs = sortTechnicalSpecs(v.technical_specs)
   const vehicleCondition = v.etat_vehicule || (Number(v.km || 0) > 0 ? 'occasion' : 'neuf')
-  const vehiclePageUrl = new URL(window.location.href)
-  vehiclePageUrl.searchParams.set('vehicule', String(v.id))
+  const vehiclePageUrl = new URL('/api/vehicle-share', window.location.origin)
+  vehiclePageUrl.searchParams.set('id', String(v.id))
   const vehicleUrl = vehiclePageUrl.href
   const whatsappMessage = disabled
     ? (lang === 'ar'
@@ -157,8 +157,8 @@ export default function VehicleDetail({ vehicle: v, onClose, onReserve, onExchan
   function prev() { setIdx(i => (i - 1 + images.length) % images.length) }
 
   async function shareVehicle() {
-    const link = new URL(window.location.pathname, window.location.origin)
-    link.searchParams.set('vehicule', String(v.id))
+    const link = new URL('/api/vehicle-share', window.location.origin)
+    link.searchParams.set('id', String(v.id))
     const shareData = {
       title: `${shopName} — ${v.marque} ${v.modele}`,
       text: `${v.marque} ${v.modele} (${v.annee}) · ${fmt(v.prix)}`,
