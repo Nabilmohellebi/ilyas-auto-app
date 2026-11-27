@@ -114,6 +114,7 @@ export default function AppointmentSlotsPanel({ shopName = 'Nabil Auto', onToast
       })
       if (error) {
         if (error.code === '23505') throw new Error('Un créneau commence déjà à cette heure.')
+        if (error.code === '23P01') throw new Error('Ce créneau chevauche un horaire déjà programmé.')
         throw error
       }
       setForm(EMPTY_FORM)
