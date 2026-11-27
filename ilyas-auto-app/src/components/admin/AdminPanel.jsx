@@ -55,6 +55,23 @@ const ADMIN_NAV_GROUPS = [
 
 function statutOf(key) { return STATUTS.find(s => s.key === key) || STATUTS[0] }
 
+function formatAppointmentTime(value) {
+  return new Date(value).toLocaleTimeString('fr-FR', {
+    timeZone: 'Africa/Algiers',
+    hour: '2-digit',
+    minute: '2-digit',
+  })
+}
+
+function formatAppointmentDay(value) {
+  return new Date(value).toLocaleDateString('fr-FR', {
+    timeZone: 'Africa/Algiers',
+    weekday: 'long',
+    day: '2-digit',
+    month: 'long',
+  })
+}
+
 const SELL_DETAILS_PREFIX = 'HBR_REQUEST_V2:'
 const SELL_SOURCE_LABELS = {
   site: 'Site internet',
@@ -660,6 +677,7 @@ export default function AdminPanel({ onLogout, onToast }) {
   const [resSearch, setResSearch] = useState('')
   const [vehicles, setVehicles] = useState([])
   const [reservations, setReservations] = useState([])
+  const [appointmentSlots, setAppointmentSlots] = useState([])
   const [bannerMsgs, setBannerMsgs] = useState([])
   const [testimonials, setTestimonials] = useState([])
   const [sellRequests, setSellRequests] = useState([])
@@ -683,8 +701,23 @@ export default function AdminPanel({ onLogout, onToast }) {
   }, [])
 
   const loadReservations = useCallback(async () => {
-    const { data } = await supabase.from('reservations').select('*').order('created_at', { ascending: false })
-    setReservations(data || [])
+    const [reservationResult, slotResult] = await Promise.all([
+      supabase.from('reservations').select('*').order('created_at', { ascending: false }),
+      supabase
+        .from('appointment_slots')
+        .select('id, starts_at, ends_at, label, status')
+        .eq('status', 'booked')
+        .gte('starts_at', new Date().toISOString())
+        .order('starts_at', { ascending: true })
+        .limit(100),
+    ])
+    setReservations(reservationResult.data || [])
+    if (slotResult.error) {
+      console.warn('Impossible de charger les prochains rendez-vous :', slotResult.error)
+      setAppointmentSlots([])
+    } else {
+      setAppointmentSlots(slotResult.data || [])
+    }
   }, [])
 
   useEffect(() => { loadVehicles(); loadReservations(); loadBanner(); loadTestimonials(); loadSellRequests(); loadVehicleSearchRequests(); loadFollowUpSummary() }, [])
@@ -1219,6 +1252,27 @@ export default function AdminPanel({ onLogout, onToast }) {
     .sort((a, b) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime())
     .slice(0, 5)
 
+  const activeReservationsBySlot = new Map(
+    reservations
+      .filter(reservation =>
+        reservation.appointment_slot_id &&
+        !['annulee', 'refusee'].includes(reservation.statut)
+      )
+      .map(reservation => [reservation.appointment_slot_id, reservation])
+  )
+  const allUpcomingAppointments = appointmentSlots
+    .filter(slot => new Date(slot.starts_at).getTime() >= Date.now())
+    .map(slot => ({ ...slot, reservation: activeReservationsBySlot.get(slot.id) }))
+    .filter(slot => slot.reservation)
+    .sort((a, b) => new Date(a.starts_at).getTime() - new Date(b.starts_at).getTime())
+  const upcomingAppointments = allUpcomingAppointments.slice(0, 5)
+  const todayAppointmentKey = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Africa/Algiers', year: 'numeric', month: '2-digit', day: '2-digit',
+  }).format(new Date())
+  const appointmentsTodayCount = allUpcomingAppointments.filter(slot =>
+    new Intl.DateTimeFormat('en-CA', { timeZone: 'Africa/Algiers' }).format(new Date(slot.starts_at)) === todayAppointmentKey
+  ).length
+
   const now = new Date()
   const currentDateLabel = now.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
   const monthlyActivity = Array.from({ length: 6 }, (_, index) => {
@@ -1386,6 +1440,56 @@ export default function AdminPanel({ onLogout, onToast }) {
                 <span className="adm-kpi-foot"><span>Demandes à traiter</span><b>{stats.reprisesNouvelles} reprise(s) · {stats.recherchesNouvelles} recherche(s)</b></span>
               </button>
             </div>
+
+            <section className="adm-overview-card adm-upcoming-appointments">
+              <div className="adm-panel-heading adm-upcoming-heading">
+                <div>
+                  <span className="adm-eyebrow">ACCUEIL AU SHOWROOM</span>
+                  <h3>Prochains rendez-vous</h3>
+                  <p>{appointmentsTodayCount} rendez-vous aujourd’hui · {allUpcomingAppointments.length} à venir</p>
+                </div>
+                <button type="button" className="adm-text-link" onClick={() => setTab('rendezvous')}>
+                  Gérer le calendrier <span>→</span>
+                </button>
+              </div>
+
+              {upcomingAppointments.length === 0 ? (
+                <div className="adm-upcoming-empty">
+                  <span>🗓️</span>
+                  <div>
+                    <strong>Aucun rendez-vous confirmé à venir</strong>
+                    <small>Les rendez-vous réservés apparaîtront ici avec le nom du client et le véhicule concerné.</small>
+                  </div>
+                  <button type="button" className="act-btn" onClick={() => setTab('rendezvous')}>Ouvrir le calendrier</button>
+                </div>
+              ) : (
+                <div className="adm-upcoming-list">
+                  {upcomingAppointments.map(slot => {
+                    const booking = slot.reservation
+                    return (
+                      <article className="adm-upcoming-row" key={slot.id}>
+                        <div className="adm-upcoming-date">
+                          <strong>{formatAppointmentTime(slot.starts_at)}</strong>
+                          <span>{formatAppointmentTime(slot.ends_at)}</span>
+                        </div>
+                        <div className="adm-upcoming-main">
+                          <strong>{booking.nom_client || 'Client'}</strong>
+                          <span>{booking.vehicule_nom || 'Véhicule non précisé'}</span>
+                          <small>{formatAppointmentDay(slot.starts_at)} · {slot.label}</small>
+                        </div>
+                        <button
+                          type="button"
+                          className="act-btn wa adm-upcoming-contact"
+                          onClick={() => openWA(booking, shopName)}
+                        >
+                          💬 WhatsApp
+                        </button>
+                      </article>
+                    )
+                  })}
+                </div>
+              )}
+            </section>
 
             <div className="adm-dashboard-main-grid">
               <section className="adm-overview-card adm-chart-card">
