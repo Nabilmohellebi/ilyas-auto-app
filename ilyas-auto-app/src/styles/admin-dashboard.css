@@ -1179,3 +1179,80 @@ button.adm-kpi-card { cursor: pointer; }
   .commercial-target-form > div { grid-column: auto; }
   .commercial-goal-copy { align-items: flex-start; flex-direction: column; gap: 4px; }
 }
+
+
+/* Upcoming showroom appointments on the admin overview */
+.adm-modern .adm-upcoming-appointments {
+  margin-bottom: 18px;
+  padding: 17px 19px;
+}
+.adm-modern .adm-upcoming-heading { align-items: center; margin-bottom: 8px; }
+.adm-modern .adm-upcoming-heading > div { min-width: 0; }
+.adm-modern .adm-upcoming-heading p {
+  margin: 5px 0 0;
+  color: rgba(223,232,221,.42);
+  font-size: 8.5px;
+}
+.adm-upcoming-list { display: flex; flex-direction: column; }
+.adm-upcoming-row {
+  display: grid;
+  grid-template-columns: 92px minmax(0,1fr) auto;
+  align-items: center;
+  gap: 13px;
+  min-width: 0;
+  padding: 11px 0;
+  border-bottom: 1px solid rgba(255,255,255,.065);
+}
+.adm-upcoming-row:last-child { border-bottom: 0; }
+.adm-upcoming-date {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 9px 10px;
+  border: 1px solid rgba(215,177,95,.2);
+  border-radius: 9px;
+  background: rgba(215,177,95,.07);
+  text-align: center;
+}
+.adm-upcoming-date strong { color: #e8c77e; font-size: 14px; font-weight: 900; font-variant-numeric: tabular-nums; }
+.adm-upcoming-date span { color: rgba(223,232,221,.48); font-size: 8px; }
+.adm-upcoming-main { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.adm-upcoming-main strong {
+  overflow: hidden;
+  color: #f1f3ee;
+  font-size: 10px;
+  font-weight: 850;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.adm-upcoming-main > span {
+  overflow: hidden;
+  color: rgba(223,232,221,.67);
+  font-size: 9px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.adm-upcoming-main small { color: rgba(223,232,221,.38); font-size: 8px; text-transform: capitalize; }
+.adm-modern .adm-upcoming-contact { white-space: nowrap; }
+.adm-upcoming-empty {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 15px 4px 4px;
+}
+.adm-upcoming-empty > span { font-size: 25px; }
+.adm-upcoming-empty > div { display: flex; flex: 1; min-width: 0; flex-direction: column; gap: 4px; }
+.adm-upcoming-empty strong { color: #f1f3ee; font-size: 10px; font-weight: 800; }
+.adm-upcoming-empty small { color: rgba(223,232,221,.42); font-size: 8.5px; line-height: 1.55; }
+@media (max-width: 620px) {
+  .adm-modern .adm-upcoming-appointments { padding: 14px; }
+  .adm-modern .adm-upcoming-heading { align-items: flex-start; }
+  .adm-modern .adm-upcoming-heading .adm-text-link { font-size: 8px; white-space: nowrap; }
+  .adm-upcoming-row { grid-template-columns: 72px minmax(0,1fr); gap: 9px; }
+  .adm-upcoming-date { padding: 8px 5px; }
+  .adm-upcoming-date strong { font-size: 12px; }
+  .adm-upcoming-contact { grid-column: 2; justify-self: start; }
+  .adm-upcoming-empty { align-items: flex-start; flex-wrap: wrap; }
+  .adm-upcoming-empty > div { flex-basis: calc(100% - 45px); }
+  .adm-upcoming-empty > button { margin-left: 37px; }
+}
