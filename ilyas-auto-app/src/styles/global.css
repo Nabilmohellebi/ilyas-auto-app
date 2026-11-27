@@ -2393,6 +2393,10 @@ input, select, textarea { font-family: var(--fb); outline: none; }
   box-shadow: 0 7px 18px rgba(22,131,72,.22);
 }
 .vd-whatsapp-mobile { display: none !important; }
+.vd-whatsapp-desktop { display: none !important; }
+@media (min-width: 860px) {
+  .vd-whatsapp-desktop { display: flex !important; }
+}
 @media (max-width: 859px) {
   .vd-whatsapp-mobile { display: flex !important; }
   .vd-bottom .vd-whatsapp-mobile {
