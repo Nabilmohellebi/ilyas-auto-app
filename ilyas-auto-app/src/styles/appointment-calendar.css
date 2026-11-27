@@ -1,0 +1,69 @@
+.appointment-admin { display: flex; flex-direction: column; gap: 18px; }
+.appointment-admin-head,.appointment-list-head { display:flex; align-items:flex-start; justify-content:space-between; gap:16px; }
+.appointment-admin-head h2 { margin:5px 0 6px; color:#fff; font-size:22px; font-weight:900; }
+.appointment-admin-head p,.appointment-list-head p { margin:0; color:rgba(255,255,255,.48); font-size:12px; line-height:1.6; }
+.appointment-admin-stats { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; }
+.appointment-admin-stats > div { padding:15px 17px; border:1px solid var(--brd); border-radius:12px; background:var(--card); }
+.appointment-admin-stats span { display:block; margin-bottom:7px; color:rgba(255,255,255,.48); font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:.08em; }
+.appointment-admin-stats strong { color:#e8c77e; font-size:25px; font-weight:900; font-variant-numeric:tabular-nums; }
+.appointment-slot-form { padding:18px; border:1px solid rgba(215,177,95,.22); border-radius:15px; background:linear-gradient(145deg,rgba(215,177,95,.075),rgba(255,255,255,.018)); }
+.appointment-slot-form-heading h3,.appointment-list-head h3 { margin:0 0 5px; color:#fff; font-size:15px; font-weight:850; }
+.appointment-slot-form-heading p { margin:0; color:rgba(255,255,255,.46); font-size:11px; }
+.appointment-slot-fields { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin-top:16px; }
+.appointment-slot-fields label { display:flex; flex-direction:column; gap:7px; min-width:0; color:rgba(255,255,255,.7); font-size:11px; font-weight:750; }
+.appointment-slot-fields label span { color:inherit; }
+.appointment-slot-fields input { width:100%; min-height:42px; box-sizing:border-box; padding:9px 11px; border:1px solid rgba(255,255,255,.13); border-radius:9px; color:#f3f2ec; background:rgba(0,0,0,.22); font:inherit; color-scheme:dark; }
+.appointment-slot-label-field { grid-column:1/-1; }
+.appointment-slot-form-footer { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; margin-top:15px; padding-top:14px; border-top:1px solid rgba(255,255,255,.08); }
+.appointment-slot-form-footer > span { max-width:430px; color:rgba(255,255,255,.4); font-size:10px; line-height:1.5; }
+.appointment-list-head { align-items:center; margin-top:5px; }
+.appointment-timezone { padding:7px 10px; border:1px solid var(--brd); border-radius:999px; color:rgba(255,255,255,.56); font-size:10px; white-space:nowrap; }
+.appointment-slot-list { display:flex; flex-direction:column; gap:9px; }
+.appointment-slot-card { display:grid; grid-template-columns:minmax(185px, .9fr) minmax(0,1.7fr) auto; align-items:center; gap:15px; padding:14px; border:1px solid var(--brd); border-radius:13px; background:var(--card); }
+.appointment-slot-card.is-past { opacity:.58; }
+.appointment-slot-date span { display:block; margin-bottom:5px; color:rgba(255,255,255,.52); font-size:10px; text-transform:capitalize; }
+.appointment-slot-date strong { color:#e8c77e; font-size:14px; font-weight:900; }
+.appointment-slot-main > strong { display:block; margin-bottom:5px; color:#fff; font-size:12px; }
+.appointment-slot-booking { display:flex; flex-wrap:wrap; gap:5px 8px; color:rgba(255,255,255,.7); font-size:10px; }
+.appointment-slot-booking small { display:block; width:100%; color:rgba(255,255,255,.44); font-size:10px; }
+.appointment-slot-no-booking { color:rgba(255,255,255,.4); font-size:10px; }
+.appointment-slot-actions { display:flex; align-items:center; justify-content:flex-end; flex-wrap:wrap; gap:6px; }
+.appointment-slot-card.status-booked { border-inline-start:3px solid #d8b36a; }
+.appointment-slot-card.status-blocked { border-inline-start:3px solid #777; }
+.appointment-slot-card.status-open { border-inline-start:3px solid #22a66a; }
+.appointment-empty { display:flex; flex-direction:column; align-items:center; gap:8px; padding:32px 20px; border:1px dashed var(--brd); border-radius:13px; color:rgba(255,255,255,.46); text-align:center; font-size:12px; }
+.appointment-empty > span { font-size:32px; }
+.appointment-empty strong { color:#fff; font-size:14px; }
+.appointment-empty p { max-width:480px; margin:0; line-height:1.7; }
+.appointment-empty.error { align-items:flex-start; color:#fda4af; }
+.appointment-slot-card .act-btn:disabled { opacity:.5; cursor:not-allowed; }
+@media (max-width: 760px) {
+  .appointment-slot-card { grid-template-columns:1fr; gap:10px; }
+  .appointment-slot-actions { justify-content:flex-start; }
+}
+@media (max-width: 560px) {
+  .appointment-admin-head { flex-direction:column; }
+  .appointment-admin-stats { grid-template-columns:1fr; }
+  .appointment-admin-stats > div { display:flex; align-items:center; justify-content:space-between; }
+  .appointment-admin-stats span { margin:0; }
+  .appointment-slot-fields { grid-template-columns:1fr; }
+  .appointment-slot-label-field { grid-column:auto; }
+}
+.app[data-theme="light"] .appointment-admin-head h2,
+.app[data-theme="light"] .appointment-slot-form-heading h3,
+.app[data-theme="light"] .appointment-list-head h3,
+.app[data-theme="light"] .appointment-slot-main > strong,
+.app[data-theme="light"] .appointment-empty strong { color:#242428; }
+.app[data-theme="light"] .appointment-admin-stats > div,
+.app[data-theme="light"] .appointment-slot-card,
+.app[data-theme="light"] .appointment-slot-form { background:#fff; border-color:#e5e2db; }
+.app[data-theme="light"] .appointment-slot-fields input { color:#242428; background:#f7f7f8; border-color:#dcdce2; color-scheme:light; }
+.app[data-theme="ivory"] .appointment-admin-head h2,
+.app[data-theme="ivory"] .appointment-slot-form-heading h3,
+.app[data-theme="ivory"] .appointment-list-head h3,
+.app[data-theme="ivory"] .appointment-slot-main > strong,
+.app[data-theme="ivory"] .appointment-empty strong { color:var(--theme-text); }
+.app[data-theme="ivory"] .appointment-admin-stats > div,
+.app[data-theme="ivory"] .appointment-slot-card,
+.app[data-theme="ivory"] .appointment-slot-form { background:var(--theme-surface); border-color:var(--theme-border); }
+.app[data-theme="ivory"] .appointment-slot-fields input { color:var(--theme-text); background:var(--theme-field); border-color:var(--theme-border); color-scheme:light; }
