@@ -1,7 +1,9 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { supabase } from '../../supabase'
 import { BRANDS, TRANSMISSIONS, FUELS, BODY_TYPES, BADGES, STATUTS, ORIGINS } from '../../data/vehicles-data'
 import ImageCropper from './ImageCropper'
+import PlateBrandingEditor from './PlateBrandingEditor'
+import { getSettings, parseBrandIdentity, DEFAULT_BRAND_IDENTITY } from '../../utils/useSettings'
 import { mergeTechnicalSpecs, parseEquipmentLines, parseTechnicalSpecLines, sortEquipment, sortTechnicalSpecs } from '../../utils/vehicleSpecifications'
 
 export default function VehicleForm({ vehicle, onClose, onSave }) {
@@ -34,6 +36,19 @@ export default function VehicleForm({ vehicle, onClose, onSave }) {
   const [bulkTechnicalText, setBulkTechnicalText] = useState('')
   const [uploading, setUploading] = useState(false)
   const [cropQueue, setCropQueue] = useState([])
+  const [brandingTask, setBrandingTask] = useState(null)
+  const [shopName, setShopName] = useState('Nabil Auto')
+  const [brandIdentity, setBrandIdentity] = useState(DEFAULT_BRAND_IDENTITY)
+
+  useEffect(() => {
+    let active = true
+    getSettings().then(settings => {
+      if (!active) return
+      setShopName(String(settings.shop_name || 'Nabil Auto').trim() || 'Nabil Auto')
+      setBrandIdentity(parseBrandIdentity(settings.brand_identity))
+    }).catch(error => console.warn('Paramètres de marque indisponibles :', error))
+    return () => { active = false }
+  }, [])
   const [saveError, setSaveError] = useState('')
   const fileRef = useRef()
 
@@ -79,7 +94,8 @@ export default function VehicleForm({ vehicle, onClose, onSave }) {
       } catch { fileToUpload = file }
     }
 
-    const path = `vehicles/${Date.now()}.${ext}`
+    const uniqueId = globalThis.crypto?.randomUUID?.() || (Date.now() + '-' + Math.random().toString(36).slice(2))
+    const path = `vehicles/${uniqueId}.${ext}`
     const opts = isGif ? { contentType: 'image/gif', upsert: true } : { upsert: true }
     const { error } = await supabase.storage.from('vehicle-images').upload(path, fileToUpload, opts)
     setUploading(false)
@@ -124,19 +140,64 @@ export default function VehicleForm({ vehicle, onClose, onSave }) {
     queueVehicleImages(files, 'main')
   }
 
-  async function confirmVehicleCrop(croppedFile) {
+  function confirmVehicleCrop(croppedFile) {
     const task = cropQueue[0]
     if (!task) return
+    setCropQueue(current => current.slice(1))
+    setBrandingTask({ file: croppedFile, target: task.target })
+  }
+
+  async function saveBrandedPhoto({ originalFile, brandedFile, plateRect }) {
+    const task = brandingTask
+    if (!task) return
+    setUploading(true)
     try {
-      const url = await uploadFile(croppedFile)
-      if (url && task.target === 'main') {
-        setForm(current => ({ ...current, images: [...current.images, { url }], img: current.img || url }))
-      } else if (url && task.target === 'gallery') {
-        setForm(current => ({ ...current, images_gallery: [...current.images_gallery, { url }] }))
+      const originalUrl = await uploadFile(originalFile)
+      if (!originalUrl) throw new Error('La photo originale n’a pas pu être enregistrée.')
+      const url = await uploadFile(brandedFile)
+      if (!url) throw new Error('La photo personnalisée n’a pas pu être enregistrée.')
+      const photo = {
+        url,
+        originalUrl,
+        plateRect,
+        brandingName: shopName,
+        brandingLogoUrl: brandIdentity.logoUrl || '',
+        brandingAccentColor: brandIdentity.accentColor || '#d7b15f',
+        brandingVersion: 1,
       }
+      if (task.target === 'main') {
+        setForm(current => ({ ...current, images: [...current.images, photo], img: current.img || url }))
+      } else {
+        setForm(current => ({ ...current, images_gallery: [...current.images_gallery, photo] }))
+      }
+      setBrandingTask(null)
     } finally {
-      setCropQueue(current => current.slice(1))
+      setUploading(false)
     }
+  }
+
+  async function skipPhotoBranding() {
+    const task = brandingTask
+    if (!task) return
+    setUploading(true)
+    try {
+      const url = await uploadFile(task.file)
+      if (!url) throw new Error('La photo n’a pas pu être enregistrée.')
+      const photo = { url, originalUrl: url, brandingVersion: 0 }
+      if (task.target === 'main') {
+        setForm(current => ({ ...current, images: [...current.images, photo], img: current.img || url }))
+      } else {
+        setForm(current => ({ ...current, images_gallery: [...current.images_gallery, photo] }))
+      }
+      setBrandingTask(null)
+    } finally {
+      setUploading(false)
+    }
+  }
+
+  function cancelPhotoBranding() {
+    setBrandingTask(null)
+    setCropQueue([])
   }
 
   function handleGalleryFileSelect(e) {
@@ -225,8 +286,8 @@ export default function VehicleForm({ vehicle, onClose, onSave }) {
       setSaveError('L’ancien prix doit être un nombre positif.')
       return
     }
-    if (uploading) {
-      setSaveError('Attends la fin du téléversement des photos.')
+    if (uploading || brandingTask || cropQueue.length > 0) {
+      setSaveError('Termine la personnalisation et le téléversement des photos avant d’enregistrer.')
       return
     }
 
@@ -476,6 +537,9 @@ export default function VehicleForm({ vehicle, onClose, onSave }) {
           {/* ── Photos carrousel ── */}
           <div className="pf-section">
             <h3>📸 Photos du véhicule</h3>
+            <p style={{ color: 'rgba(255,255,255,.58)', fontSize: 12, lineHeight: 1.6, marginBottom: 12 }}>
+              Après le recadrage, le site recherche la plaque et propose d’y placer le logo ou le nom actuel du showroom. Vérifie la position avant validation : tu peux déplacer et redimensionner le marquage. La photo originale est conservée pour permettre de changer l’identité plus tard.
+            </p>
             <label className="upload-zone"
               onDragOver={e => e.preventDefault()}
               onDrop={e => {
@@ -490,6 +554,7 @@ export default function VehicleForm({ vehicle, onClose, onSave }) {
               </div>
               <div style={{ fontSize: 11, color: 'rgba(255,255,255,.25)', marginTop: 3 }}>JPG, PNG, WebP, GIF — compression automatique</div>
             </label>
+            <small style={{ display: 'block', color: 'rgba(255,255,255,.34)', fontSize: 10, marginTop: 2 }}>Les photos fixes JPG, PNG et WebP sont personnalisées. Les GIF animés sont conservés sans modification.</small>
 
             {form.images.length > 0 && (
               <div style={{ marginTop: 10 }}>
@@ -568,12 +633,12 @@ export default function VehicleForm({ vehicle, onClose, onSave }) {
         <div className="pf-footer">
           {saveError && <div role="alert" style={{ flex: '1 1 100%', color: '#ffb3b8', fontSize: 12, lineHeight: 1.5 }}>{saveError}</div>}
           <button className="btn-cancel" onClick={onClose}>Annuler</button>
-          <button className="btn-save" onClick={handleSave} disabled={uploading || cropQueue.length > 0 || !form.marque.trim() || !form.modele.trim() || !form.prix}>
-            {uploading ? '⏳ Photos en cours…' : isEdit ? '💾 Enregistrer' : '➕ Ajouter au stock'}
+          <button className="btn-save" onClick={handleSave} disabled={uploading || cropQueue.length > 0 || Boolean(brandingTask) || !form.marque.trim() || !form.modele.trim() || !form.prix}>
+            {uploading || brandingTask ? '⏳ Photos en cours…' : isEdit ? '💾 Enregistrer' : '➕ Ajouter au stock'}
           </button>
         </div>
       </div>
-      {cropQueue[0] && (
+      {!brandingTask && cropQueue[0] && (
         <ImageCropper
           key={cropQueue[0].target + '-' + cropQueue[0].file.name + '-' + cropQueue.length}
           file={cropQueue[0].file}
@@ -582,6 +647,17 @@ export default function VehicleForm({ vehicle, onClose, onSave }) {
           outputFormat="image/jpeg"
           onCancel={cancelVehicleCropQueue}
           onConfirm={confirmVehicleCrop}
+        />
+      )}
+      {brandingTask && (
+        <PlateBrandingEditor
+          file={brandingTask.file}
+          shopName={shopName}
+          logoUrl={brandIdentity.logoUrl}
+          accentColor={brandIdentity.accentColor}
+          onConfirm={saveBrandedPhoto}
+          onSkip={skipPhotoBranding}
+          onCancel={cancelPhotoBranding}
         />
       )}
     </div>

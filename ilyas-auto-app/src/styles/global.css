@@ -2501,3 +2501,236 @@ input, select, textarea { font-family: var(--fb); outline: none; }
   .res-calendar-days { grid-template-columns: repeat(auto-fit,minmax(48px,1fr)); }
   .res-calendar-days button { min-height: 60px; }
 }
+
+
+/* Vehicle photo license-plate branding editor */
+.plate-branding-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 10050;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+  background: rgba(5, 8, 13, .88);
+  backdrop-filter: blur(9px);
+}
+.plate-branding-dialog {
+  width: min(900px, 100%);
+  max-height: min(92vh, 980px);
+  overflow: auto;
+  border: 1px solid rgba(215, 177, 95, .28);
+  border-radius: 18px;
+  padding: 20px;
+  background: #141923;
+  color: #f7f5ef;
+  box-shadow: 0 28px 90px rgba(0, 0, 0, .55);
+}
+.plate-branding-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+.plate-branding-eyebrow {
+  color: #d7b15f;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .16em;
+}
+.plate-branding-header h2 {
+  margin: 5px 0 4px;
+  color: #fff;
+  font-size: clamp(20px, 3vw, 26px);
+}
+.plate-branding-header p {
+  margin: 0;
+  color: rgba(255,255,255,.58);
+  font-size: 12px;
+  line-height: 1.5;
+}
+.plate-branding-close {
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  border: 1px solid rgba(255,255,255,.13);
+  border-radius: 10px;
+  background: rgba(255,255,255,.06);
+  color: #fff;
+  font-size: 23px;
+  cursor: pointer;
+}
+.plate-branding-status {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 36px;
+  margin-bottom: 10px;
+  color: rgba(255,255,255,.76);
+  font-size: 12px;
+}
+.plate-branding-status-dot {
+  width: 8px;
+  height: 8px;
+  flex: 0 0 8px;
+  border-radius: 50%;
+  background: #d7b15f;
+}
+.plate-branding-status-dot.is-good { background: #50c878; }
+.plate-branding-status-dot.is-warning { background: #f0ad4e; }
+.plate-branding-spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255,255,255,.18);
+  border-top-color: #d7b15f;
+  border-radius: 50%;
+  animation: plate-branding-spin .8s linear infinite;
+}
+@keyframes plate-branding-spin { to { transform: rotate(360deg); } }
+.plate-branding-stage {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 12px;
+  background: #080b10;
+  line-height: 0;
+  touch-action: none;
+}
+.plate-branding-stage > img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: none;
+  user-select: none;
+  pointer-events: none;
+}
+.plate-branding-overlay {
+  position: absolute;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border: 2px solid #d7b15f;
+  border-radius: 5px;
+  background: linear-gradient(145deg, rgba(18, 28, 41, .98), rgba(5, 10, 17, .98));
+  box-shadow: 0 3px 12px rgba(0,0,0,.55), inset 0 0 0 1px rgba(255,255,255,.12);
+  cursor: move;
+  touch-action: none;
+}
+.plate-branding-overlay::after {
+  content: "";
+  position: absolute;
+  inset: 3px;
+  border: 1px solid rgba(215,177,95,.4);
+  border-radius: 3px;
+  pointer-events: none;
+}
+.plate-branding-logo {
+  display: block;
+  width: 88%;
+  height: 82%;
+  object-fit: contain;
+  pointer-events: none;
+}
+.plate-branding-name {
+  max-width: 92%;
+  overflow: hidden;
+  color: #fff;
+  font-size: clamp(7px, 1.8vw, 20px);
+  font-weight: 900;
+  letter-spacing: .04em;
+  line-height: 1;
+  text-align: center;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+  pointer-events: none;
+}
+.plate-branding-resize {
+  position: absolute;
+  right: -1px;
+  bottom: -1px;
+  z-index: 2;
+  width: 15px;
+  height: 15px;
+  border: 2px solid #111923;
+  border-radius: 4px 0 3px 0;
+  background: #f0c66f;
+  cursor: nwse-resize;
+  touch-action: none;
+}
+.plate-branding-preview-caption {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+  color: rgba(255,255,255,.55);
+  font-size: 10px;
+}
+.plate-branding-preview-caption span {
+  color: #d7b15f;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: .12em;
+}
+.plate-branding-preview-caption strong {
+  color: #fff;
+  font-size: 12px;
+}
+.plate-branding-preview-caption small {
+  color: rgba(255,255,255,.45);
+  font-size: 10px;
+}
+.plate-branding-error {
+  margin: 10px 0 0;
+  color: #ffb3b8;
+  font-size: 12px;
+}
+.plate-branding-footer {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+}
+.plate-branding-footer button {
+  min-height: 40px;
+  padding: 0 14px;
+  border-radius: 9px;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+}
+.plate-branding-footer button:disabled { opacity: .55; cursor: wait; }
+.plate-branding-secondary {
+  border: 1px solid rgba(255,255,255,.14);
+  background: transparent;
+  color: rgba(255,255,255,.74);
+}
+.plate-branding-plain {
+  border: 1px solid rgba(255,255,255,.16);
+  background: rgba(255,255,255,.06);
+  color: #fff;
+}
+.plate-branding-primary {
+  border: 1px solid #d7b15f;
+  background: linear-gradient(135deg, #e3c47f, #b98a39);
+  color: #171b22;
+}
+.plate-branding-note {
+  margin: 12px 0 0;
+  color: rgba(255,255,255,.42);
+  font-size: 10px;
+  line-height: 1.5;
+}
+@media (max-width: 600px) {
+  .plate-branding-backdrop { padding: 8px; align-items: flex-end; }
+  .plate-branding-dialog { max-height: 95vh; padding: 14px; border-radius: 16px 16px 12px 12px; }
+  .plate-branding-footer { display: grid; grid-template-columns: 1fr 1fr; }
+  .plate-branding-primary { grid-column: 1 / -1; grid-row: 1; }
+  .plate-branding-secondary, .plate-branding-plain { grid-row: 2; }
+}

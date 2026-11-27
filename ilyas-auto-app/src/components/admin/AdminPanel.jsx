@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { supabase } from '../../supabase'
 import { saveSetting, getSettings, parseBrandIdentity, parseShowroomHeroImages, DEFAULT_BRAND_IDENTITY } from '../../utils/useSettings'
+import { rebrandStoredVehiclePhotos } from '../../utils/vehicleBranding'
 import { openWA, fmt, genId } from '../../utils/notify'
 import { STATUTS, PLACEHOLDER_IMG, flagURI } from '../../data/vehicles-data'
 import VehicleForm from './VehicleForm'
@@ -118,6 +119,9 @@ function AdminSettings({ onLogout, onToast, onBrandNameChange }) {
   const logoInputRef = useRef(null)
   const heroInputRef = useRef(null)
   const initialLogoPath = useRef('')
+  const initialLogoUrl = useRef('')
+  const initialBrandAccent = useRef(DEFAULT_BRAND_IDENTITY.accentColor)
+  const initialShopName = useRef('Nabil Auto')
   const initialHeroPaths = useRef([])
 
   useEffect(() => {
@@ -127,6 +131,9 @@ function AdminSettings({ onLogout, onToast, onBrandNameChange }) {
       const savedBrand = parseBrandIdentity(s.brand_identity)
       setBrandIdentity(savedBrand)
       initialLogoPath.current = savedBrand.logoPath
+      initialLogoUrl.current = savedBrand.logoUrl
+      initialBrandAccent.current = savedBrand.accentColor
+      initialShopName.current = String(s.shop_name || 'Nabil Auto').trim() || 'Nabil Auto'
       const savedHeroImages = parseShowroomHeroImages(s.hero_images)
       setHeroImages(savedHeroImages)
       initialHeroPaths.current = savedHeroImages.map(image => image.path).filter(Boolean)
@@ -268,9 +275,31 @@ function AdminSettings({ onLogout, onToast, onBrandNameChange }) {
         const { error: removeError } = await supabase.storage.from('showroom-media').remove([oldPath])
         if (removeError) console.warn('Ancien logo conservé dans le stockage :', removeError)
       }
+      const logoChanged = initialLogoUrl.current !== nextBrand.logoUrl || initialBrandAccent.current !== nextBrand.accentColor
       initialLogoPath.current = nextBrand.logoPath
+      initialLogoUrl.current = nextBrand.logoUrl
+      initialBrandAccent.current = nextBrand.accentColor
       setBrandIdentity(nextBrand)
-      onToast && onToast(nextBrand.logoUrl ? '✅ Ton logo est maintenant publié sur le site.' : '✅ Logo personnalisé retiré.', 'default')
+      let updatedPhotoCount = 0
+      let rebrandWarning = ''
+      if (logoChanged) {
+        try {
+          const summary = await rebrandStoredVehiclePhotos({
+            supabase,
+            shopName: persistedSettings.shop_name || 'Nabil Auto',
+            brandIdentity: persistedBrand,
+          })
+          updatedPhotoCount = summary.updated
+          if (summary.errors) rebrandWarning = ' Certaines anciennes photos n’ont pas pu être actualisées.'
+        } catch (rebrandError) {
+          console.warn('Actualisation des plaques existantes :', rebrandError)
+          rebrandWarning = ' Le nouveau logo est enregistré, mais les anciennes photos n’ont pas toutes pu être actualisées.'
+        }
+      }
+      const refreshed = updatedPhotoCount
+        ? ` ${updatedPhotoCount} photo(s) existante(s) actualisée(s).`
+        : ''
+      onToast && onToast((nextBrand.logoUrl ? '✅ Ton logo est maintenant publié sur le site.' : '✅ Logo personnalisé retiré.') + refreshed + rebrandWarning, rebrandWarning ? 'error' : 'default')
     } catch (e) {
       onToast && onToast('❌ Impossible d’enregistrer le logo : ' + e.message, 'error')
     } finally {
@@ -328,6 +357,29 @@ function AdminSettings({ onLogout, onToast, onBrandNameChange }) {
 
       const brandName = shop.name.trim() || 'Nabil Auto'
       onBrandNameChange?.(brandName)
+      const showroomNameChanged = initialShopName.current !== brandName
+      initialShopName.current = brandName
+      if (showroomNameChanged) {
+        try {
+          const persistedSettings = await getSettings()
+          const summary = await rebrandStoredVehiclePhotos({
+            supabase,
+            shopName: brandName,
+            brandIdentity: parseBrandIdentity(persistedSettings.brand_identity),
+          })
+          if (summary.updated || summary.errors) {
+            onToast && onToast(
+              summary.updated
+                ? `✅ Nom du showroom enregistré · ${summary.updated} photo(s) actualisée(s).${summary.errors ? ' Certaines photos restent à vérifier.' : ''}`
+                : '✅ Nom enregistré. Certaines photos existantes n’ont pas pu être actualisées.',
+              summary.errors ? 'error' : 'default',
+            )
+          }
+        } catch (rebrandError) {
+          console.warn('Actualisation des plaques après changement de nom :', rebrandError)
+          onToast && onToast('✅ Nom du showroom enregistré. Les anciennes photos n’ont pas pu être actualisées automatiquement.', 'error')
+        }
+      }
 
       try {
         const adminSession = window.sessionStorage.getItem('hbr_admin_session')
