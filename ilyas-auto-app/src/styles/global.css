@@ -2503,6 +2503,7 @@ input, select, textarea { font-family: var(--fb); outline: none; }
 }
 
 
+
 /* Vehicle photo license-plate branding editor */
 .plate-branding-backdrop {
   position: fixed;
@@ -2512,19 +2513,19 @@ input, select, textarea { font-family: var(--fb); outline: none; }
   align-items: center;
   justify-content: center;
   padding: 18px;
-  background: rgba(5, 8, 13, .88);
-  backdrop-filter: blur(9px);
+  background: rgba(241, 245, 249, .88);
+  backdrop-filter: blur(8px);
 }
 .plate-branding-dialog {
   width: min(900px, 100%);
   max-height: min(92vh, 980px);
   overflow: auto;
-  border: 1px solid rgba(215, 177, 95, .28);
+  border: 1px solid #e2e8f0;
   border-radius: 18px;
   padding: 20px;
-  background: #141923;
-  color: #f7f5ef;
-  box-shadow: 0 28px 90px rgba(0, 0, 0, .55);
+  background: #ffffff;
+  color: #1e293b;
+  box-shadow: 0 24px 80px rgba(15, 23, 42, .18);
 }
 .plate-branding-header {
   display: flex;
@@ -2534,19 +2535,19 @@ input, select, textarea { font-family: var(--fb); outline: none; }
   margin-bottom: 14px;
 }
 .plate-branding-eyebrow {
-  color: #d7b15f;
+  color: #9a6b20;
   font-size: 10px;
   font-weight: 900;
   letter-spacing: .16em;
 }
 .plate-branding-header h2 {
   margin: 5px 0 4px;
-  color: #fff;
+  color: #172033;
   font-size: clamp(20px, 3vw, 26px);
 }
 .plate-branding-header p {
   margin: 0;
-  color: rgba(255,255,255,.58);
+  color: #64748b;
   font-size: 12px;
   line-height: 1.5;
 }
@@ -2554,10 +2555,10 @@ input, select, textarea { font-family: var(--fb); outline: none; }
   width: 34px;
   height: 34px;
   flex: 0 0 34px;
-  border: 1px solid rgba(255,255,255,.13);
+  border: 1px solid #e2e8f0;
   border-radius: 10px;
-  background: rgba(255,255,255,.06);
-  color: #fff;
+  background: #f8fafc;
+  color: #475569;
   font-size: 23px;
   cursor: pointer;
 }
@@ -2565,10 +2566,15 @@ input, select, textarea { font-family: var(--fb); outline: none; }
   display: flex;
   align-items: center;
   gap: 9px;
-  min-height: 36px;
-  margin-bottom: 10px;
-  color: rgba(255,255,255,.76);
+  min-height: 38px;
+  margin-bottom: 12px;
+  padding: 8px 11px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  background: #f8fafc;
+  color: #475569;
   font-size: 12px;
+  line-height: 1.45;
 }
 .plate-branding-status-dot {
   width: 8px;
@@ -2577,13 +2583,14 @@ input, select, textarea { font-family: var(--fb); outline: none; }
   border-radius: 50%;
   background: #d7b15f;
 }
-.plate-branding-status-dot.is-good { background: #50c878; }
-.plate-branding-status-dot.is-warning { background: #f0ad4e; }
+.plate-branding-status-dot.is-good { background: #16a34a; }
+.plate-branding-status-dot.is-warning { background: #d97706; }
 .plate-branding-spinner {
   width: 14px;
   height: 14px;
-  border: 2px solid rgba(255,255,255,.18);
-  border-top-color: #d7b15f;
+  flex: 0 0 14px;
+  border: 2px solid #e2e8f0;
+  border-top-color: #b88739;
   border-radius: 50%;
   animation: plate-branding-spin .8s linear infinite;
 }
@@ -2592,9 +2599,9 @@ input, select, textarea { font-family: var(--fb); outline: none; }
   position: relative;
   width: 100%;
   overflow: hidden;
-  border: 1px solid rgba(255,255,255,.12);
+  border: 1px solid #e2e8f0;
   border-radius: 12px;
-  background: #080b10;
+  background: #f1f5f9;
   line-height: 0;
   touch-action: none;
 }
@@ -2612,11 +2619,10 @@ input, select, textarea { font-family: var(--fb); outline: none; }
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
-  border: 2px solid #d7b15f;
+  border: 2px solid #c89542;
   border-radius: 5px;
-  background: linear-gradient(145deg, rgba(18, 28, 41, .98), rgba(5, 10, 17, .98));
-  box-shadow: 0 3px 12px rgba(0,0,0,.55), inset 0 0 0 1px rgba(255,255,255,.12);
+  background: linear-gradient(145deg, #ffffff, #f8fafc);
+  box-shadow: 0 3px 12px rgba(15, 23, 42, .22), inset 0 0 0 1px rgba(255,255,255,.9);
   cursor: move;
   touch-action: none;
 }
@@ -2624,7 +2630,7 @@ input, select, textarea { font-family: var(--fb); outline: none; }
   content: "";
   position: absolute;
   inset: 3px;
-  border: 1px solid rgba(215,177,95,.4);
+  border: 1px solid rgba(154, 107, 32, .24);
   border-radius: 3px;
   pointer-events: none;
 }
@@ -2638,7 +2644,7 @@ input, select, textarea { font-family: var(--fb); outline: none; }
 .plate-branding-name {
   max-width: 92%;
   overflow: hidden;
-  color: #fff;
+  color: #172033;
   font-size: clamp(7px, 1.8vw, 20px);
   font-weight: 900;
   letter-spacing: .04em;
@@ -2649,45 +2655,112 @@ input, select, textarea { font-family: var(--fb); outline: none; }
   white-space: nowrap;
   pointer-events: none;
 }
+.plate-branding-rotate {
+  position: absolute;
+  z-index: 4;
+  top: -34px;
+  left: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 27px;
+  height: 27px;
+  margin-left: -13.5px;
+  border: 1px solid #c89542;
+  border-radius: 50%;
+  background: #ffffff;
+  color: #8a5d18;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, .18);
+  font-size: 19px;
+  line-height: 1;
+  cursor: grab;
+  touch-action: none;
+}
+.plate-branding-rotate::after {
+  content: "";
+  position: absolute;
+  top: 25px;
+  left: 11px;
+  width: 2px;
+  height: 9px;
+  background: #c89542;
+  pointer-events: none;
+}
 .plate-branding-resize {
   position: absolute;
-  right: -1px;
-  bottom: -1px;
-  z-index: 2;
+  right: -7px;
+  bottom: -7px;
+  z-index: 4;
   width: 15px;
   height: 15px;
-  border: 2px solid #111923;
-  border-radius: 4px 0 3px 0;
-  background: #f0c66f;
+  border: 2px solid #ffffff;
+  border-radius: 4px;
+  background: #c89542;
+  box-shadow: 0 1px 4px rgba(15,23,42,.25);
   cursor: nwse-resize;
   touch-action: none;
+}
+.plate-branding-controls {
+  margin-top: 17px;
+  padding: 13px 14px;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background: #f8fafc;
+}
+.plate-branding-control-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 9px;
+  color: #334155;
+  font-size: 12px;
+  font-weight: 700;
+}
+.plate-branding-control-heading strong {
+  color: #8a5d18;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+.plate-branding-controls input[type="range"] {
+  display: block;
+  width: 100%;
+  margin: 0;
+  accent-color: #b88739;
+  cursor: pointer;
+}
+.plate-branding-controls input[type="range"]:disabled { cursor: wait; opacity: .55; }
+.plate-branding-control-hint {
+  margin-top: 8px;
+  color: #64748b;
+  font-size: 10px;
+  line-height: 1.5;
 }
 .plate-branding-preview-caption {
   display: flex;
   align-items: baseline;
   flex-wrap: wrap;
   gap: 8px;
-  margin-top: 12px;
-  color: rgba(255,255,255,.55);
+  margin-top: 13px;
+  color: #64748b;
   font-size: 10px;
 }
 .plate-branding-preview-caption span {
-  color: #d7b15f;
+  color: #9a6b20;
   font-size: 9px;
   font-weight: 900;
   letter-spacing: .12em;
 }
 .plate-branding-preview-caption strong {
-  color: #fff;
+  color: #172033;
   font-size: 12px;
 }
 .plate-branding-preview-caption small {
-  color: rgba(255,255,255,.45);
+  color: #64748b;
   font-size: 10px;
 }
 .plate-branding-error {
   margin: 10px 0 0;
-  color: #ffb3b8;
+  color: #b91c1c;
   font-size: 12px;
 }
 .plate-branding-footer {
@@ -2707,23 +2780,23 @@ input, select, textarea { font-family: var(--fb); outline: none; }
 }
 .plate-branding-footer button:disabled { opacity: .55; cursor: wait; }
 .plate-branding-secondary {
-  border: 1px solid rgba(255,255,255,.14);
-  background: transparent;
-  color: rgba(255,255,255,.74);
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  color: #475569;
 }
 .plate-branding-plain {
-  border: 1px solid rgba(255,255,255,.16);
-  background: rgba(255,255,255,.06);
-  color: #fff;
+  border: 1px solid #cbd5e1;
+  background: #f8fafc;
+  color: #334155;
 }
 .plate-branding-primary {
-  border: 1px solid #d7b15f;
-  background: linear-gradient(135deg, #e3c47f, #b98a39);
-  color: #171b22;
+  border: 1px solid #a8782c;
+  background: linear-gradient(135deg, #e4c17d, #c4913d);
+  color: #172033;
 }
 .plate-branding-note {
   margin: 12px 0 0;
-  color: rgba(255,255,255,.42);
+  color: #64748b;
   font-size: 10px;
   line-height: 1.5;
 }
