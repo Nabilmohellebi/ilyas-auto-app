@@ -18,7 +18,7 @@ export default function TrackingPage({ onClose }) {
     setLoading(true); setError(''); setRes(null)
     const { data, error: lookupError } = await supabase
       .from('reservations')
-      .select('id, vehicule_nom, vehicule_prix, statut, created_at')
+      .select('id, vehicule_nom, vehicule_prix, statut, created_at, status_updated_at')
       .eq('id', q)
       .maybeSingle()
     setLoading(false)
@@ -56,6 +56,10 @@ export default function TrackingPage({ onClose }) {
             <div className="track-summary">
               <div><span className="lbl">{t.tracking.vehicule}</span><strong>{res.vehicule_nom}</strong></div>
               <div><span className="lbl">{t.tracking.prix}</span><strong style={{ color: 'var(--br3)' }}>{fmt(res.vehicule_prix)}</strong></div>
+            </div>
+            <div className="track-dates" aria-live="polite">
+              <div><span>{t.tracking.createdAt}</span><strong>{res.created_at ? new Date(res.created_at).toLocaleString() : '—'}</strong></div>
+              <div><span>{t.tracking.updatedAt}</span><strong>{res.status_updated_at ? new Date(res.status_updated_at).toLocaleString() : '—'}</strong></div>
             </div>
 
             {terminalMessage ? (
