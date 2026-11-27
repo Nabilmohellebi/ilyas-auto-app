@@ -10,6 +10,7 @@ import CommercialDashboardPanel from './CommercialDashboardPanel'
 import TradeInspectionEditor from './TradeInspectionEditor'
 import VehicleSearchRequestsPanel from './VehicleSearchRequestsPanel'
 import CustomerFollowUpsPanel from './CustomerFollowUpsPanel'
+import AppointmentSlotsPanel from './AppointmentSlotsPanel'
 import ImageCropper from './ImageCropper'
 import '../../styles/admin-dashboard.css'
 
@@ -35,6 +36,7 @@ const ADMIN_NAV_GROUPS = [
   ] },
   { label: 'CLIENTS & VENTES', items: [
     { key: 'reservations', label: 'Réservations', glyph: '▤' },
+    { key: 'rendezvous', label: 'Calendrier des rendez-vous', glyph: '◷' },
     { key: 'crm', label: 'CRM clients', glyph: '◎' },
     { key: 'reprises', label: 'Ventes & échanges', glyph: '⇄' },
     { key: 'recherches', label: 'Recherches clients', glyph: '⌕' },
@@ -1615,6 +1617,11 @@ export default function AdminPanel({ onLogout, onToast }) {
               </div>
             ))}
           </div>
+        )}
+
+        {/* ── TAB CALENDRIER DES RENDEZ-VOUS ── */}
+        {tab === 'rendezvous' && (
+          <AppointmentSlotsPanel shopName={shopName} onToast={onToast} />
         )}
 
         {/* ── TAB REPRISES ── */}

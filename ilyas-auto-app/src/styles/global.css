@@ -2409,3 +2409,95 @@ input, select, textarea { font-family: var(--fb); outline: none; }
     border-radius: 12px;
   }
 }
+
+
+
+/* Public appointment calendar — reservation modal */
+.res-calendar-picker {
+  margin-bottom: 14px;
+  padding: 13px;
+  border: 1px solid rgba(215,177,95,.25);
+  border-radius: 12px;
+  background: rgba(255,255,255,.035);
+}
+.res-calendar-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.res-calendar-title-row label {
+  color: #f4e6c3;
+  font-size: 12px;
+  font-weight: 850;
+}
+.res-calendar-title-row span {
+  color: rgba(255,255,255,.48);
+  font-size: 10px;
+  line-height: 1.5;
+}
+.res-calendar-days {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(58px, 1fr));
+  gap: 7px;
+}
+.res-calendar-days button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-height: 67px;
+  padding: 8px 5px;
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 9px;
+  color: rgba(255,255,255,.68);
+  background: rgba(255,255,255,.045);
+  cursor: pointer;
+  transition: border-color .16s ease, background .16s ease, transform .16s ease;
+}
+.res-calendar-days button:hover,
+.res-calendar-times button:hover { border-color: rgba(215,177,95,.55); }
+.res-calendar-days button.active,
+.res-calendar-times button.active {
+  border-color: #d4b36e;
+  color: #1b1d18;
+  background: linear-gradient(135deg,#f0dfb0,#c8a15e);
+  box-shadow: 0 4px 12px rgba(215,177,95,.12);
+}
+.res-calendar-days button small { color: inherit; font-size: 9px; text-transform: capitalize; }
+.res-calendar-days button strong { color: inherit; font-size: 18px; font-weight: 900; line-height: 1; }
+.res-calendar-time-heading { margin-top: 15px; }
+.res-calendar-times { display: flex; flex-wrap: wrap; gap: 7px; }
+.res-calendar-times button {
+  min-height: 36px;
+  padding: 8px 11px;
+  border: 1px solid rgba(255,255,255,.14);
+  border-radius: 8px;
+  color: rgba(255,255,255,.8);
+  background: rgba(255,255,255,.05);
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: border-color .16s ease, background .16s ease;
+}
+.res-calendar-empty,
+.res-calendar-loading,
+.res-calendar-fallback-note {
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  border: 1px solid rgba(215,177,95,.18);
+  border-radius: 9px;
+  color: rgba(255,255,255,.58);
+  background: rgba(215,177,95,.055);
+  font-size: 10.5px;
+  line-height: 1.6;
+}
+.res-calendar-empty { margin: 0; }
+@media (max-width: 480px) {
+  .res-calendar-picker { padding: 10px; }
+  .res-calendar-title-row { align-items: flex-start; flex-direction: column; gap: 4px; }
+  .res-calendar-days { grid-template-columns: repeat(auto-fit,minmax(48px,1fr)); }
+  .res-calendar-days button { min-height: 60px; }
+}
