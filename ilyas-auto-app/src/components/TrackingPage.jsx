@@ -3,88 +3,142 @@ import { supabase } from '../supabase'
 import { fmt } from '../utils/notify'
 import { useLang } from '../i18n/LangContext'
 
-const STATUS_INDEX = { nouvelle: 0, contactee: 1, inspection: 2, offre_proposee: 3, acceptee: 4, finalisee: 5, vendue: 6 }
+function formatDate(value, locale) {
+  if (!value) return '—'
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) return '—'
+  return date.toLocaleString(locale, { dateStyle: 'medium', timeStyle: 'short' })
+}
 
 export default function TrackingPage({ onClose }) {
-  const { t } = useLang()
-  const [input, setInput] = useState('')
-  const [res, setRes] = useState(null)
+  const { t, lang, rtl } = useLang()
+  const [reference, setReference] = useState('')
+  const [phone, setPhone] = useState('')
+  const [records, setRecords] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const locale = lang === 'ar' ? 'ar-DZ' : 'fr-FR'
 
   async function search() {
-    const q = input.trim().toUpperCase()
-    if (!q) return
-    setLoading(true); setError(''); setRes(null)
-    const { data, error: lookupError } = await supabase
-      .from('reservations')
-      .select('id, vehicule_nom, vehicule_prix, statut, created_at, status_updated_at')
-      .eq('id', q)
-      .maybeSingle()
-    setLoading(false)
-    if (lookupError) {
-      console.error('HBR AUTO tracking:', lookupError)
-      setError('Le suivi est momentanément indisponible. Réessaie dans quelques instants.')
+    const requestReference = reference.trim().toUpperCase()
+    const phoneDigits = phone.replace(/\D/g, '')
+    if (!requestReference || phoneDigits.length < 8) {
+      setError(t.tracking.invalidInput)
       return
     }
-    if (!data) { setError(t.tracking.aucune); return }
-    setRes(data)
-  }
 
-  const STEPS = t.tracking.steps
-  const curStep = res ? (STATUS_INDEX[res.statut] ?? 0) : -1
-  const terminalMessage = res?.statut === 'annulee'
-    ? t.tracking.annulee
-    : res?.statut === 'refusee' ? t.tracking.refusee : ''
+    setLoading(true)
+    setError('')
+    setRecords([])
+
+    try {
+      const { data, error: lookupError } = await supabase.rpc('customer_portal_lookup', {
+        p_reference: requestReference,
+        p_phone: phone.trim(),
+      })
+      if (lookupError) throw lookupError
+      if (!Array.isArray(data) || data.length === 0) {
+        setError(t.tracking.aucune)
+      } else {
+        setRecords(data)
+      }
+    } catch (lookupError) {
+      console.error('HBR AUTO customer portal:', lookupError)
+      setError(t.tracking.error)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   return (
     <div className="res-ov" onClick={e => e.target === e.currentTarget && onClose()}>
-      <div className="res-box track-modal" style={{ maxWidth: 480 }}>
-        <button className="btn-close" onClick={onClose}>✕</button>
-        <h2 style={{ fontFamily: 'var(--ff)', fontSize: 20, fontWeight: 900, color: 'white', marginBottom: 4 }}>{t.tracking.titre}</h2>
-        <p style={{ fontSize: 12.5, color: 'rgba(255,255,255,.5)', marginBottom: 16 }}>{t.tracking.desc}</p>
-
-        <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
-          <input className="track-input" placeholder="IA-XXXXXXXXXXXX" maxLength={15} aria-label={t.tracking.desc} value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => e.key === 'Enter' && search()} />
-          <button className="btn-save" type="button" aria-label="Rechercher ma réservation" onClick={search} disabled={loading || !input.trim()}>{loading ? '…' : '🔍'}</button>
+      <div className="res-box track-modal customer-portal-modal" dir={rtl ? 'rtl' : 'ltr'}>
+        <button className="btn-close" onClick={onClose} aria-label={t.tracking.close}>✕</button>
+        <div className="customer-portal-heading">
+          <span className="customer-portal-eyebrow">{t.tracking.eyebrow}</span>
+          <h2 style={{ fontFamily: 'var(--ff)', fontSize: 21, fontWeight: 900, color: 'white', marginBottom: 5 }}>{t.tracking.titre}</h2>
+          <p style={{ fontSize: 12.5, color: 'rgba(255,255,255,.55)', lineHeight: 1.65, marginBottom: 18 }}>{t.tracking.desc}</p>
         </div>
 
-        {error && <div style={{ color: '#ffb3b8', fontSize: 12.5, marginBottom: 12 }}>❌ {error}</div>}
-
-        {res && (
-          <div>
-            <div className="track-summary">
-              <div><span className="lbl">{t.tracking.vehicule}</span><strong>{res.vehicule_nom}</strong></div>
-              <div><span className="lbl">{t.tracking.prix}</span><strong style={{ color: 'var(--br3)' }}>{fmt(res.vehicule_prix)}</strong></div>
-            </div>
-            <div className="track-dates" aria-live="polite">
-              <div><span>{t.tracking.createdAt}</span><strong>{res.created_at ? new Date(res.created_at).toLocaleString() : '—'}</strong></div>
-              <div><span>{t.tracking.updatedAt}</span><strong>{res.status_updated_at ? new Date(res.status_updated_at).toLocaleString() : '—'}</strong></div>
-            </div>
-
-            {terminalMessage ? (
-              <div className="track-cancelled" style={{ background: 'rgba(255,255,255,.05)', border: '1px solid rgba(255,255,255,.1)', borderRadius: 10, padding: 14, textAlign: 'center', color: 'rgba(255,255,255,.5)', fontSize: 13 }}>
-                {terminalMessage}
-              </div>
-            ) : (
-              <div className="track-steps">
-                {STEPS.map((s, i) => {
-                  const done = i <= curStep
-                  const current = i === curStep
-                  return (
-                    <div key={i} className="track-step">
-                      {i < STEPS.length - 1 && <div className={`track-line ${done ? 'done' : ''}`} />}
-                      <div className={`track-icon ${done ? 'done' : ''} ${current ? 'current' : ''}`}>{s.icon}</div>
-                      <div>
-                        <div className={`track-label ${done ? 'done' : ''}`}>{s.label}{current && <span className="track-current-tag">{t.tracking.enCours}</span>}</div>
-                        <div className="track-desc">{s.desc}</div>
-                      </div>
-                    </div>
-                  )
-                })}
-              </div>
-            )}
+        <div className="customer-portal-form">
+          <div className="form-field">
+            <label htmlFor="customer-portal-reference">{t.tracking.referenceLabel}</label>
+            <input
+              id="customer-portal-reference"
+              className="track-input"
+              placeholder={t.tracking.referencePlaceholder}
+              maxLength={40}
+              autoComplete="off"
+              value={reference}
+              onChange={e => setReference(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && search()}
+            />
           </div>
+          <div className="form-field">
+            <label htmlFor="customer-portal-phone">{t.tracking.phoneLabel}</label>
+            <input
+              id="customer-portal-phone"
+              className="track-input"
+              type="tel"
+              inputMode="tel"
+              autoComplete="tel"
+              maxLength={30}
+              placeholder={t.tracking.phonePlaceholder}
+              value={phone}
+              onChange={e => setPhone(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && search()}
+            />
+          </div>
+          <button className="btn-save customer-portal-submit" type="button" onClick={search} disabled={loading || !reference.trim() || phone.replace(/\D/g, '').length < 8}>
+            {loading ? t.tracking.loading : t.tracking.accessButton}
+          </button>
+        </div>
+
+        <p className="customer-portal-note">🔒 {t.tracking.accessNote}</p>
+        {error && <div role="alert" style={{ color: '#ffb3b8', fontSize: 12.5, margin: '12px 0' }}>❌ {error}</div>}
+
+        {records.length > 0 && (
+          <section className="customer-portal-results" aria-live="polite">
+            <div className="customer-portal-results-heading">
+              <h3>{t.tracking.recordsTitle}</h3>
+              <span>{records.length}</span>
+            </div>
+            <div className="customer-portal-record-list">
+              {records.map(record => (
+                <article className="customer-portal-record" key={record.request_type + ':' + record.reference}>
+                  <div className="customer-portal-record-top">
+                    <span className="customer-portal-kind">
+                      {record.request_type === 'reservation' ? t.tracking.reservationType : t.tracking.tradeType}
+                    </span>
+                    <span className={'res-badge ' + (record.statut || 'nouvelle')}>
+                      {t.tracking.statusLabels[record.statut] || record.statut || '—'}
+                    </span>
+                  </div>
+                  <h4>{record.label || '—'}</h4>
+                  <div className="customer-portal-record-details">
+                    <div>
+                      <span>{t.tracking.referenceNumber}</span>
+                      <strong>{record.reference}</strong>
+                    </div>
+                    {record.amount !== null && record.amount !== undefined && (
+                      <div>
+                        <span>{t.tracking.amountLabel}</span>
+                        <strong className="customer-portal-amount">{fmt(record.amount)}</strong>
+                      </div>
+                    )}
+                    <div>
+                      <span>{t.tracking.createdAt}</span>
+                      <strong>{formatDate(record.created_at, locale)}</strong>
+                    </div>
+                    <div>
+                      <span>{t.tracking.updatedAt}</span>
+                      <strong>{formatDate(record.updated_at, locale)}</strong>
+                    </div>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </section>
         )}
       </div>
     </div>
