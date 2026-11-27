@@ -2356,3 +2356,9 @@ input, select, textarea { font-family: var(--fb); outline: none; }
   .image-cropper-canvas { max-height: 48vh; }
   .image-cropper-footer button { flex: 1; padding: 0 10px; }
 }
+
+.customer-portal-record-actions { display: flex; justify-content: flex-end; margin-top: 12px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,.08); }
+.customer-portal-pdf-button { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 34px; padding: 7px 11px; border: 1px solid rgba(214,163,74,.38); border-radius: 8px; background: rgba(214,163,74,.09); color: var(--br3, #d6a34a); font-size: 10.5px; font-weight: 800; cursor: pointer; transition: background .18s ease, border-color .18s ease, transform .18s ease; }
+.customer-portal-pdf-button:hover { background: rgba(214,163,74,.16); border-color: rgba(214,163,74,.62); transform: translateY(-1px); }
+.customer-portal-pdf-button:focus-visible { outline: 2px solid var(--br3, #d6a34a); outline-offset: 2px; }
+@media print { .customer-portal-pdf-button { display: none !important; } }
