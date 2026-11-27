@@ -103,6 +103,7 @@ export const fr = {
   detail: {
     description: '📝 Description', equipements: '⚙️ Équipements & Options', plusPhotos: '📸 Plus de photos',
     reserver: '📅 Prendre rendez-vous', acheterOccasion: '🛒 Acheter / visiter', vendu: '🚫 Véhicule vendu', prix: 'Prix', video: '🎬 Voir la vidéo',
+    whatsappQuestion: '💬 Poser une question sur WhatsApp', whatsappSimilar: '🚗 Trouver un modèle similaire sur WhatsApp',
   },
   finance: {
     titre: '💰 Simulateur de financement',
@@ -225,6 +226,7 @@ export const ar = {
   detail: {
     description: '📝 الوصف', equipements: '⚙️ التجهيزات والخيارات', plusPhotos: '📸 المزيد من الصور',
     reserver: '📅 حجز موعد', acheterOccasion: '🛒 شراء / معاينة', vendu: '🚫 السيارة مباعة', prix: 'السعر', video: '🎬 مشاهدة الفيديو',
+    whatsappQuestion: '💬 الاستفسار عبر واتساب', whatsappSimilar: '🚗 البحث عن سيارة مشابهة عبر واتساب',
   },
   finance: {
     titre: '💰 محاكي التمويل',
