@@ -162,7 +162,7 @@ export default function PlateBrandingEditor({ file, shopName, logoUrl, accentCol
         {error && <p className="plate-branding-error" role="alert">{error}</p>}
         <footer className="plate-branding-footer">
           <button type="button" className="plate-branding-secondary" onClick={onCancel} disabled={applying}>Annuler</button>
-          <button type="button" className="plate-branding-plain" onClick={onSkip} disabled={applying}>Garder sans modifier</button>
+          <button type="button" className="plate-branding-plain" onClick={async () => { setError(""); try { await onSkip?.() } catch (skipError) { setError(skipError?.message || "La photo n’a pas pu être enregistrée.") } }} disabled={applying}>Garder sans modifier</button>
           <button type="button" className="plate-branding-primary" onClick={applyBranding} disabled={applying || detecting}>
             {applying ? 'Préparation…' : '✓ Appliquer le logo'}
           </button>
