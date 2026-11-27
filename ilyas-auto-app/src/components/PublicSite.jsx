@@ -789,6 +789,7 @@ function PublicSiteInner() {
         <Suspense fallback={<div className="spinner" role="status">Chargement de la fiche…</div>}>
           <VehicleDetail
             shopName={s.nom}
+            whatsapp={s.whatsapp}
             vehicle={openVehicle}
             onClose={closeVehicleDetail}
             onReserve={v => { setOpenVehicle(null); setReserveVehicle(v) }}
