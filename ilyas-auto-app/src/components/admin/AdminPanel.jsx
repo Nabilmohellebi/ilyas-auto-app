@@ -120,6 +120,7 @@ function AdminSettings({ onLogout, onToast, onBrandNameChange }) {
   const heroInputRef = useRef(null)
   const initialLogoPath = useRef('')
   const initialLogoUrl = useRef('')
+  const initialBrandAccent = useRef(DEFAULT_BRAND_IDENTITY.accentColor)
   const initialShopName = useRef('Nabil Auto')
   const initialHeroPaths = useRef([])
 
@@ -131,6 +132,7 @@ function AdminSettings({ onLogout, onToast, onBrandNameChange }) {
       setBrandIdentity(savedBrand)
       initialLogoPath.current = savedBrand.logoPath
       initialLogoUrl.current = savedBrand.logoUrl
+      initialBrandAccent.current = savedBrand.accentColor
       initialShopName.current = String(s.shop_name || 'Nabil Auto').trim() || 'Nabil Auto'
       const savedHeroImages = parseShowroomHeroImages(s.hero_images)
       setHeroImages(savedHeroImages)
@@ -273,9 +275,10 @@ function AdminSettings({ onLogout, onToast, onBrandNameChange }) {
         const { error: removeError } = await supabase.storage.from('showroom-media').remove([oldPath])
         if (removeError) console.warn('Ancien logo conservé dans le stockage :', removeError)
       }
-      const logoChanged = initialLogoUrl.current !== nextBrand.logoUrl
+      const logoChanged = initialLogoUrl.current !== nextBrand.logoUrl || initialBrandAccent.current !== nextBrand.accentColor
       initialLogoPath.current = nextBrand.logoPath
       initialLogoUrl.current = nextBrand.logoUrl
+      initialBrandAccent.current = nextBrand.accentColor
       setBrandIdentity(nextBrand)
       let updatedPhotoCount = 0
       let rebrandWarning = ''
