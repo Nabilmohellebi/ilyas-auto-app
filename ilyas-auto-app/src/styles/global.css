@@ -587,6 +587,12 @@ input, select, textarea { font-family: var(--fb); outline: none; }
 .track-summary { display: flex; justify-content: space-between; background: rgba(230,57,70,.06); border: 1px solid rgba(230,57,70,.18); border-radius: 10px; padding: 12px 14px; margin-bottom: 18px; }
 .track-summary .lbl { display: block; font-size: 10px; color: rgba(255,255,255,.4); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 3px; }
 .track-summary strong { font-size: 14px; color: white; }
+.track-dates { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; margin: -6px 0 18px; }
+.track-dates > div { min-width: 0; padding: 9px 11px; border: 1px solid rgba(255,255,255,.09); border-radius: 9px; background: rgba(255,255,255,.035); }
+.track-dates span, .track-dates strong { display: block; }
+.track-dates span { color: rgba(255,255,255,.48); font-size: 10px; margin-bottom: 4px; }
+.track-dates strong { color: rgba(255,255,255,.88); font-size: 11px; line-height: 1.45; overflow-wrap: anywhere; }
+@media (max-width: 420px) { .track-dates { grid-template-columns: 1fr; } }
 .track-steps { display: flex; flex-direction: column; }
 .track-step { display: flex; gap: 12px; margin-bottom: 16px; position: relative; }
 .track-step:last-child { margin-bottom: 0; }

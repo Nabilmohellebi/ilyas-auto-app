@@ -69,6 +69,7 @@ export const fr = {
       { icon: '✅', label: 'Transaction terminée', desc: 'Votre réservation a été finalisée.' },
     ],
     enCours: 'EN COURS',
+    createdAt: 'Demande créée', updatedAt: 'Dernière mise à jour',
   },
   detail: {
     description: '📝 Description', equipements: '⚙️ Équipements & Options', plusPhotos: '📸 Plus de photos',
@@ -161,6 +162,7 @@ export const ar = {
       { icon: '✅', label: 'اكتملت المعاملة', desc: 'تم إتمام الحجز بنجاح.' },
     ],
     enCours: 'قيد التنفيذ',
+    createdAt: 'تاريخ إنشاء الطلب', updatedAt: 'آخر تحديث',
   },
   detail: {
     description: '📝 الوصف', equipements: '⚙️ التجهيزات والخيارات', plusPhotos: '📸 المزيد من الصور',
