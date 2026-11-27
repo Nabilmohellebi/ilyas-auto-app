@@ -212,7 +212,7 @@ export async function rebrandStoredVehiclePhotos({ supabase, shopName, brandIden
         const item = next[key][index]
         if (!item?.originalUrl || !item?.plateRect) continue
         scanned += 1
-        if (item.brandingName === branding.shopName && item.brandingLogoUrl === branding.logoUrl) continue
+        if (item.brandingName === branding.shopName && item.brandingLogoUrl === branding.logoUrl && item.brandingAccentColor === branding.accentColor) continue
         try {
           const blob = await createBrandedVehicleImageBlob(item.originalUrl, item.plateRect, branding)
           const id = globalThis.crypto?.randomUUID?.() || (Date.now() + '-' + Math.random().toString(36).slice(2))
@@ -231,6 +231,7 @@ export async function rebrandStoredVehiclePhotos({ supabase, shopName, brandIden
             brandedPath: path,
             brandingName: branding.shopName,
             brandingLogoUrl: branding.logoUrl,
+            brandingAccentColor: branding.accentColor,
           }
           if (key === 'images' && vehicle.img === oldUrl) vehicle.img = data.publicUrl
           changed = true
