@@ -608,6 +608,16 @@ function PublicSiteInner() {
             {sorted.map(v => {
               const disc = v.prix_old && v.prix_old > v.prix ? Math.round(100 - (v.prix / v.prix_old) * 100) : 0
               const disabled = v.statut === 'vendu'
+              const vehicleShareUrl = new URL('/api/vehicle-share', window.location.origin)
+              vehicleShareUrl.searchParams.set('id', String(v.id))
+              const vehicleWhatsAppMessage = disabled
+                ? (lang === 'ar'
+                    ? `مرحبًا ${s.nom}، السيارة ${v.marque} ${v.modele} (${v.annee}) معروضة كسيارة مباعة. هل لديكم نموذج مشابه؟\nرابط السيارة: ${vehicleShareUrl.href}`
+                    : `Bonjour ${s.nom}, la ${v.marque} ${v.modele} (${v.annee}) est indiquée comme vendue. Avez-vous un modèle similaire à proposer ?\nFiche : ${vehicleShareUrl.href}`)
+                : (lang === 'ar'
+                    ? `مرحبًا ${s.nom}، أنا مهتم بسيارة ${v.marque} ${v.modele} (${v.annee}) بسعر ${fmt(v.prix)}. هل ما زالت متوفرة؟\nرابط السيارة: ${vehicleShareUrl.href}`
+                    : `Bonjour ${s.nom}, je suis intéressé(e) par la ${v.marque} ${v.modele} (${v.annee}) affichée à ${fmt(v.prix)}. Est-elle toujours disponible ?\nFiche : ${vehicleShareUrl.href}`)
+              const vehicleWhatsAppHref = waLink(vehicleWhatsAppMessage, s.whatsapp)
               return (
                 <div key={v.id} className="veh-card" style={{ opacity: disabled ? .55 : 1 }}>
                   <div className="veh-card-top-overlay">
@@ -645,11 +655,16 @@ function PublicSiteInner() {
                       {disc > 0 && <span className="old">{fmt(v.prix_old)}</span>}
                     </div>
                   </div>
-                  {hasWhatsApp && <a className="veh-card-wa-bar"
-                    href={waLink(`Bonjour, je suis intéressé(e) par la ${v.marque} ${v.modele} affichée sur votre site.`, s.whatsapp)}
-                    target="_blank" rel="noreferrer" onClick={e => e.stopPropagation()}>
+                  {hasWhatsApp && vehicleWhatsAppHref && <a className="veh-card-wa-bar"
+                    href={vehicleWhatsAppHref}
+                    target="_blank" rel="noopener noreferrer"
+                    aria-label={disabled ? t.detail.whatsappSimilar : t.detail.whatsappQuestion}
+                    title={disabled ? t.detail.whatsappSimilar : t.detail.whatsappQuestion}
+                    onClick={e => e.stopPropagation()}>
                     <WhatsAppIcon size={20} />
-                    <span className="veh-card-wa-label">Discuter sur WhatsApp</span>
+                    <span className="veh-card-wa-label">{disabled
+                      ? (lang === 'ar' ? 'سيارة مشابهة' : 'Modèle similaire')
+                      : (lang === 'ar' ? 'استفسار WhatsApp' : 'Question WhatsApp')}</span>
                   </a>}
                   <div className="veh-card-body">
                     <div className="veh-card-top" style={{ cursor: 'pointer' }} onClick={() => openVehicleDetail(v)}>
