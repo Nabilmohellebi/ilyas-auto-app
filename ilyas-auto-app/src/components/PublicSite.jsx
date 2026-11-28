@@ -71,6 +71,7 @@ function PublicSiteInner() {
   const [bodyType, setBodyType] = useState('all')
   const [budget, setBudget] = useState('all')
   const [sort, setSort] = useState('default')
+  const [filtersExpanded, setFiltersExpanded] = useState(false)
   const [heroIdx, setHeroIdx] = useState(0)
 
   useEffect(() => {
@@ -366,6 +367,8 @@ function PublicSiteInner() {
     search.trim() || vehicleCondition !== 'all' || brand !== 'all' ||
     origin !== 'all' || bodyType !== 'all' || budget !== 'all' || sort !== 'default' || showFavorites
   )
+  const activeAdvancedFilterCount = [brand, origin, bodyType, budget, sort]
+    .filter(value => value !== 'all' && value !== 'default').length
 
   function togglePublicTheme(event) {
     // La bascule de thème ne doit pas rerendre tout le catalogue et ses nombreuses cartes.
@@ -521,34 +524,52 @@ function PublicSiteInner() {
           <button type="button" className={vehicleCondition === 'occasion' ? 'active' : ''} aria-pressed={vehicleCondition === 'occasion'} onClick={() => setVehicleCondition('occasion')}>🔄 {t.catalogue.occasions} <span>{usedVehicleCount}</span></button>
         </div>
 
-        <div className="filters-bar">
+        <div className={`filters-bar ${filtersExpanded ? 'is-expanded' : ''}`}>
           <input aria-label={t.catalogue.rechercher} placeholder={t.catalogue.rechercher} value={search} onChange={e => setSearch(e.target.value)} />
-          <select aria-label={t.catalogue.toutesMarques} value={brand} onChange={e => setBrand(e.target.value)}>
-            <option value="all">{t.catalogue.toutesMarques}</option>
-            {brands.map(b => <option key={b} value={b}>{b}</option>)}
-          </select>
-          <select aria-label={t.catalogue.toutesOrigines} value={origin} onChange={e => setOrigin(e.target.value)}>
-            <option value="all">{t.catalogue.toutesOrigines}</option>
-            {Object.entries(ORIGINS).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
-          </select>
-          <select aria-label={t.catalogue.carrosserie} value={bodyType} onChange={e => setBodyType(e.target.value)}>
-            <option value="all">{t.catalogue.carrosserie}</option>
-            {BODY_TYPES.map(b => <option key={b} value={b}>{b}</option>)}
-          </select>
-          <select aria-label={t.catalogue.toutBudget} value={budget} onChange={e => setBudget(e.target.value)}>
-            <option value="all">{t.catalogue.toutBudget}</option>
-            <option value="low">{t.catalogue.budgetLow}</option>
-            <option value="mid">{t.catalogue.budgetMid}</option>
-            <option value="high">{t.catalogue.budgetHigh}</option>
-          </select>
-          <select aria-label={t.catalogue.triDefaut} value={sort} onChange={e => setSort(e.target.value)}>
-            <option value="default">{t.catalogue.triDefaut}</option>
-            <option value="price_asc">{t.catalogue.prixCroissant}</option>
-            <option value="price_desc">{t.catalogue.prixDecroissant}</option>
-            <option value="year_desc">{t.catalogue.anneeRecent}</option>
-            <option value="year_asc">{t.catalogue.anneeAncien}</option>
-            <option value="km_asc">{t.catalogue.kmMoins}</option>
-          </select>
+          <button
+            type="button"
+            className="catalogue-filters-toggle"
+            aria-expanded={filtersExpanded}
+            aria-controls="catalogue-advanced-filters"
+            onClick={() => setFiltersExpanded(value => !value)}
+          >
+            <span className="catalogue-filters-toggle-label">
+              <span aria-hidden="true">⚙️</span>
+              {lang === 'ar' ? 'التصفية والفرز' : 'Filtres et tri'}
+            </span>
+            <span className="catalogue-filters-toggle-meta">
+              {activeAdvancedFilterCount > 0 && <span className="catalogue-filters-count">{activeAdvancedFilterCount}</span>}
+              <span aria-hidden="true">{filtersExpanded ? '−' : '+'}</span>
+            </span>
+          </button>
+          <div className="catalogue-advanced-filters" id="catalogue-advanced-filters">
+            <select aria-label={t.catalogue.toutesMarques} value={brand} onChange={e => setBrand(e.target.value)}>
+              <option value="all">{t.catalogue.toutesMarques}</option>
+              {brands.map(b => <option key={b} value={b}>{b}</option>)}
+            </select>
+            <select aria-label={t.catalogue.toutesOrigines} value={origin} onChange={e => setOrigin(e.target.value)}>
+              <option value="all">{t.catalogue.toutesOrigines}</option>
+              {Object.entries(ORIGINS).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
+            </select>
+            <select aria-label={t.catalogue.carrosserie} value={bodyType} onChange={e => setBodyType(e.target.value)}>
+              <option value="all">{t.catalogue.carrosserie}</option>
+              {BODY_TYPES.map(b => <option key={b} value={b}>{b}</option>)}
+            </select>
+            <select aria-label={t.catalogue.toutBudget} value={budget} onChange={e => setBudget(e.target.value)}>
+              <option value="all">{t.catalogue.toutBudget}</option>
+              <option value="low">{t.catalogue.budgetLow}</option>
+              <option value="mid">{t.catalogue.budgetMid}</option>
+              <option value="high">{t.catalogue.budgetHigh}</option>
+            </select>
+            <select aria-label={t.catalogue.triDefaut} value={sort} onChange={e => setSort(e.target.value)}>
+              <option value="default">{t.catalogue.triDefaut}</option>
+              <option value="price_asc">{t.catalogue.prixCroissant}</option>
+              <option value="price_desc">{t.catalogue.prixDecroissant}</option>
+              <option value="year_desc">{t.catalogue.anneeRecent}</option>
+              <option value="year_asc">{t.catalogue.anneeAncien}</option>
+              <option value="km_asc">{t.catalogue.kmMoins}</option>
+            </select>
+          </div>
         </div>
 
         {!loading && !stockError && vehicles.length > 0 && (
