@@ -1717,3 +1717,422 @@
     animation-iteration-count: 1 !important;
   }
 }
+
+
+/* ============================================================
+   NABIL AUTO — iOS-inspired customer flows
+   Vehicle detail, booking, trade-in and customer tracking.
+   ============================================================ */
+
+.app[data-theme] .vd-ov {
+  background: var(--theme-bg) !important;
+  color: var(--theme-text);
+  overscroll-behavior: contain;
+}
+
+.app[data-theme] .vd-layout {
+  gap: clamp(14px, 2vw, 24px);
+  padding: clamp(12px, 2vw, 24px);
+}
+
+.app[data-theme] .vd-gallery {
+  border: 1px solid var(--ios-glass-border);
+  border-radius: 26px;
+  box-shadow: var(--ios-shadow);
+}
+
+.app[data-theme] .vd-thumbs {
+  margin-top: 10px;
+  padding: 10px;
+  gap: 9px;
+  border: 1px solid var(--ios-glass-border);
+  border-radius: 18px;
+  background: var(--ios-glass);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+}
+
+.app[data-theme] .vd-thumb {
+  border: 2px solid transparent;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: border-color .2s ease, transform .2s ease, opacity .2s ease;
+}
+
+.app[data-theme] .vd-thumb.active {
+  border-color: var(--public-accent);
+  transform: translateY(-1px);
+}
+
+.app[data-theme] .vd-info {
+  border: 1px solid var(--ios-glass-border) !important;
+  border-radius: 28px !important;
+  padding: clamp(20px, 3vw, 30px) !important;
+  box-shadow: var(--ios-shadow) !important;
+}
+
+.app[data-theme] .vd-title {
+  letter-spacing: -.04em;
+  line-height: 1.14;
+}
+
+.app[data-theme] .vd-price-row {
+  align-items: baseline;
+  gap: 10px;
+  margin-block: 15px 20px;
+}
+
+.app[data-theme] .vd-specs-grid {
+  gap: 9px;
+}
+
+.app[data-theme] .vd-specs-grid > div {
+  min-height: 52px;
+  border-radius: 16px !important;
+  padding: 11px 12px;
+}
+
+.app[data-theme] .vd-section {
+  border: 1px solid var(--ios-glass-border) !important;
+  border-top: 1px solid var(--ios-glass-border) !important;
+  border-radius: 20px !important;
+  padding: 18px !important;
+  background: var(--ios-glass) !important;
+  box-shadow: 0 9px 24px rgba(0, 0, 0, .045);
+  -webkit-backdrop-filter: blur(15px);
+  backdrop-filter: blur(15px);
+}
+
+.app[data-theme] .vd-section h3 {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.app[data-theme] .vd-bottom {
+  background: var(--ios-glass-strong) !important;
+  border: 1px solid var(--ios-glass-border) !important;
+  border-bottom: 0 !important;
+  border-radius: 24px 24px 0 0;
+  padding: 12px max(16px, env(safe-area-inset-right)) calc(12px + env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+  -webkit-backdrop-filter: blur(26px) saturate(175%) !important;
+  backdrop-filter: blur(26px) saturate(175%) !important;
+  box-shadow: 0 -12px 32px rgba(0, 0, 0, .14) !important;
+}
+
+.app[data-theme] .vd-close-float {
+  width: 44px;
+  height: 44px;
+  top: max(14px, env(safe-area-inset-top));
+  left: max(14px, env(safe-area-inset-left));
+  border-radius: 50% !important;
+  border: 1px solid var(--ios-glass-border) !important;
+  background: var(--ios-glass-strong) !important;
+  color: var(--theme-text) !important;
+  -webkit-text-fill-color: currentColor !important;
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+  box-shadow: var(--ios-shadow) !important;
+  transition: transform .2s ease, background .2s ease;
+}
+
+.app[data-theme] .vd-close-float:active {
+  transform: scale(.92);
+}
+
+.app[data-theme] .vd-share-btn,
+.app[data-theme] .vd-print-btn,
+.app[data-theme] .vd-whatsapp-btn {
+  min-height: 46px;
+  border-radius: 15px !important;
+  transition: transform .2s ease, box-shadow .2s ease, filter .2s ease;
+}
+
+.app[data-theme] .vd-share-btn:active,
+.app[data-theme] .vd-print-btn:active,
+.app[data-theme] .vd-whatsapp-btn:active {
+  transform: scale(.98);
+}
+
+/* Shared iOS-like modal surface for reservation, trade-in and customer portal. */
+.app[data-theme] .res-ov {
+  padding: max(14px, env(safe-area-inset-top)) max(14px, env(safe-area-inset-right)) max(14px, env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-left));
+  background: rgba(5, 8, 12, .58) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(135%);
+  backdrop-filter: blur(18px) saturate(135%);
+  overscroll-behavior: contain;
+}
+
+.app[data-theme="ivory"] .res-ov {
+  background: rgba(51, 41, 29, .34) !important;
+}
+
+.app[data-theme] .res-box {
+  background: var(--ios-glass-strong) !important;
+  border: 1px solid var(--ios-glass-border) !important;
+  border-radius: 28px !important;
+  box-shadow: 0 28px 90px rgba(0, 0, 0, .32), inset 0 1px 0 rgba(255, 255, 255, .07) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(165%);
+  backdrop-filter: blur(28px) saturate(165%);
+  max-height: min(90dvh, 900px);
+  padding: clamp(20px, 4vw, 28px);
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+}
+
+.app[data-theme] .res-box :where(h2, h3) {
+  letter-spacing: -.035em;
+  line-height: 1.2;
+}
+
+.app[data-theme] .res-box .btn-close {
+  width: 38px;
+  height: 38px;
+  border-radius: 50% !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .1);
+}
+
+.app[data-theme] .res-box .form-field {
+  gap: 7px;
+}
+
+.app[data-theme] .res-box .form-field label {
+  font-size: 11px;
+  letter-spacing: .025em;
+}
+
+.app[data-theme] .res-box .form-field :where(input, select, textarea) {
+  min-height: 48px;
+  padding: 12px 14px;
+  border: 1px solid var(--ios-glass-border) !important;
+  border-radius: 15px !important;
+  background: var(--ios-control) !important;
+  color: var(--theme-text) !important;
+  -webkit-text-fill-color: currentColor !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .04);
+  transition: border-color .2s ease, box-shadow .2s ease, background .2s ease;
+}
+
+.app[data-theme] .res-box .form-field :where(input, select, textarea):focus {
+  border-color: var(--public-accent) !important;
+  box-shadow: 0 0 0 4px var(--public-accent-soft) !important;
+}
+
+.app[data-theme] .res-box .form-field textarea {
+  min-height: 94px;
+  resize: vertical;
+}
+
+.app[data-theme] .res-box .res-veh-preview {
+  border: 1px solid var(--ios-glass-border) !important;
+  border-radius: 18px !important;
+  padding: 12px !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .06);
+}
+
+.app[data-theme] .res-box .res-veh-preview img {
+  border-radius: 12px;
+}
+
+.app[data-theme] .res-calendar-picker {
+  border: 1px solid var(--ios-glass-border) !important;
+  border-radius: 20px !important;
+  padding: 14px !important;
+  background: var(--ios-control) !important;
+}
+
+.app[data-theme] .res-calendar-days button,
+.app[data-theme] .res-calendar-times button {
+  min-height: 44px;
+  border: 1px solid var(--ios-glass-border) !important;
+  border-radius: 13px !important;
+  background: var(--ios-glass) !important;
+  color: var(--theme-text) !important;
+  -webkit-text-fill-color: currentColor !important;
+  transition: transform .18s ease, border-color .18s ease, background .18s ease, box-shadow .18s ease;
+}
+
+.app[data-theme] .res-calendar-days button.active,
+.app[data-theme] .res-calendar-times button.active {
+  border-color: var(--public-accent) !important;
+  background: var(--public-accent-soft) !important;
+  box-shadow: inset 0 0 0 1px var(--public-accent);
+}
+
+.app[data-theme] .res-calendar-days button:active,
+.app[data-theme] .res-calendar-times button:active {
+  transform: scale(.97);
+}
+
+.app[data-theme] .res-box .btn-save {
+  min-height: 50px;
+  border-radius: 16px !important;
+  box-shadow: 0 9px 22px rgba(0, 0, 0, .14);
+  transition: transform .2s ease, box-shadow .2s ease, filter .2s ease;
+}
+
+.app[data-theme] .res-box .btn-save:active {
+  transform: scale(.985);
+}
+
+.app[data-theme] .trade-type-grid {
+  gap: 10px;
+}
+
+.app[data-theme] .trade-type-option {
+  min-height: 110px;
+  border: 1px solid var(--ios-glass-border) !important;
+  border-radius: 18px !important;
+  background: var(--ios-control) !important;
+  color: var(--theme-text) !important;
+  transition: transform .2s ease, border-color .2s ease, background .2s ease, box-shadow .2s ease;
+}
+
+.app[data-theme] .trade-type-option.active {
+  border-color: var(--public-accent) !important;
+  background: var(--public-accent-soft) !important;
+  box-shadow: inset 0 0 0 1px var(--public-accent), 0 8px 18px rgba(0, 0, 0, .07);
+}
+
+.app[data-theme] .trade-type-option:active {
+  transform: scale(.985);
+}
+
+.app[data-theme] .trade-form-section {
+  border: 1px solid var(--ios-glass-border) !important;
+  border-radius: 18px !important;
+  padding: 15px !important;
+  background: var(--ios-control) !important;
+}
+
+.app[data-theme] .trade-section-title {
+  margin-bottom: 12px;
+  letter-spacing: -.015em;
+}
+
+.app[data-theme] .trade-calculation {
+  border: 1px solid var(--ios-glass-border) !important;
+  border-radius: 18px !important;
+  padding: 14px !important;
+  background: var(--ios-glass) !important;
+}
+
+.app[data-theme] .trade-balance {
+  border-radius: 15px !important;
+}
+
+.app[data-theme] .track-modal .customer-portal-heading {
+  padding-right: 34px;
+}
+
+.app[data-theme] .customer-portal-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  min-height: 26px;
+  padding: 5px 10px;
+  border: 1px solid var(--ios-glass-border);
+  border-radius: 999px;
+  background: var(--ios-control);
+  color: var(--public-accent) !important;
+  font-size: 10px;
+  font-weight: 850;
+  letter-spacing: .08em;
+}
+
+.app[data-theme] .customer-portal-record {
+  border: 1px solid var(--ios-glass-border) !important;
+  border-radius: 18px !important;
+  padding: 15px !important;
+  background: var(--ios-control) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .045);
+}
+
+.app[data-theme] .customer-portal-record-details > div {
+  border: 1px solid var(--ios-glass-border);
+  border-radius: 12px;
+  padding: 9px 10px;
+  background: var(--ios-glass);
+}
+
+.app[data-theme] .customer-portal-pdf-button {
+  min-height: 40px;
+  padding: 9px 14px;
+  border: 1px solid var(--ios-glass-border);
+  border-radius: 999px;
+  background: var(--ios-glass);
+  color: var(--theme-text);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 800;
+  transition: transform .18s ease, background .18s ease;
+}
+
+.app[data-theme] .customer-portal-pdf-button:active {
+  transform: scale(.97);
+}
+
+@media (max-width: 640px) {
+  .app[data-theme] .vd-layout {
+    padding: 10px 10px calc(96px + env(safe-area-inset-bottom));
+    gap: 12px;
+  }
+
+  .app[data-theme] .vd-gallery {
+    border-radius: 20px;
+  }
+
+  .app[data-theme] .vd-thumbs {
+    border-radius: 15px;
+  }
+
+  .app[data-theme] .vd-info {
+    border-radius: 22px !important;
+    padding: 18px 15px 24px !important;
+  }
+
+  .app[data-theme] .vd-section {
+    border-radius: 17px !important;
+    padding: 15px !important;
+  }
+
+  .app[data-theme] .res-ov {
+    align-items: flex-end;
+    padding: 8px 8px max(8px, env(safe-area-inset-bottom));
+  }
+
+  .app[data-theme] .res-box {
+    width: 100%;
+    max-height: min(92dvh, 900px);
+    border-radius: 26px 26px 20px 20px !important;
+    padding: 22px 17px max(20px, env(safe-area-inset-bottom));
+  }
+
+  .app[data-theme] .res-box .btn-close {
+    top: 13px;
+    right: 13px;
+  }
+
+  .app[data-theme] .res-box .form-field :where(input, select, textarea) {
+    font-size: 16px !important;
+  }
+
+  .app[data-theme] .trade-type-option {
+    min-height: 102px;
+    padding: 12px;
+  }
+
+  .app[data-theme] .customer-portal-record-details {
+    gap: 8px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app[data-theme] .vd-ov *,
+  .app[data-theme] .res-ov *,
+  .app[data-theme] .vd-ov *::before,
+  .app[data-theme] .res-ov *::before {
+    transition-duration: .01ms !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
