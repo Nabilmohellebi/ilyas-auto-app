@@ -535,7 +535,7 @@ function PublicSiteInner() {
           >
             <span className="catalogue-filters-toggle-label">
               <span aria-hidden="true">⚙️</span>
-              {lang === 'ar' ? 'التصفية والفرز' : 'Filtres et tri'}
+              {filtersExpanded ? (lang === 'ar' ? 'إخفاء الفلاتر' : 'Masquer les filtres') : (lang === 'ar' ? 'التصفية والفرز' : 'Filtres et tri')}
             </span>
             <span className="catalogue-filters-toggle-meta">
               {activeAdvancedFilterCount > 0 && <span className="catalogue-filters-count">{activeAdvancedFilterCount}</span>}
