@@ -2136,3 +2136,266 @@
     animation-iteration-count: 1 !important;
   }
 }
+
+
+/* ============================================================
+   NABIL AUTO — iOS motion & page transitions
+   Short, calm motion for public content and customer overlays.
+   ============================================================ */
+
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes nabil-fade-up {
+    from { opacity: 0; transform: translate3d(0, 14px, 0); }
+    to { opacity: 1; transform: translate3d(0, 0, 0); }
+  }
+
+  @keyframes nabil-soft-fade {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes nabil-sheet-in {
+    from { opacity: 0; transform: translate3d(0, 18px, 0) scale(.985); }
+    to { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+  }
+
+  @keyframes nabil-mobile-sheet-in {
+    from { opacity: .65; transform: translate3d(0, 28px, 0); }
+    to { opacity: 1; transform: translate3d(0, 0, 0); }
+  }
+
+  @keyframes nabil-gallery-in {
+    from { opacity: 0; transform: scale(1.012); }
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  .app[data-theme] .hero-auto-content {
+    animation: nabil-fade-up .68s cubic-bezier(.2, .8, .2, 1) both;
+  }
+
+  .app[data-theme] .veh-card,
+  .app[data-theme] .testi-card,
+  .app[data-theme] .edito-card {
+    animation: nabil-fade-up .42s cubic-bezier(.2, .8, .2, 1) both;
+  }
+
+  .app[data-theme] .veh-card:nth-child(2),
+  .app[data-theme] .testi-card:nth-child(2),
+  .app[data-theme] .edito-card:nth-child(2) {
+    animation-delay: 35ms;
+  }
+
+  .app[data-theme] .veh-card:nth-child(3),
+  .app[data-theme] .testi-card:nth-child(3),
+  .app[data-theme] .edito-card:nth-child(3) {
+    animation-delay: 70ms;
+  }
+
+  .app[data-theme] .veh-card:nth-child(4),
+  .app[data-theme] .testi-card:nth-child(4),
+  .app[data-theme] .edito-card:nth-child(4) {
+    animation-delay: 105ms;
+  }
+
+  .app[data-theme] .vd-ov {
+    animation: nabil-soft-fade .22s ease-out both;
+  }
+
+  .app[data-theme] .vd-gallery {
+    animation: nabil-gallery-in .48s cubic-bezier(.2, .8, .2, 1) both;
+  }
+
+  .app[data-theme] .vd-info {
+    animation: nabil-fade-up .48s cubic-bezier(.2, .8, .2, 1) 45ms both;
+  }
+
+  .app[data-theme] .vd-detail-sections > .vd-section {
+    animation: nabil-fade-up .42s cubic-bezier(.2, .8, .2, 1) both;
+  }
+
+  .app[data-theme] .vd-detail-sections > .vd-section:nth-child(2) {
+    animation-delay: 55ms;
+  }
+
+  .app[data-theme] .vd-detail-sections > .vd-section:nth-child(3) {
+    animation-delay: 100ms;
+  }
+
+  .app[data-theme] .res-ov {
+    animation: nabil-soft-fade .2s ease-out both;
+  }
+
+  .app[data-theme] .res-box {
+    animation: nabil-sheet-in .34s cubic-bezier(.18, .89, .32, 1.12) both;
+  }
+
+  .app[data-theme] .cmp-ov,
+  .app[data-theme] .vehicle-search-overlay {
+    animation: nabil-soft-fade .2s ease-out both;
+  }
+
+  .app[data-theme] .cmp-box,
+  .app[data-theme] .vehicle-search-modal {
+    animation: nabil-sheet-in .34s cubic-bezier(.18, .89, .32, 1.12) both;
+  }
+
+  .app[data-theme] .veh-card,
+  .app[data-theme] .testi-card,
+  .app[data-theme] .edito-card,
+  .app[data-theme] .showroom-info-row,
+  .app[data-theme] .veh-thumb,
+  .app[data-theme] .vd-thumb,
+  .app[data-theme] .nav-wa-btn,
+  .app[data-theme] .footer-social a,
+  .app[data-theme] .footer-social button {
+    transition:
+      transform .24s cubic-bezier(.2, .8, .2, 1),
+      box-shadow .24s ease,
+      border-color .24s ease,
+      background-color .2s ease,
+      color .2s ease,
+      filter .2s ease;
+  }
+
+  .app[data-theme] .nav-links a {
+    position: relative;
+    transition: color .2s ease, opacity .2s ease;
+  }
+
+  .app[data-theme] .nav-links a::after {
+    content: "";
+    position: absolute;
+    right: 0;
+    bottom: -7px;
+    left: 0;
+    height: 2px;
+    border-radius: 999px;
+    background: var(--public-accent);
+    transform: scaleX(0);
+    transform-origin: center;
+    transition: transform .22s cubic-bezier(.2, .8, .2, 1);
+  }
+
+  .app[data-theme] .nav-links a:hover::after,
+  .app[data-theme] .nav-links a:focus-visible::after {
+    transform: scaleX(1);
+  }
+
+  .app[data-theme] :where(
+    .btn-hero-primary,
+    .btn-hero-secondary,
+    .btn-veh-reserve,
+    .btn-save,
+    .nav-wa-btn,
+    .veh-card-wa-bar,
+    .vehicle-search-cta-button,
+    .catalogue-filters-toggle,
+    .catalogue-favorites-toggle,
+    .catalogue-share-btn,
+    .catalogue-reset-btn,
+    .vd-share-btn,
+    .vd-print-btn,
+    .customer-portal-pdf-button
+  ) {
+    transition:
+      transform .2s cubic-bezier(.2, .8, .2, 1),
+      box-shadow .2s ease,
+      filter .2s ease,
+      background-color .2s ease;
+  }
+
+  .app[data-theme] :where(
+    .btn-hero-primary,
+    .btn-hero-secondary,
+    .btn-veh-reserve,
+    .btn-save,
+    .nav-wa-btn,
+    .veh-card-wa-bar,
+    .vehicle-search-cta-button,
+    .catalogue-filters-toggle,
+    .catalogue-favorites-toggle,
+    .catalogue-share-btn,
+    .catalogue-reset-btn,
+    .vd-share-btn,
+    .vd-print-btn,
+    .customer-portal-pdf-button
+  ):active {
+    transform: scale(.975);
+  }
+
+  .app[data-theme] .veh-card-img img {
+    transition: transform .62s cubic-bezier(.2, .7, .2, 1), filter .3s ease;
+  }
+
+  .app[data-theme] .veh-card:focus-within {
+    border-color: var(--public-accent) !important;
+    box-shadow: 0 0 0 3px var(--public-accent-soft), var(--ios-shadow) !important;
+  }
+
+  .app[data-theme] .vd-gallery img {
+    transition: opacity .22s ease, transform .42s cubic-bezier(.2, .7, .2, 1);
+  }
+
+  .app[data-theme] .vd-arrow,
+  .app[data-theme] .vd-dot,
+  .app[data-theme] .vd-close-float,
+  .app[data-theme] .btn-close {
+    transition: transform .2s cubic-bezier(.2, .8, .2, 1), background-color .2s ease, box-shadow .2s ease;
+  }
+
+  .app[data-theme] .vd-arrow:active,
+  .app[data-theme] .vd-close-float:active,
+  .app[data-theme] .btn-close:active {
+    transform: scale(.92);
+  }
+
+  .app[data-theme] :where(input, select, textarea) {
+    transition: border-color .2s ease, box-shadow .2s ease, background-color .2s ease;
+  }
+
+  .app[data-theme] .showroom-info-row:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--ios-shadow);
+  }
+}
+
+@media (max-width: 640px) and (prefers-reduced-motion: no-preference) {
+  .app[data-theme] .res-box {
+    animation-name: nabil-mobile-sheet-in;
+    animation-duration: .38s;
+    animation-timing-function: cubic-bezier(.18, .89, .32, 1.08);
+  }
+
+  .app[data-theme] .nav-mobile {
+    animation: nabil-mobile-sheet-in .24s cubic-bezier(.2, .8, .2, 1) both;
+  }
+}
+
+/* Avoid content hiding behind sticky navigation after in-page navigation. */
+.app[data-theme] {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html,
+  .app[data-theme] {
+    scroll-behavior: auto !important;
+  }
+
+  .app[data-theme] .veh-card,
+  .app[data-theme] .testi-card,
+  .app[data-theme] .edito-card,
+  .app[data-theme] .hero-auto-content,
+  .app[data-theme] .vd-ov,
+  .app[data-theme] .vd-gallery,
+  .app[data-theme] .vd-info,
+  .app[data-theme] .vd-detail-sections > .vd-section,
+  .app[data-theme] .res-ov,
+  .app[data-theme] .res-box,
+  .app[data-theme] .cmp-ov,
+  .app[data-theme] .cmp-box,
+  .app[data-theme] .vehicle-search-overlay,
+  .app[data-theme] .vehicle-search-modal {
+    animation: none !important;
+  }
+}
